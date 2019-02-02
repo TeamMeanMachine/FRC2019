@@ -31,6 +31,7 @@ repositories {
     mavenCentral()
     maven { setUrl("http://first.wpi.edu/FRC/roborio/maven/release") }
     maven { setUrl("http://devsite.ctr-electronics.com/maven/release/") }
+    maven { setUrl("http://maven.highcurrent.io/maven") }
 }
 
 dependencies {
