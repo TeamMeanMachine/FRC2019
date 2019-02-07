@@ -5,6 +5,7 @@ import org.team2471.frc.lib.Unproven
 import org.team2471.frc.lib.actuators.TalonSRX
 import org.team2471.frc.lib.framework.Subsystem
 import org.team2471.frc.lib.motion.following.SwerveDrive
+import org.team2471.frc.lib.motion.following.drive
 import org.team2471.frc.lib.motion_profiling.following.SwerveParameters
 import org.team2471.frc.lib.units.*
 
@@ -99,5 +100,9 @@ object Drive: Subsystem("Drive"), SwerveDrive {
 
         backLeftSteer.setMotionMagicSetpoint(backLeftAngle.asDegrees)
         backRightSteer.setMotionMagicSetpoint(backRightAngle.asDegrees)
+    }
+
+    override suspend fun default() {
+        drive(OI.driveTranslation, OI.driveRotation)
     }
 }
