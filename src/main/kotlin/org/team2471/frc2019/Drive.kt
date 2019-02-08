@@ -3,6 +3,7 @@ package org.team2471.frc2019
 import com.analog.adis16448.frc.ADIS16448_IMU
 import org.team2471.frc.lib.Unproven
 import org.team2471.frc.lib.actuators.TalonSRX
+import org.team2471.frc.lib.control.PDController
 import org.team2471.frc.lib.framework.Subsystem
 import org.team2471.frc.lib.motion.following.SwerveDrive
 import org.team2471.frc.lib.motion.following.drive
@@ -11,6 +12,10 @@ import org.team2471.frc.lib.units.*
 
 @Unproven
 object Drive: Subsystem("Drive"), SwerveDrive {
+    private const val P = 0.0
+    private const val D = 0.0
+    private const val dt = .02
+
     private val frontLeftMotor = TalonSRX(Talons.DRIVE_FRONTLEFT)
     private val frontRightMotor = TalonSRX(Talons.DRIVE_FRONTRIGHT)
 
@@ -22,6 +27,11 @@ object Drive: Subsystem("Drive"), SwerveDrive {
 
     private val backLeftSteer = TalonSRX(Talons.STEER_BACKLEFT)
     private val backRightSteer = TalonSRX(Talons.STEER_BACKRIGHT)
+
+    private val frontLeftController = PDController(P, D, dt)
+    private val frontRightController = PDController(P, D, dt)
+    private val backLeftController = PDController(P, D, dt)
+    private val backRightController = PDController(P, D, dt)
 
     private val gyro = ADIS16448_IMU()
 
@@ -95,11 +105,15 @@ object Drive: Subsystem("Drive"), SwerveDrive {
         backLeftMotor.setPercentOutput(backLeftPower)
         backRightMotor.setPercentOutput(backRightPower)
 
-        frontLeftSteer.setMotionMagicSetpoint(frontLeftAngle.asDegrees)
-        frontRightSteer.setMotionMagicSetpoint(frontRightAngle.asDegrees)
-
-        backLeftSteer.setMotionMagicSetpoint(backLeftAngle.asDegrees)
-        backRightSteer.setMotionMagicSetpoint(backRightAngle.asDegrees)
+        frontLeftSteer.setPercentOutput(frontLeftController.update(frontLeftAngle.asDegrees, frontLeftAngle.asDegrees))
+        backLeftSteer.setPercentOutput(backLeftController.update(backLeftAngle.asDegrees, backLeftAngle.asDegrees))
+        frontRightSteer.setPercentOutput(frontRightController.update(frontRightAngle.asDegrees, frontRightAngle.asDegrees))
+        backRightSteer.setPercentOutput(backRightController.update(backRightAngle.asDegrees, backRightAngle.asDegrees))
+//        frontLeftSteer.setMotionMagicSetpoint(frontLeftAngle.asDegrees)
+//        frontRightSteer.setMotionMagicSetpoint(frontRightAngle.asDegrees)
+//
+//        backLeftSteer.setMotionMagicSetpoint(backLeftAngle.asDegrees)
+//        backRightSteer.setMotionMagicSetpoint(backRightAngle.asDegrees)
     }
 
     override suspend fun default() {

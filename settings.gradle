@@ -24,6 +24,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'atlas2019'
+rootProject.name = 'frc2019'
 
 include 'meanlib'
