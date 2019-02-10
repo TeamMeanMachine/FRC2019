@@ -5,7 +5,7 @@ plugins {
     id "edu.wpi.first.GradleRIO" version "2019.2.1"
 }
 
-def MAIN_CLASS = "org.team2471.atlas2019.RobotKt"
+def MAIN_CLASS = "org.team2471.frc2019.Main"
 
 deploy {
     targets {
