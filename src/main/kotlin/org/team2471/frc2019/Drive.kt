@@ -10,17 +10,29 @@ import org.team2471.frc.lib.motion_profiling.following.SwerveParameters
 import org.team2471.frc.lib.units.*
 
 object Drive : Subsystem("Drive"), SwerveDrive {
-    override val frontLeftModule =
-        Module(MotorController(TalonID(Talons.DRIVE_FRONTLEFT)), MotorController(TalonID(Talons.STEER_FRONTLEFT)), false)
+    override val frontLeftModule = Module(
+        MotorController(TalonID(Talons.DRIVE_FRONTLEFT)),
+        MotorController(TalonID(Talons.STEER_FRONTLEFT)),
+        false
+    )
 
-    override val frontRightModule =
-        Module(MotorController(TalonID(Talons.DRIVE_FRONTRIGHT)), MotorController(TalonID(Talons.STEER_FRONTRIGHT)), false)
+    override val frontRightModule = Module(
+        MotorController(TalonID(Talons.DRIVE_FRONTRIGHT)),
+        MotorController(TalonID(Talons.STEER_FRONTRIGHT)),
+        false
+    )
 
-    override val backLeftModule =
-        Module(MotorController(TalonID(Talons.DRIVE_BACKLEFT)), MotorController(TalonID(Talons.STEER_BACKLEFT)), true)
+    override val backLeftModule = Module(
+        MotorController(TalonID(Talons.DRIVE_BACKLEFT)),
+        MotorController(TalonID(Talons.STEER_BACKLEFT)),
+        true
+    )
 
-    override val backRightModule =
-        Module(MotorController(TalonID(Talons.DRIVE_BACKRIGHT)), MotorController(TalonID(Talons.STEER_BACKRIGHT)), true)
+    override val backRightModule = Module(
+        MotorController(TalonID(Talons.DRIVE_BACKRIGHT)),
+        MotorController(TalonID(Talons.STEER_BACKRIGHT)),
+        true
+    )
 
     private val gyro = SpinMaster16448()
 
@@ -39,7 +51,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 //        }
 //    }
 
-    class Module(private val driveMotor: MotorController, private val turnMotor: MotorController, isBack: Boolean) :
+    class Module(val driveMotor: MotorController, private val turnMotor: MotorController, isBack: Boolean) :
         SwerveDrive.Module {
 
         companion object {
@@ -64,14 +76,12 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                 encoderContinuous(false)
                 inverted(true)
                 sensorPhase(true)
+                currentLimit(30, 0, 0)
             }
             driveMotor.config {
                 inverted(isBack)
+                currentLimit(30, 0, 0)
             }
-        }
-
-        fun setRampRate(timeToFull: Time) {
-            driveMotor.config(0) { openLoopRamp(timeToFull.asSeconds) }
         }
 
         override fun drive(angle: Angle, power: Double) {
@@ -79,14 +89,14 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             val current = this.angle
             val error = (angle - current).wrap()
             val turnPower = pdController.update(error.asDegrees)
-            println(
-                "Angle: %.3f\tTarget: %.3f\tError: %.3f\tPower: %.3f".format(
-                    current.asDegrees,
-                    angle.asDegrees,
-                    error.asDegrees,
-                    turnPower
-                )
-            )
+//            println(
+//                "Angle: %.3f\tTarget: %.3f\tError: %.3f\tPower: %.3f".format(
+//                    current.asDegrees,
+//                    angle.asDegrees,
+//                    error.asDegrees,
+//                    turnPower
+//                )
+//            )
 
             turnMotor.setPercentOutput(turnPower)
         }

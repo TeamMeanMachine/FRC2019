@@ -17,18 +17,24 @@ object Talons {
 
     const val ELEVATOR_MASTER = 4
 
-    const val ARM_MASTER = 7
+    const val ARM_MASTER = 8
 
-    const val OB1_INTAKE = 8
+    const val OB1_INTAKE = 7
 
     const val OB1_PIVOT_MASTER = 11
 }
 
 object Victors {
     const val ELEVATOR_SLAVE = 5
-    const val ARM_SLAVE = 6
+    const val ARM_SLAVE = 9
 
-    const val HIGH_INTAKE = 9
+    const val RESERVED = 6
 
     const val OB1_PIVOT_SLAVE = 10
+}
+
+object Solenoids {
+    const val BALL_INTAKE = 0
+    const val HATCH_INTAKE = 1
+    const val SHIFTER = 2
 }
