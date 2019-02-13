@@ -1,11 +1,14 @@
 package org.team2471.frc2019
 
+import com.analog.adis16448.frc.ADIS16448_IMU
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import org.team2471.frc.lib.actuators.MotorController
 import org.team2471.frc.lib.actuators.TalonID
 import org.team2471.frc.lib.control.PDController
+import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.Subsystem
 import org.team2471.frc.lib.motion.following.SwerveDrive
+import org.team2471.frc.lib.motion.following.drive
 import org.team2471.frc.lib.motion_profiling.following.SwerveParameters
 import org.team2471.frc.lib.units.*
 
@@ -34,22 +37,24 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         true
     )
 
-    private val gyro = SpinMaster16448()
+//    private val gyro = SpinMaster16448()
+    private val gyro = ADIS16448_IMU()
 
     override val heading: Angle
-        get() = gyro.angle.degrees
+        get() = -gyro.angleX.degrees.wrap()
 
     override val headingRate: AngularVelocity
-        get() = gyro.rate.degrees.perSecond
+        get() = gyro.rateX.degrees.perSecond
 
     override val parameters: SwerveParameters = SwerveParameters(20.5, 21.0, 0.0)
 
-//    override suspend fun default() {
-//        drive(OI.driveTranslation, OI.driveRotation)
-//        periodic {
-//            println(frontLeftModule.angle.asDegrees)
-//        }
-//    }
+    fun zeroGyro() = gyro.reset()
+
+    override suspend fun default() {
+        periodic {
+            drive(OI.driveTranslation, OI.driveRotation)
+        }
+    }
 
     class Module(val driveMotor: MotorController, private val turnMotor: MotorController, isBack: Boolean) :
         SwerveDrive.Module {
@@ -80,6 +85,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             }
             driveMotor.config {
                 inverted(isBack)
+                brakeMode()
                 currentLimit(30, 0, 0)
             }
         }

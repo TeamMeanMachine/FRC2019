@@ -13,8 +13,8 @@ import org.team2471.frc.lib.units.degrees
 import org.team2471.frc.lib.units.seconds
 
 object OI {
-    private val driverController = XboxController(0)
-    private val operatorController = XboxController(1)
+    val driverController = XboxController(0)
+    val operatorController = XboxController(1)
 
     val driveTranslationX: Double
         get() = driverController.getRawAxis(0).deadband(0.2).squareWithSign()
@@ -29,8 +29,11 @@ object OI {
         get() = (driverController.getRawAxis(4).deadband(0.2)).squareWithSign()
 
 
-    val leftYStick: Double
-        get() = operatorController.getRawAxis(0)
+    val operatorLeftYStick: Double
+        get() = -operatorController.getRawAxis(1).deadband(0.15)
+
+    val operatorRightYStick: Double
+        get() = -operatorController.getRawAxis(5).deadband(0.15)
 
     val rightYStick: Double
         get() = -driverController.getRawAxis(5).deadband(0.2)
