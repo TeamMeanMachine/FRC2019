@@ -37,14 +37,14 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         true
     )
 
-//    private val gyro = SpinMaster16448()
-    private val gyro = ADIS16448_IMU()
+    private val gyro = SpinMaster16448()
+//    private val gyro = ADIS16448_IMU()
 
     override val heading: Angle
-        get() = -gyro.angleX.degrees.wrap()
+        get() = -gyro.angle.degrees.wrap()   //getX .degrees.wrap()
 
     override val headingRate: AngularVelocity
-        get() = gyro.rateX.degrees.perSecond
+        get() = gyro.rate.degrees.perSecond
 
     override val parameters: SwerveParameters = SwerveParameters(20.5, 21.0, 0.0)
 
@@ -53,6 +53,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     override suspend fun default() {
         periodic {
             drive(OI.driveTranslation, OI.driveRotation)
+//            println(heading)
         }
     }
 

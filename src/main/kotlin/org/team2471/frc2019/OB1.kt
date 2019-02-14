@@ -48,9 +48,9 @@ object OB1 : Subsystem("OB1") {
 
     private val pivotRange = -2.0..180.0
 
-    private val topExtent = Vector2(-8.0, -1.0)
+    private val topExtent = Vector2(8.0, -1.0)
 
-    private val bottomExtent = Vector2(-8.0, -11.0)
+    private val bottomExtent = Vector2(8.0, -11.0)
 
     val collisionZone: DoubleRange
         get() {
@@ -91,7 +91,7 @@ object OB1 : Subsystem("OB1") {
             OB1.pivot(ob1Setpoint)
             intake(OI.operatorController.getTriggerAxis(GenericHID.Hand.kLeft))
             val collisionZone = collisionZone
-            println("%.3f -> %.3f..%.3f".format(angle.asDegrees, collisionZone.start, collisionZone.endInclusive))
+//            println("%.3f -> %.3f..%.3f".format(angle.asDegrees, collisionZone.start, collisionZone.endInclusive))
         }
     }
 

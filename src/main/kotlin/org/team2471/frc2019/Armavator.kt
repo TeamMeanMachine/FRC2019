@@ -25,6 +25,9 @@ import org.team2471.frc2019.Victors.ELEVATOR_SLAVE
 object Armavator : Subsystem("Armavator") {
     private const val ARM_OFFSET = -119.22
     private const val ELEVATOR_FEED_FORWARD = 0.1
+    private const val ELEVATOR_HEIGHT = 21.5 //inches
+    private const val ARM_LENGTH = 28.0 //inches
+    private const val COLLISION_SAFETY_FACTOR = 6.0 //inches
 
     val elevatorMotors = MotorController(TalonID(ELEVATOR_MASTER), VictorID(ELEVATOR_SLAVE)).config {
         encoderType(FeedbackDevice.Analog)
@@ -59,6 +62,9 @@ object Armavator : Subsystem("Armavator") {
 
     private val heightRange: DoubleRange = -0.1..15.0 // inches
 
+    val collisionZone: DoubleRange
+        get() = (clawHeight.asInches - COLLISION_SAFETY_FACTOR)..(clawHeight.asInches + COLLISION_SAFETY_FACTOR)
+
     val height: Length
         get() = elevatorMotors.position.inches
 
@@ -73,13 +79,15 @@ object Armavator : Subsystem("Armavator") {
         get() = pinchSolenoid.get()
         set(value) = pinchSolenoid.set(value)
 
+    private val clawHeight: Length
+        get() = ELEVATOR_HEIGHT.inches + height + (Math.sin(angle.asRadians) * ARM_LENGTH).inches
 
     init {
         elevatorMotors.position = 0.0
     }
 
     fun setArmSetpoint(angle: Angle) {
-        println("Setpoint:${angle.asDegrees}, Current: ${this.angle.asDegrees}, Power: ${armMotors.output}")
+//        println("Setpoint:${angle.asDegrees}, Current: ${this.angle.asDegrees}, Power: ${armMotors.output}")
         armMotors.setPositionSetpoint(angle.asDegrees - ARM_OFFSET)
     }
 
@@ -97,11 +105,18 @@ object Armavator : Subsystem("Armavator") {
     }
 
     override suspend fun default() {
+        var armSetpoint = angle
+        var elevatorSetpoint = height
         periodic {
-            elevateRaw(OI.operatorLeftYStick * 0.3)
-            setArmRaw(OI.operatorRightYStick * 0.3)
+            armSetpoint += (OI.operatorRightYStick * 50.0 * period).degrees
+            elevatorSetpoint += (OI.operatorLeftYStick * 7 * period).inches
+            elevate(elevatorSetpoint)
+            setArmSetpoint(armSetpoint)
             isPinching = OI.operatorController.getBumper(GenericHID.Hand.kRight)
             isClamping = !OI.operatorController.getBumper(GenericHID.Hand.kLeft)
+            val clawHeight = clawHeight
+            val collisionZone = collisionZone
+            println(clawHeight)
         }
     }
 }
