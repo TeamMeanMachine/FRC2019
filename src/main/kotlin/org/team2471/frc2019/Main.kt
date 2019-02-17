@@ -12,30 +12,56 @@ import org.team2471.frc.lib.framework.runRobotProgram
 import org.team2471.frc.lib.motion.following.drive
 import org.team2471.frc.lib.units.asDegrees
 import org.team2471.frc.lib.units.degrees
+import org.team2471.frc.lib.units.inches
 import kotlin.concurrent.thread
 
 object Robot: RobotProgram {
+    override suspend fun enable() {
+        Armavator.heightSetpoint = Armavator.height
+        Armavator.angleSetpoint = Armavator.angle
+        OB1.pivotSetpoint = OB1.angle
+        Armavator.enable()
+        OB1.enable()
+        Drive.disable()
+    }
 
     override suspend fun autonomous() {
     }
 
     override suspend fun teleop() {
         Drive.zeroGyro()
+        periodic {
+            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
+        }
     }
 
     override suspend fun test() {
+
+
+//        val startingHeight = Armavator.height
+//        val startingAngle = Armavator.angle
+//        repeat(0) {
+//            Armavator.animate(6.0.inches, 0.degrees)
+//            Armavator.animate(startingHeight, startingAngle)
+//        }
+//
+//        OB1.animateToAngle(90.0.degrees)
+//        OB1.animateToAngle(0.degrees)
     }
 
     override suspend fun disable() {
+        Armavator.disable()
+        OB1.disable()
+        Drive.disable()
     }
 }
 
 fun main() {
     initializeWpilib()
 
-    Drive.enable()
-    Armavator.enable()
-    OB1.enable()
+    Drive
+    Armavator
+    OB1
 
     runRobotProgram(Robot)
 }

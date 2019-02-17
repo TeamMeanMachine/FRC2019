@@ -2,6 +2,7 @@ package org.team2471.frc2019
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import edu.wpi.first.wpilibj.GenericHID
+import edu.wpi.first.wpilibj.Timer
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.team2471.frc.lib.actuators.MotorController
@@ -16,12 +17,14 @@ import org.team2471.frc.lib.framework.Subsystem
 import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.math.DoubleRange
 import org.team2471.frc.lib.math.Vector2
+import org.team2471.frc.lib.math.cubicMap
 import org.team2471.frc.lib.testing.smoothDrivePosition
 import org.team2471.frc.lib.units.*
 import org.team2471.frc2019.Talons.OB1_INTAKE
 import org.team2471.frc2019.Talons.OB1_PIVOT_MASTER
 import org.team2471.frc2019.Victors.OB1_PIVOT_SLAVE
 import javax.xml.bind.JAXBElement
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
@@ -67,9 +70,12 @@ object OB1 : Subsystem("OB1") {
 
     const val BALL_INTAKE_PRESET = 67.0
 
-    fun pivot(angle: Angle) {
-        pivotMotors.setPositionSetpoint(angle.asDegrees.coerceIn(pivotRange))
-    }
+
+    var pivotSetpoint: Angle = angle
+        set(value) {
+            field = value.asDegrees.coerceIn(pivotRange).degrees
+            pivotMotors.setPositionSetpoint(field.asDegrees)
+        }
 
     fun pivotRaw(power: Double) {
         pivotMotors.setPercentOutput(power)
@@ -80,26 +86,36 @@ object OB1 : Subsystem("OB1") {
         intakeMotor.setPercentOutput(power)
     }
 
-    suspend fun animateToAngle(angle: Angle, time: Time) = use(this) {
-        pivotMotors.smoothDrivePosition(angle.asDegrees, time)
-    }
-
     override suspend fun default() {
-        var ob1Setpoint = OB1.angle
         periodic {
-            ob1Setpoint += (OI.rightYStick * 80.0 * period).degrees
-            OB1.pivot(ob1Setpoint)
+            pivotSetpoint += (OI.rightYStick * 80.0 * period).degrees
             intake(OI.operatorController.getTriggerAxis(GenericHID.Hand.kLeft))
-            val collisionZone = collisionZone
 //            println("%.3f -> %.3f..%.3f".format(angle.asDegrees, collisionZone.start, collisionZone.endInclusive))
         }
     }
 
 }
 
+suspend fun OB1.animateToAngle(
+    angle: Angle,
+    time: Time = 1.5.seconds * (abs((this.angle - angle).asDegrees) / 180.0) // 1.5 seconds per 180 degrees
+) = use(this) {
+    println("OBI animating to $angle")
+    val timer = Timer()
+    timer.start()
+    val startingAngle = OB1.angle
+    periodic {
+        pivotSetpoint = cubicMap(0.0, time.asSeconds, startingAngle.asDegrees, angle.asDegrees, timer.get()).degrees
+
+        if (timer.get().seconds >= time) {
+            stop()
+        }
+    }
+}
+
 suspend fun OB1.intakeHatch() = use(OB1) {
     periodic {
-        pivot(0.degrees)
+        pivotSetpoint = 0.degrees
         intake(-0.5)
     }
 }

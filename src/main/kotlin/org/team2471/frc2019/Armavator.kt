@@ -2,6 +2,7 @@ package org.team2471.frc2019
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import com.ctre.phoenix.motorcontrol.can.TalonSRX
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.GenericHID
 import edu.wpi.first.wpilibj.Solenoid
 import org.team2471.frc.lib.actuators.MotorController
@@ -21,13 +22,15 @@ import org.team2471.frc2019.Talons.ARM_MASTER
 import org.team2471.frc2019.Talons.ELEVATOR_MASTER
 import org.team2471.frc2019.Victors.ARM_SLAVE
 import org.team2471.frc2019.Victors.ELEVATOR_SLAVE
+import kotlin.math.abs
 
 object Armavator : Subsystem("Armavator") {
     private const val ARM_OFFSET = -119.22
     private const val ELEVATOR_FEED_FORWARD = 0.1
-    private const val ELEVATOR_HEIGHT = 21.5 //inches
-    private const val ARM_LENGTH = 28.0 //inches
+    const val ELEVATOR_HEIGHT = 21.5 //inches
+    const val ARM_LENGTH = 28.0 //inches
     private const val COLLISION_SAFETY_FACTOR = 6.0 //inches
+    private const val ARM_SAFETY_CAP = 30.0 // degrees
 
     val elevatorMotors = MotorController(TalonID(ELEVATOR_MASTER), VictorID(ELEVATOR_SLAVE)).config {
         encoderType(FeedbackDevice.Analog)
@@ -60,10 +63,8 @@ object Armavator : Subsystem("Armavator") {
     private val clawSolenoid = Solenoid(BALL_INTAKE)
     private val pinchSolenoid = Solenoid(HATCH_INTAKE)
 
-    private val heightRange: DoubleRange = -0.1..15.0 // inches
-
-    val collisionZone: DoubleRange
-        get() = (clawHeight.asInches - COLLISION_SAFETY_FACTOR)..(clawHeight.asInches + COLLISION_SAFETY_FACTOR)
+    private val heightRange: DoubleRange = -0.1..26.0 // inches
+    private val armRange: DoubleRange = -74.0..64.0 // degrees
 
     val height: Length
         get() = elevatorMotors.position.inches
@@ -79,21 +80,25 @@ object Armavator : Subsystem("Armavator") {
         get() = pinchSolenoid.get()
         set(value) = pinchSolenoid.set(value)
 
-    private val clawHeight: Length
-        get() = ELEVATOR_HEIGHT.inches + height + (Math.sin(angle.asRadians) * ARM_LENGTH).inches
+    var angleSetpoint: Angle = angle
+        set(value) {
+            field = value.asDegrees.coerceIn(armRange).degrees
+
+            if(abs(field.asDegrees - angle.asDegrees) > ARM_SAFETY_CAP) {
+                DriverStation.reportWarning("The Arm is moving too fast!", false)
+            }
+
+            armMotors.setPositionSetpoint((field.asDegrees - ARM_OFFSET))
+        }
+
+    var heightSetpoint: Length = height
+        set(value) {
+            field = value.asInches.coerceIn(heightRange).inches
+            elevatorMotors.setPositionSetpoint(field.asInches, ELEVATOR_FEED_FORWARD)
+        }
 
     init {
         elevatorMotors.position = 0.0
-    }
-
-    fun setArmSetpoint(angle: Angle) {
-//        println("Setpoint:${angle.asDegrees}, Current: ${this.angle.asDegrees}, Power: ${armMotors.output}")
-        armMotors.setPositionSetpoint(angle.asDegrees - ARM_OFFSET)
-    }
-
-    fun elevate(height: Length) {
-//        println("Setpoint:$height, Current: ${this.height}, Power: ${elevatorMotors.output}")
-        elevatorMotors.setPositionSetpoint(height.asInches.coerceIn(heightRange))
     }
 
     fun elevateRaw(power: Double) {
@@ -104,31 +109,49 @@ object Armavator : Subsystem("Armavator") {
         armMotors.setPercentOutput(power)
     }
 
+    fun printDebugInfo() {
+        println("Arm Angle: %.3f\tArm Setpoint: %.3f".format(angle.asDegrees, angleSetpoint.asDegrees))
+        println("Elevator Height: %.3f\tElevator Setpoint: %.3f".format(height.asInches, heightSetpoint.asInches))
+    }
+
     override suspend fun default() {
-        var armSetpoint = angle
-        var elevatorSetpoint = height
         periodic {
-            armSetpoint += (OI.operatorRightYStick * 50.0 * period).degrees
-            elevatorSetpoint += (OI.operatorLeftYStick * 7 * period).inches
-            elevate(elevatorSetpoint)
-            setArmSetpoint(armSetpoint)
-            isPinching = OI.operatorController.getBumper(GenericHID.Hand.kRight)
-            isClamping = !OI.operatorController.getBumper(GenericHID.Hand.kLeft)
-            val clawHeight = clawHeight
-            val collisionZone = collisionZone
-            println(clawHeight)
+//            printDebugInfo()
+            angleSetpoint += (OI.operatorRightYStick * 50.0 * period).degrees
+            heightSetpoint += (OI.operatorLeftYStick * 7 * period).inches
         }
     }
 }
 
-suspend fun Armavator.smoothDrivePosition(height: Length, time: Time) = use(this) {
+suspend fun Armavator.smoothDrivePosition(height: Length, time: Time = 1.5.seconds) = use(this) { //TODO: do a smarter time default later
     val timer = Timer()
     timer.start()
     periodic {
         val position = cubicMap(0.0, time.asSeconds, Armavator.height.asInches, height.asInches, timer.get()).inches
-        elevate(position)
+        heightSetpoint = position
 
         if (timer.get().seconds >= time) {
+            stop()
+        }
+    }
+}
+
+/**
+ * goes to the specified position w/o consideration of the ob1
+ */
+suspend fun Armavator.animate(height: Length, angle: Angle, time: Time = 1.5.seconds) = use(this){//TODO: do a smarter time default later
+    println("Animating Armavator to $height, $angle")
+    val timer = Timer()
+    timer.start()
+    val startingHeight = Armavator.height
+    val startingAngle = Armavator.angle
+    periodic {
+        val t = timer.get()
+        heightSetpoint = cubicMap(0.0, time.asSeconds, startingHeight.asInches, height.asInches, t).inches
+        angleSetpoint = cubicMap(0.0, time.asSeconds, startingAngle.asDegrees, angle.asDegrees, t).degrees
+
+
+        if (t.seconds >= time) {
             stop()
         }
     }

@@ -24,14 +24,14 @@ class SpinMaster16448 : Gyro {
     override fun free() = Unit
 
     init {
-        thread {
-            val serialPort = SerialPort(115200, SerialPort.Port.kMXP).apply {
-                enableTermination()
-            }
-            while (true) {
-                val message = serialPort.readString()
-                yaw = message.toDoubleOrNull() ?: continue
-            }
-        }
+//        thread {
+//            val serialPort = SerialPort(115200, SerialPort.Port.kMXP).apply {
+//                enableTermination()
+//            }
+//            while (true) {
+//                val message = serialPort.readString()
+//                yaw = message.toDoubleOrNull() ?: continue
+//            }
+//        }
     }
 }
