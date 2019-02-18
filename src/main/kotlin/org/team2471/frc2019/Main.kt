@@ -54,9 +54,10 @@ object Robot: RobotProgram {
         OB1.disable()
         Drive.disable()
 
-//        periodic {
-//            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
-//        }
+        periodic {
+            //println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
+            //println("LeftAngle: ${Drive.frontLeftModule.angle}, " + "RightAngle: ${Drive.frontRightModule.angle} "
+        }
     }
 }
 
