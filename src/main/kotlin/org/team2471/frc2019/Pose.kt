@@ -23,8 +23,9 @@ data class Pose(
     companion object {
         val STARTING_POSITION = Pose(0.inches, (-74).degrees, 90.degrees, true)
         val HOME = Pose(0.inches, (-74).degrees, 0.degrees, true)
-        val SAFETY_POSE = Pose(8.inches, (-74).degrees, 0.degrees, false)
+        val SAFETY_POSE = Pose(14.inches, (-74).degrees, 0.degrees, false)
 
+        val HATCH_GROUND_PICKUP = Pose(14.inches, (-74).degrees, (-2).degrees, false)
         val HATCH_HANDOFF = Pose(4.inches, (-20).degrees, 97.degrees, false)
         val HATCH_CARRY = Pose(7.inches, (-69).degrees, 1.degrees, false)
         val HATCH_SCORE_1 = Pose(0.inches, (-24).degrees, 6.degrees, false)
@@ -32,8 +33,8 @@ data class Pose(
         val HATCH_SCORE_3 = Pose(25.8.inches, 22.3.degrees, 6.degrees, false)
 
 
-        val CLIMB_START = Pose(1.inches, 19.degrees, 120.degrees, false, isClimbing = true)
-        val LIFTED = Pose((-18).inches, 19.degrees, 0.degrees, false, isClimbing = true)
+        val CLIMB_START = Pose(1.inches, 18.degrees, 120.degrees, false, isClimbing = true)
+        val LIFTED = Pose((-20).inches, 64.degrees, (-2).degrees, false, isClimbing = true)
     }
 }
 

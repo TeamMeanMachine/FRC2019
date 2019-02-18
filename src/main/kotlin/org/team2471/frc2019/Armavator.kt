@@ -48,6 +48,7 @@ object Armavator : Subsystem("Armavator") {
         encoderContinuous(false)
         inverted(true)
         sensorPhase(true)
+        brakeMode()
         feedbackCoefficient = 0.2586
         (ctreController as TalonSRX)
             .sensorCollection
@@ -125,10 +126,6 @@ object Armavator : Subsystem("Armavator") {
             angleSetpoint += (OI.operatorRightYStick * 50.0 * period).degrees
             heightSetpoint += (OI.operatorLeftYStick * 7 * period).inches
         }
-    }
-
-    override fun reset() {
-        isClimbing = false
     }
 }
 

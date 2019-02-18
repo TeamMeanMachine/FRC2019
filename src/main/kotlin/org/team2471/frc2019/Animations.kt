@@ -54,6 +54,14 @@ class Animation(private vararg val keyFrames: KeyFrame) {
             KeyFrame(0.seconds, Pose.CLIMB_START),
             KeyFrame(5.seconds, Pose.LIFTED)
         )
+        val HOME_TO_GROUND_PICKUP = Animation(
+            KeyFrame(0.seconds, Pose.HOME),
+            KeyFrame(0.5.seconds, Pose.HATCH_GROUND_PICKUP)
+        )
+        val GROUND_PICKUP_TO_HATCH_HANDOFF = Animation(
+            KeyFrame(0.seconds, Pose.HATCH_GROUND_PICKUP),
+            KeyFrame(1.seconds, Pose.HATCH_HANDOFF)
+        )
 
         val RETURN_TO_HOME: Animation
             get() {

@@ -6,13 +6,16 @@ import kotlinx.coroutines.yield
 import org.team2471.frc.lib.coroutines.delay
 import org.team2471.frc.lib.coroutines.halt
 import org.team2471.frc.lib.coroutines.parallel
+import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.*
 import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.math.deadband
 import org.team2471.frc.lib.math.squareWithSign
+import org.team2471.frc.lib.motion.following.drive
 import org.team2471.frc.lib.units.degrees
 import org.team2471.frc.lib.units.inches
 import org.team2471.frc.lib.units.seconds
+import org.team2471.frc.lib.util.Timer
 
 object OI {
     val driverController = XboxController(0)
@@ -63,10 +66,20 @@ object OI {
                 }
             }
             aPress {
-                Animation.HOME_TO_START_CLIMB.play()
+//                Animation.HOME_TO_START_CLIMB.play()
+                Animation.HOME_TO_GROUND_PICKUP.play()
             }
             bPress {
-                Animation.START_CLIMB_TO_LIFTED.play()
+//                Animation.START_CLIMB_TO_LIFTED.play()
+//
+//                val timer = Timer()
+//                timer.start()
+//                periodic {
+//                    if (timer.get() >= 2.5) return@periodic stop()
+//                    OB1.intake(-1.0)
+//                    Drive.drive(Vector2(0.0, 0.8), 0.0, false)
+//                }
+               Animation.GROUND_PICKUP_TO_HATCH_HANDOFF.play()
             }
 
         }
@@ -81,9 +94,14 @@ object OI {
 
             xPress {
                 use(Armavator, OB1) {
-                    Animation.START_TO_HANDOFF.play()
-                    delay(1.0)
-                    Animation.HANDOFF_TO_HATCH_CARRY.play()
+                    try {
+                        Animation.START_TO_HANDOFF.play()
+                        delay(1.0)
+                        Animation.HANDOFF_TO_HATCH_CARRY.play()
+                        halt()
+                    } finally {
+                        Armavator.isClimbing = false
+                    }
                 }
             }
             aPress {
