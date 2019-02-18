@@ -22,7 +22,7 @@ object Robot: RobotProgram {
         OB1.pivotSetpoint = OB1.angle
         Armavator.enable()
         OB1.enable()
-        Drive.disable()
+        Drive.enable()
     }
 
     override suspend fun autonomous() {
@@ -30,9 +30,9 @@ object Robot: RobotProgram {
 
     override suspend fun teleop() {
         Drive.zeroGyro()
-        periodic {
-            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
-        }
+//        periodic {
+//            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
+//        }
     }
 
     override suspend fun test() {
@@ -53,6 +53,10 @@ object Robot: RobotProgram {
         Armavator.disable()
         OB1.disable()
         Drive.disable()
+
+//        periodic {
+//            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
+//        }
     }
 }
 

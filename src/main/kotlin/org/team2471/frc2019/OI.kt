@@ -51,26 +51,62 @@ object OI {
 //            aHold { OB1.intake(1.0)}
 //        }
         driverController.createMappings {
-//            xPress { animateToPose(Pose(0.degrees, 11.inches, 0.degrees)) }
+            //            xPress { animateToPose(Pose(0.degrees, 11.inches, 0.degrees)) }
 //            bPress { animateToPose(Pose((-74).degrees, 0.inches, 150.degrees)) }
             leftBumperToggle { OB1.intakeCargo() }
+
+            xPress {
+                if (OB1.angle < 30.degrees) {
+                    Animation.CURRENT_TO_HATCH_CARRY.play()
+                } else {
+                    println("OB1 is not in a safe place!")
+                }
+            }
+            aPress {
+                Animation.HOME_TO_START_CLIMB.play()
+            }
+            bPress {
+                Animation.START_CLIMB_TO_LIFTED.play()
+            }
+
         }
 
-        operatorController.createMappings{
-            rightBumperPress{
+        operatorController.createMappings {
+            rightBumperPress {
                 Armavator.isPinching = !Armavator.isPinching
             }
-            leftBumperPress{
+            leftBumperPress {
                 Armavator.isClamping = !Armavator.isClamping
             }
 
             xPress {
                 use(Armavator, OB1) {
                     Animation.START_TO_HANDOFF.play()
-                    delay(1.5)
+                    delay(1.0)
                     Animation.HANDOFF_TO_HATCH_CARRY.play()
                 }
             }
+            aPress {
+                use(Armavator, OB1) {
+                    if (OB1.angle < 30.degrees) {
+                        Animation.SCORE_1.play()
+                    } else {
+                        println("OB1 is not in a safe place!")
+                    }
+                }
+            }
+            bPress {
+                use(Armavator, OB1) {
+                    Animation.SCORE_2.play()
+                }
+            }
+            yPress {
+                use(Armavator, OB1) {
+                    Animation.SCORE_3.play()
+                }
+            }
+
+
         }
     }
 }

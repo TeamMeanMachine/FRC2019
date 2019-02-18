@@ -63,7 +63,11 @@ object Armavator : Subsystem("Armavator") {
     private val clawSolenoid = Solenoid(BALL_INTAKE)
     private val pinchSolenoid = Solenoid(HATCH_INTAKE)
 
-    private val heightRange: DoubleRange = -0.1..26.0 // inches
+    var isClimbing = false
+
+    private val heightRange: DoubleRange
+        get() = if(!isClimbing) -0.1..26.0 else Pose.LIFTED.elevatorHeight.asInches..26.0// inches
+
     private val armRange: DoubleRange = -74.0..64.0 // degrees
 
     val height: Length
@@ -77,8 +81,8 @@ object Armavator : Subsystem("Armavator") {
         set(value) = clawSolenoid.set(!value)
 
     var isPinching: Boolean
-        get() = pinchSolenoid.get()
-        set(value) = pinchSolenoid.set(value)
+        get() = !pinchSolenoid.get()
+        set(value) = pinchSolenoid.set(!value)
 
     var angleSetpoint: Angle = angle
         set(value) {
@@ -95,6 +99,7 @@ object Armavator : Subsystem("Armavator") {
         set(value) {
             field = value.asInches.coerceIn(heightRange).inches
             elevatorMotors.setPositionSetpoint(field.asInches, ELEVATOR_FEED_FORWARD)
+            gearShifter.set(isClimbing)
         }
 
     init {
@@ -120,6 +125,10 @@ object Armavator : Subsystem("Armavator") {
             angleSetpoint += (OI.operatorRightYStick * 50.0 * period).degrees
             heightSetpoint += (OI.operatorLeftYStick * 7 * period).inches
         }
+    }
+
+    override fun reset() {
+        isClimbing = false
     }
 }
 
