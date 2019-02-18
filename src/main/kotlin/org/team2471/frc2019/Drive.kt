@@ -62,7 +62,8 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     override suspend fun default() {
         periodic {
             drive(OI.driveTranslation, OI.driveRotation)
-//            println(heading)
+
+            println( "Odometry: Heading=$heading Position: ${position.x}, ${position.y}")  // todo: send this to network tables to be displayed in visualizer
         }
     }
 
