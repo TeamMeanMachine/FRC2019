@@ -39,11 +39,11 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         true
     )
 
-    private val gyro = SpinMaster16448()
-//    private val gyro = ADIS16448_IMU()
+    //private val gyro = SpinMaster16448()
+    private val gyro = ADIS16448_IMU()
 
     override val heading: Angle
-        get() = -gyro.angle.degrees.wrap()   //getX .degrees.wrap()
+        get() = -gyro.angleX.degrees.wrap()   //getX .degrees.wrap()
 
     override val headingRate: AngularVelocity
         get() = gyro.rate.degrees.perSecond
@@ -62,9 +62,10 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 
     override suspend fun default() {
         periodic {
-            drive(OI.driveTranslation, OI.driveRotation)
+            drive(OI.driveTranslation, OI.driveRotation, false)
 
-            println( "Odometry: Heading=$heading Position: ${position.x}, ${position.y}")  // todo: send this to network tables to be displayed in visualizer
+
+            //println( "Odometry: Heading=$heading Position: ${position.x}, ${position.y}")  // todo: send this to network tables to be displayed in visualizer
         }
     }
 
@@ -117,6 +118,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             driveMotor.config {
                 inverted(isBack)
                 brakeMode()
+                feedbackCoefficient = 1/3000.0
                 currentLimit(30, 0, 0)
             }
         }
