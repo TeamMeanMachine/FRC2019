@@ -7,10 +7,12 @@ import org.team2471.frc.lib.actuators.TalonID
 import org.team2471.frc.lib.control.PDController
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.Subsystem
+import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.motion.following.SwerveDrive
 import org.team2471.frc.lib.motion.following.drive
 import org.team2471.frc.lib.motion_profiling.following.SwerveParameters
 import org.team2471.frc.lib.units.*
+import org.team2471.frc.lib.util.Timer
 
 object Drive : Subsystem("Drive"), SwerveDrive {
     override val frontLeftModule = Module(
@@ -46,6 +48,14 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     override val headingRate: AngularVelocity
         get() = gyro.rate.degrees.perSecond
 
+    var myPosition = Vector2(0.0,0.0)
+
+    override var position: Vector2
+        get() = myPosition
+        set(pos) {
+            myPosition = pos
+        }
+
     override val parameters: SwerveParameters = SwerveParameters(20.5, 21.0, 0.0)
 
     fun zeroGyro() = gyro.reset()
@@ -53,7 +63,8 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     override suspend fun default() {
         periodic {
             drive(OI.driveTranslation, OI.driveRotation)
-//            println(heading)
+
+            println( "Odometry: Heading=$heading Position: ${position.x}, ${position.y}")  // todo: send this to network tables to be displayed in visualizer
         }
     }
 
@@ -75,6 +86,25 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             get() = driveMotor.current
 
         private val pdController = PDController(P, D)
+
+        override val speed: Double
+            get() = driveMotor.velocity
+
+        override val currentDistance: Double
+            get() = driveMotor.position
+
+        var myPrevDistance : Double = 0.0
+
+        override var previousDistance: Double
+            get() = myPrevDistance
+            set(dist) {
+                myPrevDistance = dist
+            }
+        override fun zeroEncoder() {
+            driveMotor.position = 0.0
+        }
+
+
 
         init {
             turnMotor.config(20) {
@@ -119,5 +149,4 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             turnMotor.stop()
         }
     }
-
 }
