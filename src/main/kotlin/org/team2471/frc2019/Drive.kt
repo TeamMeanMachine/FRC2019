@@ -12,6 +12,7 @@ import org.team2471.frc.lib.motion.following.SwerveDrive
 import org.team2471.frc.lib.motion.following.drive
 import org.team2471.frc.lib.motion_profiling.following.SwerveParameters
 import org.team2471.frc.lib.units.*
+import org.team2471.frc.lib.util.Timer
 
 object Drive : Subsystem("Drive"), SwerveDrive {
     override val frontLeftModule = Module(
@@ -88,6 +89,22 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 
         override val speed: Double
             get() = driveMotor.velocity
+
+        override val currentDistance: Double
+            get() = driveMotor.position
+
+        var myPrevDistance : Double = 0.0
+
+        override var previousDistance: Double
+            get() = myPrevDistance
+            set(dist) {
+                myPrevDistance = dist
+            }
+        override fun zeroEncoder() {
+            driveMotor.position = 0.0
+        }
+
+
 
         init {
             turnMotor.config(20) {
