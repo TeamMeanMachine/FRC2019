@@ -2,10 +2,6 @@ package org.team2471.frc2019
 
 import edu.wpi.first.wpilibj.GenericHID
 import edu.wpi.first.wpilibj.XboxController
-import kotlinx.coroutines.yield
-import org.team2471.frc.lib.coroutines.delay
-import org.team2471.frc.lib.coroutines.halt
-import org.team2471.frc.lib.coroutines.parallel
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.*
 import org.team2471.frc.lib.math.Vector2
@@ -13,9 +9,8 @@ import org.team2471.frc.lib.math.deadband
 import org.team2471.frc.lib.math.squareWithSign
 import org.team2471.frc.lib.motion.following.drive
 import org.team2471.frc.lib.units.degrees
-import org.team2471.frc.lib.units.inches
-import org.team2471.frc.lib.units.seconds
 import org.team2471.frc.lib.util.Timer
+import org.team2471.frc2019.actions.*
 
 object OI {
     val driverController = XboxController(0)
@@ -47,6 +42,9 @@ object OI {
     val activate: Boolean
         get() = driverController.getBumper(GenericHID.Hand.kRight)
 
+    val startClimb: Boolean
+        get() = driverController.startButton
+
     init {
 //        operatorController.createMappings {
 //            yToggle { OB1.intakeHatch() }
@@ -54,16 +52,9 @@ object OI {
 //            aHold { OB1.intake(1.0)}
 //        }
         driverController.createMappings {
-//            xPress { animateToPose(Pose(0.degrees, 11.inches, 0.degrees)) }
-//            bPress { animateToPose(Pose((-74).degrees, 0.inches, 150.degrees)) }
-            leftBumperToggle {
-                intakeCargo()
-            }
+            leftBumperToggle { intakeCargo() }
 
-            aPress {
-                Animation.HOME_TO_START_CLIMB.play()
-//                Animation.HOME_TO_HATCH_GROUND_PICKUP.play()
-            }
+            rightBumperToggle{ intakeHatch() }
             bPress {
                 Animation.START_CLIMB_TO_LIFTED.play()
 
@@ -86,6 +77,7 @@ object OI {
             yPress {
                 Animation.HOME_TO_CARGO_GROUND_PICKUP.play()
             }
+            backToggle { climb() }
         }
 
         operatorController.createMappings {
@@ -100,37 +92,15 @@ object OI {
                 Armavator.elevatorMotors.position = 0.0
             }
 
-            aPress {
-                use(Armavator, OB1) {
-                    if (OB1.angle < 30.degrees) {
-                        Animation.CARGO_SCORE_1.play()
-                    } else {
-                        println("OB1 is not in a safe place!")
-                    }
-                }
-            }
-            bPress {
-                use(Armavator, OB1) {
-                    Animation.CARGO_SCORE_2.play()
-                }
-            }
+            startPress { returnHome() }
+
+            aPress { scoreLow() }
+            bPress { scoreMed() }
+            yPress { scoreHigh() }
             xPress {
-                Animation.CURRENT_TO_HOME.play()
-                /*use(Armavator, OB1) {
-                    try {
-                        Animation.START_TO_HANDOFF.play()
-                        delay(1.0)
-                        Animation.HANDOFF_TO_HATCH_CARRY.play()
-                        halt()
-                    } finally {
-                        Armavator.isClimbing = false
-                    }
-                }*/
-            }
-            yPress {
-                use(Armavator, OB1) {
-                    Animation.CARGO_SCORE_3.play()
-                }
+                scoreCargoShip()
+
+//                Animation.CURRENT_TO_HOME.play()
             }
         }
     }

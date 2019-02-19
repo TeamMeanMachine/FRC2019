@@ -2,9 +2,14 @@ package org.team2471.frc2019
 
 import com.analog.adis16448.frc.ADIS16448_IMU
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
+import edu.wpi.first.networktables.NetworkTable
+import edu.wpi.first.networktables.NetworkTableInstance
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.team2471.frc.lib.actuators.MotorController
 import org.team2471.frc.lib.actuators.TalonID
 import org.team2471.frc.lib.control.PDController
+import org.team2471.frc.lib.coroutines.MeanlibDispatcher
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.Subsystem
 import org.team2471.frc.lib.math.Vector2
@@ -105,8 +110,6 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             driveMotor.position = 0.0
         }
 
-
-
         init {
             turnMotor.config(20) {
                 encoderType(FeedbackDevice.Analog)
@@ -120,6 +123,19 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                 brakeMode()
                 feedbackCoefficient = 1/3000.0
                 currentLimit(30, 0, 0)
+            }
+            GlobalScope.launch(MeanlibDispatcher) {
+                val table = NetworkTableInstance.getDefault().getTable(name)
+                val flAngleEntry = table.getEntry("Front Left Angle")
+                val frAngleEntry = table.getEntry("Front Right Angle")
+                val blAngleEntry = table.getEntry("Back Left Angle")
+                val brAngleEntry = table.getEntry("Back Right Angle")
+                periodic {
+                    flAngleEntry.setDouble(frontLeftModule.angle.asDegrees)
+                    frAngleEntry.setDouble(frontRightModule.angle.asDegrees)
+                    blAngleEntry.setDouble(backLeftModule.angle.asDegrees)
+                    brAngleEntry.setDouble(backRightModule.angle.asDegrees)
+                }
             }
         }
 

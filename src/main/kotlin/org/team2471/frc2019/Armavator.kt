@@ -85,6 +85,8 @@ object Armavator : Subsystem("Armavator") {
         get() = !pinchSolenoid.get()
         set(value) = pinchSolenoid.set(!value)
 
+    var gamePiece: GamePiece? = null
+
     var angleSetpoint: Angle = angle
         set(value) {
             field = value.asDegrees.coerceIn(armRange).degrees
@@ -162,3 +164,5 @@ suspend fun Armavator.animate(height: Length, angle: Angle, time: Time = 1.5.sec
         }
     }
 }
+
+enum class GamePiece { HATCH_PANEL, CARGO }
