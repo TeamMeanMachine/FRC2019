@@ -19,78 +19,93 @@ class Animation(private vararg val keyFrames: KeyFrame) {
             KeyFrame(2.seconds, Pose(15.inches, (-74).degrees, 45.degrees, false, true)),
             KeyFrame(3.seconds, Pose.HATCH_HANDOFF)
         )
+
         val HANDOFF_TO_HATCH_CARRY = Animation(
             KeyFrame(0.seconds, Pose.HATCH_HANDOFF),
 //        KeyFrame(0.5.seconds, Pose(5.inches, 13.degrees, 90.degrees, false)),
             KeyFrame(0.5.seconds, Pose(9.inches, (-20).degrees, 90.degrees, false)),
             KeyFrame(1.5.seconds, Pose.HATCH_CARRY)
         )
+
         val SCORE_1
             get() = Animation(
                 KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, false)),
                 KeyFrame(1.seconds, Pose.HATCH_SCORE_1)
             )
+
         val SCORE_2
             get() = Animation(
                 KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, false)),
                 KeyFrame(1.seconds, Pose.HATCH_SCORE_2)
             )
+
         val SCORE_3
             get() = Animation(
                 KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, false)),
                 KeyFrame(1.seconds, Pose.HATCH_SCORE_3)
             )
+
         val CURRENT_TO_HATCH_CARRY
             get() = Animation(
                 KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, false)),
                 KeyFrame(2.seconds, Pose.SAFETY_POSE),
                 KeyFrame(2.5.seconds, Pose.HATCH_CARRY)
             )
+
         val HOME_TO_START_CLIMB = Animation(
             KeyFrame(0.seconds, Pose.HOME),
             KeyFrame(0.5.seconds, Pose.SAFETY_POSE),
             KeyFrame(1.0.seconds, Pose.CLIMB_START)
         )
+
         val START_CLIMB_TO_LIFTED = Animation(
             KeyFrame(0.seconds, Pose.CLIMB_START),
             KeyFrame(5.seconds, Pose.LIFTED)
         )
+
         val HOME_TO_HATCH_GROUND_PICKUP = Animation(
             KeyFrame(0.seconds, Pose.HOME),
             KeyFrame(0.5.seconds, Pose.HATCH_GROUND_PICKUP)
         )
+
         val GROUND_PICKUP_TO_HATCH_HANDOFF = Animation(
             KeyFrame(0.seconds, Pose.HATCH_GROUND_PICKUP),
             KeyFrame(1.seconds, Pose.HATCH_HANDOFF)
         )
+
         val HOME_TO_CARGO_GROUND_PICKUP = Animation(
             KeyFrame(0.seconds, Pose.HOME),
             KeyFrame(0.75.seconds, Pose.CARGO_GROUND_PICKUP)
         )
+
         val CARGO_SCORE_1
             get() = Animation(
                 KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, true)),
                 KeyFrame(0.5.seconds, Pose.CARGO_SAFETY_POSE),
                 KeyFrame(1.seconds, Pose.CARGO_SCORE_1)
             )
+
         val CARGO_SCORE_2
             get() = Animation(
                 KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, true)),
                 KeyFrame(0.5.seconds, Pose.CARGO_SAFETY_POSE),
                 KeyFrame(2.0.seconds, Pose.CARGO_SCORE_2)
             )
+
         val CARGO_SCORE_3
             get() = Animation(
                 KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, true)),
                 KeyFrame(0.5.seconds, Pose.CARGO_SAFETY_POSE),
                 KeyFrame(2.0.seconds, Pose.CARGO_SCORE_3)
             )
+
         val CARGO_SHIP_SCORE
             get() = Animation(
                 KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, true)),
                 KeyFrame(0.5.seconds, Pose.CARGO_SAFETY_POSE),
                 KeyFrame(1.5.seconds, Pose.CARGO_SHIP_SCORE)
             )
+
         val CURRENT_TO_HOME
             get() = Animation(
                 KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, true)),
