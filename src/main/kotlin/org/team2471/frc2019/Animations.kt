@@ -6,7 +6,6 @@ import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.motion_profiling.MotionCurve
 import org.team2471.frc.lib.units.*
-import java.security.Key
 
 
 data class KeyFrame(val time: Time, val pose: Pose)
@@ -30,19 +29,19 @@ class Animation(private vararg val keyFrames: KeyFrame) {
         val SCORE_1
             get() = Animation(
                 KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, false)),
-                KeyFrame(1.seconds, Pose.HATCH_SCORE_1)
+                KeyFrame(1.seconds, Pose.HATCH_LOW)
             )
 
         val SCORE_2
             get() = Animation(
                 KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, false)),
-                KeyFrame(1.seconds, Pose.HATCH_SCORE_2)
+                KeyFrame(1.seconds, Pose.HATCH_MED)
             )
 
         val SCORE_3
             get() = Animation(
                 KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, false)),
-                KeyFrame(1.seconds, Pose.HATCH_SCORE_3)
+                KeyFrame(1.seconds, Pose.HATCH_HIGH)
             )
 
         val CURRENT_TO_HATCH_CARRY
@@ -82,21 +81,21 @@ class Animation(private vararg val keyFrames: KeyFrame) {
             get() = Animation(
                 KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, true)),
                 KeyFrame(0.5.seconds, Pose.CARGO_SAFETY_POSE),
-                KeyFrame(1.seconds, Pose.CARGO_SCORE_1)
+                KeyFrame(1.seconds, Pose.CARGO_LOW)
             )
 
         val CARGO_SCORE_2
             get() = Animation(
                 KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, true)),
                 KeyFrame(0.5.seconds, Pose.CARGO_SAFETY_POSE),
-                KeyFrame(2.0.seconds, Pose.CARGO_SCORE_2)
+                KeyFrame(2.0.seconds, Pose.CARGO_MED)
             )
 
         val CARGO_SCORE_3
             get() = Animation(
                 KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, true)),
                 KeyFrame(0.5.seconds, Pose.CARGO_SAFETY_POSE),
-                KeyFrame(2.0.seconds, Pose.CARGO_SCORE_3)
+                KeyFrame(2.0.seconds, Pose.CARGO_HIGH)
             )
 
         val CARGO_SHIP_SCORE
@@ -109,14 +108,9 @@ class Animation(private vararg val keyFrames: KeyFrame) {
         val CURRENT_TO_HOME
             get() = Animation(
                 KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, true)),
-                KeyFrame(2.seconds, Pose.CARGO_SAFETY_POSE),
-                KeyFrame(2.5.seconds, Pose.HOME)
+                KeyFrame(1.5.seconds, Pose.CARGO_SAFETY_POSE),
+                KeyFrame(2.25.seconds, Pose.HOME)
             )
-
-        val RETURN_TO_HOME: Animation
-            get() {
-                TODO()
-            }
     }
 
     val duration = keyFrames.last().time
@@ -151,19 +145,16 @@ class Animation(private vararg val keyFrames: KeyFrame) {
 }
 
 suspend fun Animation.play() {
+    println("Playing animation $duration")
     val firstPose = get(0.seconds)
-    if (!firstPose.closeTo(Pose(Armavator.height, Armavator.angle, OB1.angle, true))) {
-        DriverStation.reportError("Current pose is too far away from starting point of animation", false)
-        return
-    }
+    check(firstPose.closeTo(Pose.current)) { "Current pose is too far away from starting point of animation" }
+
     use(Armavator, OB1) {
         val timer = Timer()
         timer.start()
         var i = 0
         periodic {
             val time = timer.get().seconds
-
-            if (time >= duration) return@periodic stop()
 
             val pose = get(time)
             Armavator.heightSetpoint = pose.elevatorHeight
@@ -174,8 +165,10 @@ suspend fun Animation.play() {
             OB1.pivotSetpoint = pose.ob1Angle
 
             if (i++ % 10 == 0) {
-                println(pose)
+//                println(pose)
             }
+
+            if (time >= duration) return@periodic stop()
         }
     }
 }

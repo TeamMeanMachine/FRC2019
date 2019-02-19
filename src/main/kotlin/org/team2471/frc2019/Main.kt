@@ -9,6 +9,8 @@ import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.RobotProgram
 import org.team2471.frc.lib.framework.initializeWpilib
 import org.team2471.frc.lib.framework.runRobotProgram
+import org.team2471.frc.lib.framework.use
+import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.motion.following.drive
 import org.team2471.frc.lib.units.asDegrees
 import org.team2471.frc.lib.units.degrees
@@ -30,12 +32,19 @@ object Robot: RobotProgram {
 
     override suspend fun teleop() {
         Drive.zeroGyro()
-//        periodic {
+        periodic {
 //            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
-//        }
+//            println(Pose.current.clawHeight<Pose.SAFETY_POSE.clawHeight)
+
+        }
     }
 
     override suspend fun test() {
+        use(Drive) {
+            periodic {
+                Drive.drive(Vector2(0.0, 0.2), 0.0)
+            }
+        }
 
 
 //        val startingHeight = Armavator.height

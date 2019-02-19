@@ -16,6 +16,8 @@ object Jevois {
         val position: Vector2 by lazy { Vector2(distance.asInches * sin(angle), distance.asInches * cos(angle)) }
     }
 
+    var isEnabled = false
+
     val targets: Array<Target>
         get() = emptyArray()
 }

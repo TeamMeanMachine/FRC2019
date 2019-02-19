@@ -65,6 +65,9 @@ object OB1 : Subsystem("OB1") {
             return (lower - COLLISION_SAFETY_FACTOR)..(higher + COLLISION_SAFETY_FACTOR)
         }
 
+    val intakeCurrent: Double
+        get() = intakeMotor.current
+
     val angle: Angle
         get() = pivotMotors.position.degrees
 
