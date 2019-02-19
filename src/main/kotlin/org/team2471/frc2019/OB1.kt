@@ -68,8 +68,7 @@ object OB1 : Subsystem("OB1") {
     val angle: Angle
         get() = pivotMotors.position.degrees
 
-    const val BALL_INTAKE_PRESET = 67.0
-
+    const val BALL_INTAKE_PRESET = 63.0
 
     var pivotSetpoint: Angle = angle
         set(value) {

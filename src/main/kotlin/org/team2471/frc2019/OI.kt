@@ -54,10 +54,28 @@ object OI {
 //            aHold { OB1.intake(1.0)}
 //        }
         driverController.createMappings {
-            //            xPress { animateToPose(Pose(0.degrees, 11.inches, 0.degrees)) }
+//            xPress { animateToPose(Pose(0.degrees, 11.inches, 0.degrees)) }
 //            bPress { animateToPose(Pose((-74).degrees, 0.inches, 150.degrees)) }
-            leftBumperToggle { OB1.intakeCargo() }
+            leftBumperToggle {
+                intakeCargo()
+            }
 
+            aPress {
+                Animation.HOME_TO_START_CLIMB.play()
+//                Animation.HOME_TO_HATCH_GROUND_PICKUP.play()
+            }
+            bPress {
+                Animation.START_CLIMB_TO_LIFTED.play()
+
+                val timer = Timer()
+                timer.start()
+                periodic {
+                    if (timer.get() >= 2.5) return@periodic stop()
+                    OB1.intake(-1.0)
+                    Drive.drive(Vector2(0.0, 0.8), 0.0, false)
+                }
+//               Animation.GROUND_PICKUP_TO_HATCH_HANDOFF.play()
+            }
             xPress {
                 if (OB1.angle < 30.degrees) {
                     Animation.CURRENT_TO_HATCH_CARRY.play()
@@ -65,23 +83,9 @@ object OI {
                     println("OB1 is not in a safe place!")
                 }
             }
-            aPress {
-//                Animation.HOME_TO_START_CLIMB.play()
-                Animation.HOME_TO_GROUND_PICKUP.play()
+            yPress {
+                Animation.HOME_TO_CARGO_GROUND_PICKUP.play()
             }
-            bPress {
-//                Animation.START_CLIMB_TO_LIFTED.play()
-//
-//                val timer = Timer()
-//                timer.start()
-//                periodic {
-//                    if (timer.get() >= 2.5) return@periodic stop()
-//                    OB1.intake(-1.0)
-//                    Drive.drive(Vector2(0.0, 0.8), 0.0, false)
-//                }
-               Animation.GROUND_PICKUP_TO_HATCH_HANDOFF.play()
-            }
-
         }
 
         operatorController.createMappings {
@@ -92,8 +96,27 @@ object OI {
                 Armavator.isClamping = !Armavator.isClamping
             }
 
-            xPress {
+            backPress {
+                Armavator.elevatorMotors.position = 0.0
+            }
+
+            aPress {
                 use(Armavator, OB1) {
+                    if (OB1.angle < 30.degrees) {
+                        Animation.CARGO_SCORE_1.play()
+                    } else {
+                        println("OB1 is not in a safe place!")
+                    }
+                }
+            }
+            bPress {
+                use(Armavator, OB1) {
+                    Animation.CARGO_SCORE_2.play()
+                }
+            }
+            xPress {
+                Animation.CURRENT_TO_HOME.play()
+                /*use(Armavator, OB1) {
                     try {
                         Animation.START_TO_HANDOFF.play()
                         delay(1.0)
@@ -102,29 +125,13 @@ object OI {
                     } finally {
                         Armavator.isClimbing = false
                     }
-                }
-            }
-            aPress {
-                use(Armavator, OB1) {
-                    if (OB1.angle < 30.degrees) {
-                        Animation.SCORE_1.play()
-                    } else {
-                        println("OB1 is not in a safe place!")
-                    }
-                }
-            }
-            bPress {
-                use(Armavator, OB1) {
-                    Animation.SCORE_2.play()
-                }
+                }*/
             }
             yPress {
                 use(Armavator, OB1) {
-                    Animation.SCORE_3.play()
+                    Animation.CARGO_SCORE_3.play()
                 }
             }
-
-
         }
     }
 }

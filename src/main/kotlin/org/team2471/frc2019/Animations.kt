@@ -6,6 +6,7 @@ import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.motion_profiling.MotionCurve
 import org.team2471.frc.lib.units.*
+import java.security.Key
 
 
 data class KeyFrame(val time: Time, val pose: Pose)
@@ -54,7 +55,7 @@ class Animation(private vararg val keyFrames: KeyFrame) {
             KeyFrame(0.seconds, Pose.CLIMB_START),
             KeyFrame(5.seconds, Pose.LIFTED)
         )
-        val HOME_TO_GROUND_PICKUP = Animation(
+        val HOME_TO_HATCH_GROUND_PICKUP = Animation(
             KeyFrame(0.seconds, Pose.HOME),
             KeyFrame(0.5.seconds, Pose.HATCH_GROUND_PICKUP)
         )
@@ -62,6 +63,40 @@ class Animation(private vararg val keyFrames: KeyFrame) {
             KeyFrame(0.seconds, Pose.HATCH_GROUND_PICKUP),
             KeyFrame(1.seconds, Pose.HATCH_HANDOFF)
         )
+        val HOME_TO_CARGO_GROUND_PICKUP = Animation(
+            KeyFrame(0.seconds, Pose.HOME),
+            KeyFrame(0.75.seconds, Pose.CARGO_GROUND_PICKUP)
+        )
+        val CARGO_SCORE_1
+            get() = Animation(
+                KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, true)),
+                KeyFrame(0.5.seconds, Pose.CARGO_SAFETY_POSE),
+                KeyFrame(1.seconds, Pose.CARGO_SCORE_1)
+            )
+        val CARGO_SCORE_2
+            get() = Animation(
+                KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, true)),
+                KeyFrame(0.5.seconds, Pose.CARGO_SAFETY_POSE),
+                KeyFrame(2.0.seconds, Pose.CARGO_SCORE_2)
+            )
+        val CARGO_SCORE_3
+            get() = Animation(
+                KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, true)),
+                KeyFrame(0.5.seconds, Pose.CARGO_SAFETY_POSE),
+                KeyFrame(2.0.seconds, Pose.CARGO_SCORE_3)
+            )
+        val CARGO_SHIP_SCORE
+            get() = Animation(
+                KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, true)),
+                KeyFrame(0.5.seconds, Pose.CARGO_SAFETY_POSE),
+                KeyFrame(1.5.seconds, Pose.CARGO_SHIP_SCORE)
+            )
+        val CURRENT_TO_HOME
+            get() = Animation(
+                KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, true)),
+                KeyFrame(2.seconds, Pose.CARGO_SAFETY_POSE),
+                KeyFrame(2.5.seconds, Pose.HOME)
+            )
 
         val RETURN_TO_HOME: Animation
             get() {
@@ -96,6 +131,8 @@ class Animation(private vararg val keyFrames: KeyFrame) {
             keyFrame.pose.isClimbing
         )
     }
+
+    fun reverse() = Animation(*keyFrames.map { KeyFrame(duration - it.time, it.pose) }.reversed().toTypedArray())
 }
 
 suspend fun Animation.play() {

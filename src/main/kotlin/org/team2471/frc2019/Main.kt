@@ -31,8 +31,8 @@ object Robot: RobotProgram {
     override suspend fun teleop() {
         Drive.zeroGyro()
         periodic {
-//            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
-            println("Elevator power: ${Armavator.elevatorMotors.output}, OB1 power: ${OB1.pivotMotors.output}")
+            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
+//            println("Elevator power: ${Armavator.elevatorMotors.output}, OB1 power: ${OB1.pivotMotors.output}")
         }
     }
 
@@ -56,7 +56,8 @@ object Robot: RobotProgram {
         Drive.disable()
 
         periodic {
-            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
+//            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
+//            println("BR Angle: ${Drive.backRightModule.angle}")
         }
     }
 }
