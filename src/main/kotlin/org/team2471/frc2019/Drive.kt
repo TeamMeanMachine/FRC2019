@@ -119,8 +119,9 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             }
             driveMotor.config {
                 inverted(isBack)
+                sensorPhase(isBack)
                 brakeMode()
-                feedbackCoefficient = 1/3000.0
+                feedbackCoefficient = 1/6000.0
                 currentLimit(30, 0, 0)
             }
             GlobalScope.launch(MeanlibDispatcher) {
