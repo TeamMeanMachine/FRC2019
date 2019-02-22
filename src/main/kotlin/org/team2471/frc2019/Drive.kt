@@ -69,8 +69,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         periodic {
             drive(OI.driveTranslation, OI.driveRotation, false)
 
-
-            //println( "Odometry: Heading=$heading Position: ${position.x}, ${position.y}")  // todo: send this to network tables to be displayed in visualizer
+            //println( "Odometry: Heading=$heading Position: ${position}")  // todo: send this to network tables to be displayed in visualizer
         }
     }
 
