@@ -21,10 +21,11 @@ suspend fun climb() = use(Armavator, OB1) {
             Animation.START_CLIMB_TO_LIFTED.play()
             val timer = Timer().apply { start() }
             periodic {
-                // if (timer.get() >= 2.5) return@periodic stop()
-                OB1.intake(-1.0)
-                Drive.drive(Vector2(0.0, 0.8), 0.0, false)
+                 if (timer.get() >= 1.5) return@periodic stop()
+                OB1.intake(-0.7)
+                Drive.drive(Vector2(0.0, 0.6), 0.0, false)
             }
+            Animation.LIFTED_TO_LIFT_ELEVATOR.play()
         }
     }
 }

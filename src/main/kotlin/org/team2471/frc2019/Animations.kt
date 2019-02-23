@@ -69,7 +69,7 @@ class Animation(private vararg val keyFrames: KeyFrame) {
 
         val GROUND_PICKUP_TO_HATCH_HANDOFF = Animation(
             KeyFrame(0.seconds, Pose.HATCH_GROUND_PICKUP),
-            KeyFrame(1.seconds, Pose.HATCH_HANDOFF)
+            KeyFrame(1.25.seconds, Pose.HATCH_HANDOFF)
         )
 
         val HOME_TO_CARGO_GROUND_PICKUP = Animation(
@@ -103,6 +103,20 @@ class Animation(private vararg val keyFrames: KeyFrame) {
                 KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, true)),
                 KeyFrame(0.5.seconds, Pose.CARGO_SAFETY_POSE),
                 KeyFrame(1.5.seconds, Pose.CARGO_SHIP_SCORE)
+            )
+
+        val HOME_TO_FEEDER_STATION
+            get() = Animation(
+                KeyFrame(0.seconds, Pose.HOME),
+                KeyFrame(0.75.seconds, Pose.SAFETY_POSE),
+                KeyFrame(1.75.seconds, Pose.HATCH_INTERMEDIATE),
+                KeyFrame(2.5.seconds, Pose.HATCH_FEEDER_PICKUP)
+            )
+
+        val LIFTED_TO_LIFT_ELEVATOR
+            get() = Animation(
+                KeyFrame(0.seconds, Pose.LIFTED),
+                KeyFrame(1.seconds, Pose.CLIMB_LIFT_ELEVATOR)
             )
 
         val CURRENT_TO_HOME

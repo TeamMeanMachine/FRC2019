@@ -28,7 +28,7 @@ object Victors {
     const val ELEVATOR_SLAVE = 5
     const val ARM_SLAVE = 9
 
-    const val RESERVED = 6
+    const val ARM_INTAKE = 6
 
     const val OB1_PIVOT_SLAVE = 10
 }

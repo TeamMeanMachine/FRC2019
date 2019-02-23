@@ -8,17 +8,18 @@ import org.team2471.frc.lib.coroutines.suspendUntil
 import org.team2471.frc.lib.framework.use
 import org.team2471.frc2019.*
 
-suspend fun intakeCargo() = use(Armavator, OB1) {
+suspend fun intakeCargo(): Nothing = use(Armavator, OB1) {
     OB1.intake(1.0)
+    Armavator.intake(0.75)
     Animation.HOME_TO_CARGO_GROUND_PICKUP.play()
     try {
-        suspendUntil { OB1.intakeCurrent > 15.0  }
-        delay(0.5)
-        Armavator.gamePiece = GamePiece.CARGO
+        halt()
     } finally {
+        Armavator.gamePiece = GamePiece.CARGO
         withContext(NonCancellable) {
             OB1.intake(0.0)
             Animation.HOME_TO_CARGO_GROUND_PICKUP.reverse().play()
+            Armavator.intake(0.0)
         }
     }
 }
@@ -26,11 +27,11 @@ suspend fun intakeCargo() = use(Armavator, OB1) {
 suspend fun intakeHatch() = use(Armavator, OB1) {
     OB1.intake(0.7)
     Animation.HOME_TO_HATCH_GROUND_PICKUP.play()
-    suspendUntil { OB1.intakeCurrent > 10.0  }
+    suspendUntil { println(OB1.intakeCurrent); OB1.intakeCurrent > 30.0 }
     OB1.intake(0.5)
     Animation.GROUND_PICKUP_TO_HATCH_HANDOFF.play()
     Armavator.gamePiece = GamePiece.HATCH_PANEL
-    delay(.5)
+    delay(0.5)
     OB1.intake(-0.2)
 
     Animation.HANDOFF_TO_HATCH_CARRY.play()
@@ -47,10 +48,21 @@ suspend fun initialHandoff() = use(Armavator, OB1) {
     }
 }
 
+suspend fun pickupFeederStation() = use(Armavator, OB1) {
+    Animation.HOME_TO_FEEDER_STATION.play()
+    suspendUntil { OI.driverController.xButton }
+    Armavator.isPinching = false
+    Armavator.gamePiece = GamePiece.HATCH_PANEL
+    delay(0.75)
+    returnHome()
+}
+
 suspend fun returnHome() = use(Armavator, OB1) {
-    if (Armavator.gamePiece == GamePiece.HATCH_PANEL) {
-        Animation.CURRENT_TO_HATCH_CARRY
-    } else {
-        Animation.CURRENT_TO_HOME
-    }.play()
+    withContext(NonCancellable) {
+        if (Armavator.gamePiece == GamePiece.HATCH_PANEL) {
+            Animation.CURRENT_TO_HATCH_CARRY
+        } else {
+            Animation.CURRENT_TO_HOME
+        }.play()
+    }
 }

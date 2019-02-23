@@ -20,8 +20,10 @@ import org.team2471.frc2019.Solenoids.HATCH_INTAKE
 import org.team2471.frc2019.Solenoids.SHIFTER
 import org.team2471.frc2019.Talons.ARM_MASTER
 import org.team2471.frc2019.Talons.ELEVATOR_MASTER
+import org.team2471.frc2019.Victors.ARM_INTAKE
 import org.team2471.frc2019.Victors.ARM_SLAVE
 import org.team2471.frc2019.Victors.ELEVATOR_SLAVE
+import org.team2471.frc2019.actions.returnHome
 import kotlin.math.abs
 
 object Armavator : Subsystem("Armavator") {
@@ -60,6 +62,8 @@ object Armavator : Subsystem("Armavator") {
         currentLimit(15,0,0)
     }
 
+    private val intakeMotors = MotorController(VictorID(ARM_INTAKE))
+
     private val gearShifter = Solenoid(SHIFTER)
     private val clawSolenoid = Solenoid(BALL_INTAKE)
     private val pinchSolenoid = Solenoid(HATCH_INTAKE)
@@ -67,7 +71,7 @@ object Armavator : Subsystem("Armavator") {
     var isClimbing = false
 
     private val heightRange: DoubleRange
-        get() = if(!isClimbing) -0.1..26.0 else Pose.LIFTED.elevatorHeight.asInches..26.0// inches
+        get() = if(!isClimbing) -2.0..26.0 else Pose.LIFTED.elevatorHeight.asInches..26.0// inches
 
     private val armRange: DoubleRange = -74.0..64.0 // degrees
 
@@ -107,6 +111,10 @@ object Armavator : Subsystem("Armavator") {
 
     init {
         elevatorMotors.position = 0.0
+    }
+
+    fun intake(power: Double) {
+        intakeMotors.setPercentOutput(-power)
     }
 
     fun elevateRaw(power: Double) {

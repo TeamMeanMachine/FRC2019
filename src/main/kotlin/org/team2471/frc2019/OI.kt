@@ -17,17 +17,16 @@ object OI {
     val operatorController = XboxController(1)
 
     val driveTranslationX: Double
-        get() = driverController.getRawAxis(0).deadband(0.2).squareWithSign()
+        get() = driverController.getRawAxis(0).deadband(0.125).squareWithSign()
 
     val driveTranslationY: Double
-        get() = -driverController.getRawAxis(1).deadband(0.2).squareWithSign()
+        get() = -driverController.getRawAxis(1).deadband(0.125).squareWithSign()
 
     val driveTranslation: Vector2
         get() = Vector2(driveTranslationX, driveTranslationY)
 
     val driveRotation: Double
-        get() = (driverController.getRawAxis(4).deadband(0.2)).squareWithSign()
-
+        get() = (driverController.getRawAxis(4).deadband(0.125)).squareWithSign() * 0.5
 
     val operatorLeftYStick: Double
         get() = -operatorController.getRawAxis(1).deadband(0.15)
@@ -38,6 +37,8 @@ object OI {
     val rightYStick: Double
         get() = -driverController.getRawAxis(5).deadband(0.2)
 
+    val ejectPiece: Boolean
+        get() = driverController.getTriggerAxis(GenericHID.Hand.kRight) > 0.5
 
     val activate: Boolean
         get() = driverController.getBumper(GenericHID.Hand.kRight)
@@ -55,25 +56,9 @@ object OI {
             leftBumperToggle { intakeCargo() }
 
             rightBumperToggle{ intakeHatch() }
-            bPress {
-                Animation.START_CLIMB_TO_LIFTED.play()
 
-                val timer = Timer()
-                timer.start()
-                periodic {
-                    if (timer.get() >= 2.5) return@periodic stop()
-                    OB1.intake(-1.0)
-                    Drive.drive(Vector2(0.0, 0.8), 0.0, false)
-                }
-//               Animation.GROUND_PICKUP_TO_HATCH_HANDOFF.play()
-            }
-            xPress {
-                if (OB1.angle < 30.degrees) {
-                    Animation.CURRENT_TO_HATCH_CARRY.play()
-                } else {
-                    println("OB1 is not in a safe place!")
-                }
-            }
+            aPress{ pickupFeederStation() }
+
             yPress {
                 Animation.HOME_TO_CARGO_GROUND_PICKUP.play()
             }
