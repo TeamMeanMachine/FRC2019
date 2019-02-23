@@ -32,7 +32,7 @@ suspend fun driveToTarget() {
             val (distance, angle, skew) = target
             lastTarget = target
 
-            Drive.drive(target.position, angle.asDegrees)
+            Drive.drive(target.position, angle.asDegrees, false)
         }
     }
 }

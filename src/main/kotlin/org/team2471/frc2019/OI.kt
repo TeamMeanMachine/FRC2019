@@ -63,6 +63,9 @@ object OI {
                 Animation.HOME_TO_CARGO_GROUND_PICKUP.play()
             }
             backToggle { climb() }
+
+            startPress{Drive.zeroGyro()}
+
         }
 
         operatorController.createMappings {

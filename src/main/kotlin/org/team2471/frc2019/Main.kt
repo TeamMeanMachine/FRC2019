@@ -28,6 +28,8 @@ object Robot: RobotProgram {
     }
 
     override suspend fun autonomous() {
+        Drive.zeroGyro()
+        AutoChooser.autonomous()
     }
 
     override suspend fun teleop() {
@@ -35,6 +37,8 @@ object Robot: RobotProgram {
         periodic {
             println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
 //            println(Pose.current.clawHeight<Pose.SAFETY_POSE.clawHeight)
+            println("BL: = ${Drive.backLeftModule.currentDistance}, BR: = ${Drive.backRightModule.currentDistance}, FL: = ${Drive.frontLeftModule.currentDistance}, FR: = ${Drive.frontRightModule.currentDistance},")
+
 
         }
     }
@@ -63,9 +67,20 @@ object Robot: RobotProgram {
         OB1.disable()
         Drive.disable()
 
-//        periodic {
+
 //            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
-//        }
+
+        periodic{
+//            println("Front Left: = ${Drive.frontLeftModule.angle} " +
+//                    "Front Right: = ${Drive.frontRightModule.angle} " +
+//                    "Back Left: = ${Drive.backLeftModule.angle} " +
+//                    "Back Right: = ${Drive.backRightModule.angle}")
+//            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
+            println("BL: = ${Drive.backLeftModule.currentDistance}, BR: = ${Drive.backRightModule.currentDistance}, FL: = ${Drive.frontLeftModule.currentDistance}, FR: = ${Drive.frontRightModule.currentDistance},")
+
+
+        }
+
     }
 }
 
@@ -75,6 +90,8 @@ fun main() {
     Drive
     Armavator
     OB1
+
+    AutoChooser
 
     runRobotProgram(Robot)
 }
