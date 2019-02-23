@@ -33,7 +33,7 @@ object Robot: RobotProgram {
     override suspend fun teleop() {
         Drive.zeroGyro()
         periodic {
-//            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
+            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
 //            println(Pose.current.clawHeight<Pose.SAFETY_POSE.clawHeight)
 
         }
