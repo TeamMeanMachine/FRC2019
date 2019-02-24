@@ -4,6 +4,7 @@ import com.analog.adis16448.frc.ADIS16448_IMU
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import edu.wpi.first.networktables.NetworkTable
 import edu.wpi.first.networktables.NetworkTableInstance
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.team2471.frc.lib.actuators.MotorController
@@ -48,10 +49,23 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     private val gyro = ADIS16448_IMU()
 
     override val heading: Angle
-        get() = -gyro.angleX.degrees.wrap()   //getX .degrees.wrap()
+        get() {
+            if (SmartDashboard.getBoolean("Use Gyro", false)){
+               return -gyro.angleX.degrees.wrap()
+            } else {
+                return 0.0.degrees
+            }
+        }
 
     override val headingRate: AngularVelocity
-        get() = gyro.rate.degrees.perSecond
+        get()
+        {
+            if (SmartDashboard.getBoolean("Use Gyro", false))
+                return gyro.rate.degrees.perSecond
+            else
+                return 0.0.degrees.perSecond
+        }
+
 
     var myPosition = Vector2(0.0,0.0)
 
@@ -61,7 +75,16 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             myPosition = pos
         }
 
-    override val parameters: SwerveParameters = SwerveParameters(20.5, 21.0, 0.0)
+    override var prevPosition = Vector2(0.0,0.0)
+
+    override var prevTime = 0.0
+
+    override var velocity = Vector2(0.0,0.0)
+
+    override var prevPathPosition = Vector2(0.0,0.0)
+
+    override val parameters: SwerveParameters = SwerveParameters(20.5, 21.0, 0.0,
+        kFeedForward = 0.06, kPosition = 0.2, kTurn = 0.013) //position 0.2
 
     fun zeroGyro() = gyro.reset()
 
@@ -70,6 +93,16 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             drive(OI.driveTranslation, OI.driveRotation, false)
 
             //println( "Odometry: Heading=$heading Position: ${position}")  // todo: send this to network tables to be displayed in visualizer
+
+            GlobalScope.launch(MeanlibDispatcher) {
+                val table = NetworkTableInstance.getDefault().getTable(name)
+                val positionXEntry = table.getEntry("positionX")
+                val positionYEntry = table.getEntry("positionY")
+                periodic {
+                    positionXEntry.setDouble(position.x)
+                    positionYEntry.setDouble(position.y)
+                }
+            }
         }
     }
 
@@ -80,7 +113,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             private const val ANGLE_MAX = 983
             private const val ANGLE_MIN = 47
 
-            private const val P = 0.010
+            private const val P = 0.005 //0.010
             private const val D = 0.00075
         }
 
@@ -89,7 +122,6 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 
         val driveCurrent: Double
             get() = driveMotor.current
-
         private val pdController = PDController(P, D)
 
         override val speed: Double

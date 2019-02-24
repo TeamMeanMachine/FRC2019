@@ -1,10 +1,26 @@
 {
+	"drivetrainParameters": {
+		"drivetrain": "arcade",
+		"doHeadingCorrection": false,
+		"driveTurningP": 0.0,
+		"headingCorrectionI": 0.0,
+		"headingCorrectionIDecay": 1.0,
+		"headingCorrectionP": 0.0,
+		"headingFeedForward": 0.0,
+		"leftFeedForwardCoefficient": 0.070541988198899,
+		"leftFeedForwardOffset": 0.021428882425651,
+		"rightFeedForwardCoefficient": 0.071704891069425,
+		"rightFeedForwardOffset": 0.020459379452296,
+		"scrubFactor": 1.12,
+		"trackWidth": 2.0833333333333335
+	},
 	"mapAutonomous": {
 		"Rocket Auto": {
 			"m_mirrored": false,
 			"name": "Rocket Auto",
 			"paths": {
 				"Platform to Rocket": {
+					"curveType": "EASE",
 					"m_easeCurve": {
 						"m_defaultValue": 0.0,
 						"m_headKey": {
@@ -30,7 +46,7 @@
 								},
 								"m_prevSlopeMethod": "SLOPE_FLAT",
 								"m_prevTangent": {
-									"x": 0.8333333333333333,
+									"x": 2.5,
 									"y": 0.0
 								},
 								"m_timeAndValue": {
@@ -40,7 +56,7 @@
 							},
 							"m_nextSlopeMethod": "SLOPE_FLAT",
 							"m_nextTangent": {
-								"x": 1.6666666666666665,
+								"x": 5.0,
 								"y": 0.0
 							},
 							"m_prevAngleAndMagnitude": {
@@ -151,6 +167,7 @@
 					"trackWidth": 2.0833333333333335
 				},
 				"Feeder to Rocket": {
+					"curveType": "EASE",
 					"m_easeCurve": {
 						"m_defaultValue": 0.0,
 						"m_headKey": {
@@ -176,7 +193,7 @@
 								},
 								"m_prevSlopeMethod": "SLOPE_FLAT",
 								"m_prevTangent": {
-									"x": 0.5,
+									"x": 1.5,
 									"y": 0.0
 								},
 								"m_timeAndValue": {
@@ -186,7 +203,7 @@
 							},
 							"m_nextSlopeMethod": "SLOPE_FLAT",
 							"m_nextTangent": {
-								"x": 1.0,
+								"x": 3.0,
 								"y": 0.0
 							},
 							"m_prevAngleAndMagnitude": {
@@ -273,6 +290,7 @@
 					"trackWidth": 2.0833333333333335
 				},
 				"Rocket to Feeder": {
+					"curveType": "EASE",
 					"m_easeCurve": {
 						"m_defaultValue": 0.0,
 						"m_headKey": {
@@ -298,7 +316,7 @@
 								},
 								"m_prevSlopeMethod": "SLOPE_FLAT",
 								"m_prevTangent": {
-									"x": 0.8333333333333333,
+									"x": 2.5,
 									"y": 0.0
 								},
 								"m_timeAndValue": {
@@ -308,7 +326,7 @@
 							},
 							"m_nextSlopeMethod": "SLOPE_FLAT",
 							"m_nextTangent": {
-								"x": 1.6666666666666665,
+								"x": 5.0,
 								"y": 0.0
 							},
 							"m_prevAngleAndMagnitude": {
@@ -418,17 +436,14 @@
 					"speed": 1.0,
 					"trackWidth": 2.0833333333333335
 				}
-			},
-			"robotLength": 3.1666666666666665,
-			"robotWidth": 2.5,
-			"scrubFactor": 1.12,
-			"trackWidth": 2.0833333333333335
+			}
 		},
 		"Tests": {
 			"m_mirrored": false,
 			"name": "Tests",
 			"paths": {
 				"Angle and Magnitude Bug": {
+					"curveType": "EASE",
 					"m_easeCurve": {
 						"m_defaultValue": 0.0,
 						"m_headKey": {
@@ -454,7 +469,7 @@
 								},
 								"m_prevSlopeMethod": "SLOPE_FLAT",
 								"m_prevTangent": {
-									"x": 0.0,
+									"x": 2.5,
 									"y": 0.0
 								},
 								"m_timeAndValue": {
@@ -464,7 +479,7 @@
 							},
 							"m_nextSlopeMethod": "SLOPE_FLAT",
 							"m_nextTangent": {
-								"x": 0.0,
+								"x": 5.0,
 								"y": 0.0
 							},
 							"m_prevAngleAndMagnitude": {
@@ -507,8 +522,8 @@
 								},
 								"m_nextSlopeMethod": "SLOPE_SMOOTH",
 								"m_nextTangent": {
-									"x": 0.0,
-									"y": 0.0
+									"x": -3.6742346141747673,
+									"y": 2.121320343559643
 								},
 								"m_position": {
 									"x": -2.0,
@@ -520,8 +535,8 @@
 								},
 								"m_prevSlopeMethod": "SLOPE_SMOOTH",
 								"m_prevTangent": {
-									"x": 0.0,
-									"y": 0.0
+									"x": -3.6742346141747673,
+									"y": 2.121320343559643
 								}
 							},
 							"m_nextSlopeMethod": "SLOPE_MANUAL",
@@ -551,6 +566,7 @@
 					"trackWidth": 2.0833333333333335
 				},
 				"8 Foot Straight": {
+					"curveType": "EASE",
 					"m_easeCurve": {
 						"m_defaultValue": 0.0,
 						"m_headKey": {
@@ -576,7 +592,7 @@
 								},
 								"m_prevSlopeMethod": "SLOPE_FLAT",
 								"m_prevTangent": {
-									"x": 0.0,
+									"x": 2.5,
 									"y": 0.0
 								},
 								"m_timeAndValue": {
@@ -586,7 +602,7 @@
 							},
 							"m_nextSlopeMethod": "SLOPE_FLAT",
 							"m_nextTangent": {
-								"x": 0.0,
+								"x": 5.0,
 								"y": 0.0
 							},
 							"m_prevAngleAndMagnitude": {
@@ -630,7 +646,7 @@
 								"m_nextSlopeMethod": "SLOPE_SMOOTH",
 								"m_nextTangent": {
 									"x": 0.0,
-									"y": 0.0
+									"y": 7.6
 								},
 								"m_position": {
 									"x": 0.0,
@@ -643,13 +659,13 @@
 								"m_prevSlopeMethod": "SLOPE_SMOOTH",
 								"m_prevTangent": {
 									"x": 0.0,
-									"y": 0.0
+									"y": 7.6
 								}
 							},
 							"m_nextSlopeMethod": "SLOPE_SMOOTH",
 							"m_nextTangent": {
 								"x": 0.0,
-								"y": 0.0
+								"y": 7.6
 							},
 							"m_position": {
 								"x": 0.0,
@@ -662,17 +678,18 @@
 							"m_prevSlopeMethod": "SLOPE_SMOOTH",
 							"m_prevTangent": {
 								"x": 0.0,
-								"y": 0.0
+								"y": 7.6
 							}
 						}
 					},
 					"name": "8 Foot Straight",
-					"robotDirection": "BACKWARD",
+					"robotDirection": "FORWARD",
 					"scrubFactor": 1.12,
 					"speed": 1.0,
 					"trackWidth": 2.0833333333333335
 				},
 				"8 Foot Circle": {
+					"curveType": "EASE",
 					"m_easeCurve": {
 						"m_defaultValue": 0.0,
 						"m_headKey": {
@@ -698,7 +715,7 @@
 								},
 								"m_prevSlopeMethod": "SLOPE_FLAT",
 								"m_prevTangent": {
-									"x": 0.0,
+									"x": 4.0,
 									"y": 0.0
 								},
 								"m_timeAndValue": {
@@ -708,7 +725,7 @@
 							},
 							"m_nextSlopeMethod": "SLOPE_FLAT",
 							"m_nextTangent": {
-								"x": 0.0,
+								"x": 8.0,
 								"y": 0.0
 							},
 							"m_prevAngleAndMagnitude": {
@@ -867,6 +884,7 @@
 					"trackWidth": 2.0833333333333335
 				},
 				"4 Foot Circle": {
+					"curveType": "EASE",
 					"m_easeCurve": {
 						"m_defaultValue": 0.0,
 						"m_headKey": {
@@ -892,7 +910,7 @@
 								},
 								"m_prevSlopeMethod": "SLOPE_FLAT",
 								"m_prevTangent": {
-									"x": 0.0,
+									"x": 2.0,
 									"y": 0.0
 								},
 								"m_timeAndValue": {
@@ -902,7 +920,7 @@
 							},
 							"m_nextSlopeMethod": "SLOPE_FLAT",
 							"m_nextTangent": {
-								"x": 0.0,
+								"x": 4.0,
 								"y": 0.0
 							},
 							"m_prevAngleAndMagnitude": {
@@ -1061,6 +1079,7 @@
 					"trackWidth": 2.0833333333333335
 				},
 				"2 Foot Circle": {
+					"curveType": "EASE",
 					"m_easeCurve": {
 						"m_defaultValue": 0.0,
 						"m_headKey": {
@@ -1086,7 +1105,7 @@
 								},
 								"m_prevSlopeMethod": "SLOPE_FLAT",
 								"m_prevTangent": {
-									"x": 0.0,
+									"x": 1.0,
 									"y": 0.0
 								},
 								"m_timeAndValue": {
@@ -1096,7 +1115,7 @@
 							},
 							"m_nextSlopeMethod": "SLOPE_FLAT",
 							"m_nextTangent": {
-								"x": 0.0,
+								"x": 2.0,
 								"y": 0.0
 							},
 							"m_prevAngleAndMagnitude": {
@@ -1254,17 +1273,14 @@
 					"speed": 1.0,
 					"trackWidth": 2.0833333333333335
 				}
-			},
-			"robotLength": 3.1666666666666665,
-			"robotWidth": 2.5,
-			"scrubFactor": 1.12,
-			"trackWidth": 2.0833333333333335
+			}
 		},
 		"Ambitious Auto": {
 			"m_mirrored": false,
 			"name": "Ambitious Auto",
 			"paths": {
 				"Platform to far rocket": {
+					"curveType": "EASE",
 					"m_easeCurve": {
 						"m_defaultValue": 0.0,
 						"m_headKey": {
@@ -1462,6 +1478,7 @@
 					"trackWidth": 2.0833333333333335
 				},
 				"Far rocket to player station": {
+					"curveType": "EASE",
 					"m_easeCurve": {
 						"m_defaultValue": 0.0,
 						"m_headKey": {
@@ -1659,6 +1676,7 @@
 					"trackWidth": 2.0833333333333335
 				},
 				"Player station to close rocket": {
+					"curveType": "EASE",
 					"m_easeCurve": {
 						"m_defaultValue": 0.0,
 						"m_headKey": {
@@ -1831,6 +1849,7 @@
 					"trackWidth": 2.0833333333333335
 				},
 				"Close rocket to cargo pit": {
+					"curveType": "EASE",
 					"m_easeCurve": {
 						"m_defaultValue": 0.0,
 						"m_headKey": {
@@ -2003,6 +2022,7 @@
 					"trackWidth": 2.0833333333333335
 				},
 				"Cargo pit to mid rocket": {
+					"curveType": "EASE",
 					"m_easeCurve": {
 						"m_defaultValue": 0.0,
 						"m_headKey": {
@@ -2174,11 +2194,11 @@
 					"speed": 1.0,
 					"trackWidth": 2.0833333333333335
 				}
-			},
-			"robotLength": 3.1666666666666665,
-			"robotWidth": 2.5,
-			"scrubFactor": 1.12,
-			"trackWidth": 2.0833333333333335
+			}
 		}
+	},
+	"robotParameters": {
+		"robotLength": 2.6666666666666665,
+		"robotWidth": 2.3333333333333335
 	}
 }

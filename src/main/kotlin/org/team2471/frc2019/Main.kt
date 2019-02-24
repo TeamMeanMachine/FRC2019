@@ -5,6 +5,7 @@ package org.team2471.frc2019
 import edu.wpi.first.wpilibj.Compressor
 import edu.wpi.first.wpilibj.SerialPort
 import edu.wpi.first.wpilibj.Solenoid
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.RobotProgram
 import org.team2471.frc.lib.framework.initializeWpilib
@@ -15,9 +16,14 @@ import org.team2471.frc.lib.motion.following.drive
 import org.team2471.frc.lib.units.asDegrees
 import org.team2471.frc.lib.units.degrees
 import org.team2471.frc.lib.units.inches
+import org.team2471.frc2019.testing.steeringTests
 import kotlin.concurrent.thread
 
 object Robot: RobotProgram {
+    init {
+        SmartDashboard.setPersistent("Use Gyro")
+    }
+
     override suspend fun enable() {
         Armavator.heightSetpoint = Armavator.height
         Armavator.angleSetpoint = Armavator.angle
@@ -35,21 +41,22 @@ object Robot: RobotProgram {
     override suspend fun teleop() {
         Drive.zeroGyro()
         periodic {
-            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
+   //         println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
 //            println(Pose.current.clawHeight<Pose.SAFETY_POSE.clawHeight)
-            println("BL: = ${Drive.backLeftModule.currentDistance}, BR: = ${Drive.backRightModule.currentDistance}, FL: = ${Drive.frontLeftModule.currentDistance}, FR: = ${Drive.frontRightModule.currentDistance},")
+    //        println("BL: = ${Drive.backLeftModule.currentDistance}, BR: = ${Drive.backRightModule.currentDistance}, FL: = ${Drive.frontLeftModule.currentDistance}, FR: = ${Drive.frontRightModule.currentDistance},")
 
 
         }
     }
 
     override suspend fun test() {
-        use(Drive) {
-            periodic {
-                Drive.drive(Vector2(0.0, 0.2), 0.0)
-            }
-        }
+//        use(Drive) {
+//            periodic {
+//                Drive.drive(Vector2(0.0, 0.2), 0.0)
+//            }
+//        }
 
+        Drive.steeringTests()
 
 //        val startingHeight = Armavator.height
 //        val startingAngle = Armavator.angle
@@ -76,7 +83,7 @@ object Robot: RobotProgram {
 //                    "Back Left: = ${Drive.backLeftModule.angle} " +
 //                    "Back Right: = ${Drive.backRightModule.angle}")
 //            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
-            println("BL: = ${Drive.backLeftModule.currentDistance}, BR: = ${Drive.backRightModule.currentDistance}, FL: = ${Drive.frontLeftModule.currentDistance}, FR: = ${Drive.frontRightModule.currentDistance},")
+//            println("BL: = ${Drive.backLeftModule.currentDistance}, BR: = ${Drive.backRightModule.currentDistance}, FL: = ${Drive.frontLeftModule.currentDistance}, FR: = ${Drive.frontRightModule.currentDistance},")
 
 
         }
