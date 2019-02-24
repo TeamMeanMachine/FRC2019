@@ -2,10 +2,14 @@ package org.team2471.frc2019
 
 import com.analog.adis16448.frc.ADIS16448_IMU
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
+import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.team2471.frc.lib.actuators.MotorController
 import org.team2471.frc.lib.actuators.TalonID
 import org.team2471.frc.lib.control.PDController
+import org.team2471.frc.lib.coroutines.MeanlibDispatcher
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.Subsystem
 import org.team2471.frc.lib.math.Vector2
@@ -44,7 +48,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 //    private val gyro = GuttedADIS()
 //    private val gyro = Gyro
 
-    override var heading: Angle
+    override val headingWithDashboardSwitch: Angle
         get() {
             return if (SmartDashboard.getBoolean("Use Gyro", false)) {
 //                -gyro.angleX.degrees.wrap()
@@ -53,11 +57,8 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                 0.0.degrees
             }
         }
-        set(newHeading) {
 
-        }
-
-    override val headingRate: AngularVelocity
+    override val headingRateWithDashboardSwitch: AngularVelocity
         get() {
             return if (SmartDashboard.getBoolean("Use Gyro", false)) {
 //                gyro.rate.degrees.perSecond
@@ -67,6 +68,11 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             }
         }
 
+    override val heading: Angle
+        get() = 0.degrees//-gyro.angleX.degrees.wrap()
+
+    override val headingRate: AngularVelocity
+        get() = 0.degrees.perSecond//-gyro.rate.degrees.perSecond
 
     var myPosition = Vector2(0.0, 0.0)
 
@@ -202,6 +208,27 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                 brakeMode()
                 feedbackCoefficient = 1 / 6000.0
                 currentLimit(30, 0, 0)
+            }
+            GlobalScope.launch(MeanlibDispatcher) {
+                val table = NetworkTableInstance.getDefault().getTable(name)
+                val flAngleEntry = table.getEntry("Front Left Angle")
+                val frAngleEntry = table.getEntry("Front Right Angle")
+                val blAngleEntry = table.getEntry("Back Left Angle")
+                val brAngleEntry = table.getEntry("Back Right Angle")
+                val flSPEntry = table.getEntry("Front Left SP")
+                val frSPEntry = table.getEntry("Front Right SP")
+                val blSPEntry = table.getEntry("Back Left SP")
+                val brSPEntry = table.getEntry("Back Right SP")
+                periodic {
+                    flAngleEntry.setDouble(frontLeftModule.angle.asDegrees)
+                    frAngleEntry.setDouble(frontRightModule.angle.asDegrees)
+                    blAngleEntry.setDouble(backLeftModule.angle.asDegrees)
+                    brAngleEntry.setDouble(backRightModule.angle.asDegrees)
+                    flSPEntry.setDouble(frontLeftModule.setPoint.asDegrees)
+                    frSPEntry.setDouble(frontRightModule.setPoint.asDegrees)
+                    blSPEntry.setDouble(backLeftModule.setPoint.asDegrees)
+                    brSPEntry.setDouble(backRightModule.setPoint.asDegrees)
+                }
             }
         }
 

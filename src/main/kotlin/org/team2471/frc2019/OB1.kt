@@ -91,7 +91,6 @@ object OB1 : Subsystem("OB1") {
 
     override suspend fun default() {
         periodic {
-            pivotSetpoint += (OI.rightYStick * 80.0 * period).degrees
             intake(OI.operatorController.getTriggerAxis(GenericHID.Hand.kLeft))
 //            println("%.3f -> %.3f..%.3f".format(angle.asDegrees, collisionZone.start, collisionZone.endInclusive))
         }
