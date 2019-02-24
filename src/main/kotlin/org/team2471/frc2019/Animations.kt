@@ -108,8 +108,8 @@ class Animation(private vararg val keyFrames: KeyFrame) {
         val HOME_TO_FEEDER_STATION
             get() = Animation(
                 KeyFrame(0.seconds, Pose.HOME),
-                KeyFrame(0.75.seconds, Pose.SAFETY_POSE),
-                KeyFrame(1.75.seconds, Pose.HATCH_INTERMEDIATE),
+                KeyFrame(0.75.seconds, Pose.SAFETY_POSE.copy(isPinching = true)),
+                KeyFrame(1.75.seconds, Pose.HATCH_INTERMEDIATE.copy(isPinching = true)),
                 KeyFrame(2.5.seconds, Pose.HATCH_FEEDER_PICKUP)
             )
 

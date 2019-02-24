@@ -81,10 +81,11 @@ object OB1 : Subsystem("OB1") {
 
     fun pivotRaw(power: Double) {
         pivotMotors.setPercentOutput(power)
-        println(angle.asDegrees)
+//        println(angle.asDegrees)
     }
 
     fun intake(power: Double) {
+//        println(Thread.currentThread().stackTrace.drop(2).first().toString())
         intakeMotor.setPercentOutput(power)
     }
 
