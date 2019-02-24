@@ -55,4 +55,3 @@ data class Pose(
         val CARGO_SHIP_SCORE = Pose(0.inches, (30).degrees, 6.degrees, true, false)
     }
 }
-
