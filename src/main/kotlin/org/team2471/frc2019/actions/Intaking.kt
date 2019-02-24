@@ -66,3 +66,16 @@ suspend fun returnHome() = use(Armavator, OB1) {
         }.play()
     }
 }
+
+suspend fun ejectPiece() {
+    val gamePiece = Armavator.gamePiece ?: return
+    use(Armavator, OB1) {
+        when(gamePiece) {
+            GamePiece.CARGO -> Armavator.intake(-0.7)
+            GamePiece.HATCH_PANEL -> Armavator.isPinching = true
+        }
+        Armavator.gamePiece = null
+        delay(0.5)
+        returnHome()
+    }
+}

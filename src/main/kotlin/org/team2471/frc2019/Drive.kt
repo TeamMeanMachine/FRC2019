@@ -2,14 +2,10 @@ package org.team2471.frc2019
 
 import com.analog.adis16448.frc.ADIS16448_IMU
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
-import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.team2471.frc.lib.actuators.MotorController
 import org.team2471.frc.lib.actuators.TalonID
 import org.team2471.frc.lib.control.PDController
-import org.team2471.frc.lib.coroutines.MeanlibDispatcher
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.Subsystem
 import org.team2471.frc.lib.math.Vector2
@@ -43,24 +39,32 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         true
     )
 
-    //private val gyro = SpinMaster16448()
-    private val gyro = ADIS16448_IMU()
+//    private val gyro = SpinMaster16448()
+//    private val gyro = ADIS16448_IMU()
+//    private val gyro = GuttedADIS()
+//    private val gyro = Gyro
 
-    override val heading: Angle
+    override var heading: Angle
         get() {
-            if (SmartDashboard.getBoolean("Use Gyro", false)) {
-                return -gyro.angleX.degrees.wrap()
+            return if (SmartDashboard.getBoolean("Use Gyro", false)) {
+//                -gyro.angleX.degrees.wrap()
+                0.0.degrees
             } else {
-                return 0.0.degrees
+                0.0.degrees
             }
+        }
+        set(newHeading) {
+
         }
 
     override val headingRate: AngularVelocity
         get() {
-            if (SmartDashboard.getBoolean("Use Gyro", false))
-                return gyro.rate.degrees.perSecond
-            else
-                return 0.0.degrees.perSecond
+            return if (SmartDashboard.getBoolean("Use Gyro", false)) {
+//                gyro.rate.degrees.perSecond
+                0.0.degrees.perSecond
+            } else {
+                0.0.degrees.perSecond
+            }
         }
 
 
@@ -85,7 +89,49 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         kFeedForward = 0.06, kPosition = 0.2, kTurn = 0.013
     ) //position 0.2
 
-    fun zeroGyro() = gyro.reset()
+    init {
+        SmartDashboard.setPersistent("Use Gyro")
+
+//        GlobalScope.launch(MeanlibDispatcher) {
+//            val table = NetworkTableInstance.getDefault().getTable(name)
+//
+//            val headingEntry = table.getEntry("Heading")
+//
+//            val flAngleEntry = table.getEntry("Front Left Angle")
+//            val frAngleEntry = table.getEntry("Front Right Angle")
+//            val blAngleEntry = table.getEntry("Back Left Angle")
+//            val brAngleEntry = table.getEntry("Back Right Angle")
+//            val flSPEntry = table.getEntry("Front Left SP")
+//            val frSPEntry = table.getEntry("Front Right SP")
+//            val blSPEntry = table.getEntry("Back Left SP")
+//            val brSPEntry = table.getEntry("Back Right SP")
+//
+//            val flErrorEntry = table.getEntry("Front Left Error")
+//            val frErrorEntry = table.getEntry("Front Right Error")
+//            val blErrorEntry = table.getEntry("Back Left Error")
+//            val brErrorEntry = table.getEntry("Back Right Error")
+//
+//            periodic {
+//                flAngleEntry.setDouble(frontLeftModule.angle.asDegrees)
+//                frAngleEntry.setDouble(frontRightModule.angle.asDegrees)
+//                blAngleEntry.setDouble(backLeftModule.angle.asDegrees)
+//                brAngleEntry.setDouble(backRightModule.angle.asDegrees)
+//                flSPEntry.setDouble(frontLeftModule.setPoint.asDegrees)
+//                frSPEntry.setDouble(frontRightModule.setPoint.asDegrees)
+//                blSPEntry.setDouble(backLeftModule.setPoint.asDegrees)
+//                brSPEntry.setDouble(backRightModule.setPoint.asDegrees)
+//
+//                flErrorEntry.setDouble(frontLeftModule.error.asDegrees)
+//                frErrorEntry.setDouble(frontRightModule.error.asDegrees)
+//                blErrorEntry.setDouble(backLeftModule.error.asDegrees)
+//                brErrorEntry.setDouble(backRightModule.error.asDegrees)
+//
+//                headingEntry.setDouble(heading.asDegrees)
+//            }
+//        }
+    }
+
+    fun zeroGyro() = Unit//gyro.reset()
 
     override suspend fun default() {
 /*
@@ -145,6 +191,9 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 
         var setPoint = Angle(0.0)
 
+        val error: Angle
+            get() = turnMotor.closedLoopError.degrees
+
         init {
             turnMotor.config(20) {
                 encoderType(FeedbackDevice.Analog)
@@ -159,27 +208,6 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                 brakeMode()
                 feedbackCoefficient = 1 / 6000.0
                 currentLimit(30, 0, 0)
-            }
-            GlobalScope.launch(MeanlibDispatcher) {
-                val table = NetworkTableInstance.getDefault().getTable(name)
-                val flAngleEntry = table.getEntry("Front Left Angle")
-                val frAngleEntry = table.getEntry("Front Right Angle")
-                val blAngleEntry = table.getEntry("Back Left Angle")
-                val brAngleEntry = table.getEntry("Back Right Angle")
-                val flSPEntry = table.getEntry("Front Left SP")
-                val frSPEntry = table.getEntry("Front Right SP")
-                val blSPEntry = table.getEntry("Back Left SP")
-                val brSPEntry = table.getEntry("Back Right SP")
-                periodic {
-                    flAngleEntry.setDouble(frontLeftModule.angle.asDegrees)
-                    frAngleEntry.setDouble(frontRightModule.angle.asDegrees)
-                    blAngleEntry.setDouble(backLeftModule.angle.asDegrees)
-                    brAngleEntry.setDouble(backRightModule.angle.asDegrees)
-                    flSPEntry.setDouble(frontLeftModule.setPoint.asDegrees)
-                    frSPEntry.setDouble(frontRightModule.setPoint.asDegrees)
-                    blSPEntry.setDouble(backLeftModule.setPoint.asDegrees)
-                    brSPEntry.setDouble(backRightModule.setPoint.asDegrees)
-                }
             }
         }
 

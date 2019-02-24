@@ -38,11 +38,11 @@ data class Pose(
         val HATCH_GROUND_PICKUP = Pose(14.inches, (-72).degrees, (-2).degrees, false, true)
         val HATCH_HANDOFF = Pose(2.inches, (-15).degrees, 105.degrees, false, false)
         val HATCH_CARRY = Pose(11.inches, (-69).degrees, 1.degrees, false, false)
-        val HATCH_INTERMEDIATE = Pose(7.inches, -40.degrees, 6.degrees, false, false)
+        val HATCH_INTERMEDIATE = Pose(7.inches, (-40).degrees, 6.degrees, false, false)
         val HATCH_LOW = Pose(0.inches, (-13).degrees, 6.degrees, false)
         val HATCH_MED = Pose(6.inches, 19.degrees, 6.degrees, false)
         val HATCH_HIGH = Pose(25.8.inches, 22.3.degrees, 6.degrees, false)
-        val HATCH_FEEDER_PICKUP = Pose(-2.inches, (-20).degrees, 6.degrees, false, true)
+        val HATCH_FEEDER_PICKUP = Pose(0.inches, (-35).degrees, 6.degrees, false, true)
 
         val CLIMB_START = Pose(1.inches, 18.degrees, 120.degrees, false, isClimbing = true)
         val LIFTED = Pose((-20).inches, 64.degrees, (-2).degrees, false, isClimbing = true)

@@ -20,10 +20,6 @@ import org.team2471.frc2019.testing.steeringTests
 import kotlin.concurrent.thread
 
 object Robot: RobotProgram {
-    init {
-        SmartDashboard.setPersistent("Use Gyro")
-    }
-
     override suspend fun enable() {
         Armavator.heightSetpoint = Armavator.height
         Armavator.angleSetpoint = Armavator.angle
@@ -70,14 +66,14 @@ object Robot: RobotProgram {
     }
 
     override suspend fun disable() {
-        Armavator.disable()
-        OB1.disable()
-        Drive.disable()
+//        Armavator.disable()
+//        OB1.disable()
+//        Drive.disable()
 
 
 //            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
 
-        periodic{
+//        periodic{
 //            println("Front Left: = ${Drive.frontLeftModule.angle} " +
 //                    "Front Right: = ${Drive.frontRightModule.angle} " +
 //                    "Back Left: = ${Drive.backLeftModule.angle} " +
@@ -86,7 +82,7 @@ object Robot: RobotProgram {
 //            println("BL: = ${Drive.backLeftModule.currentDistance}, BR: = ${Drive.backRightModule.currentDistance}, FL: = ${Drive.frontLeftModule.currentDistance}, FR: = ${Drive.frontRightModule.currentDistance},")
 
 
-        }
+//        }
 
     }
 }
@@ -98,7 +94,7 @@ fun main() {
     Armavator
     OB1
 
-    AutoChooser
+//    AutoChooser
 
     runRobotProgram(Robot)
 }

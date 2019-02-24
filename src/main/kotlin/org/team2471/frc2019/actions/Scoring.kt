@@ -27,7 +27,7 @@ private suspend fun score(position: ScoringPosition) {
             keyFrames.add(KeyFrame(1.5.seconds, Pose.CARGO_SAFETY_POSE))
         } else if (gamePiece == GamePiece.HATCH_PANEL &&
             (position == ScoringPosition.ROCKET_LOW || position == ScoringPosition.CARGO_SHIP)) {
-            keyFrames.add(KeyFrame( 1.seconds, Pose.SAFETY_POSE))
+            keyFrames.add(KeyFrame(1.seconds, Pose.SAFETY_POSE))
             keyFrames.add(KeyFrame(1.5.seconds, Pose.HATCH_INTERMEDIATE))
         }
         keyFrames.add(
@@ -66,7 +66,8 @@ private suspend fun score(position: ScoringPosition) {
             delay(0.5)
         }
         Armavator.gamePiece = null
-        delay(0.5)
+        val drivePosition = Drive.position
+        suspendUntil { Drive.position.distance(drivePosition) > 1.5 }
         returnHome()
         Armavator.intake(0.0)
     }

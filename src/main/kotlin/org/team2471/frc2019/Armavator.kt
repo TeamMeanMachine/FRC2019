@@ -119,8 +119,10 @@ object Armavator : Subsystem("Armavator") {
         GlobalScope.launch(MeanlibDispatcher) {
             val table = NetworkTableInstance.getDefault().getTable(name)
             val heightEntry = table.getEntry("Height")
+            val angleEntry = table.getEntry("Angle")
             periodic {
                 heightEntry.setDouble(height.asInches)
+                angleEntry.setDouble(angle.asDegrees)
             }
         }
     }

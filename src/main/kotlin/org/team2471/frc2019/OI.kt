@@ -2,14 +2,10 @@ package org.team2471.frc2019
 
 import edu.wpi.first.wpilibj.GenericHID
 import edu.wpi.first.wpilibj.XboxController
-import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.*
 import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.math.deadband
 import org.team2471.frc.lib.math.squareWithSign
-import org.team2471.frc.lib.motion.following.drive
-import org.team2471.frc.lib.units.degrees
-import org.team2471.frc.lib.util.Timer
 import org.team2471.frc2019.actions.*
 
 object OI {
@@ -55,17 +51,15 @@ object OI {
         driverController.createMappings {
             leftBumperToggle { intakeCargo() }
 
-            rightBumperToggle{ intakeHatch() }
+            bPress { ejectPiece() }
 
-            aPress{ pickupFeederStation() }
+            rightBumperToggle { intakeHatch() }
 
-            yPress {
-                Animation.HOME_TO_CARGO_GROUND_PICKUP.play()
-            }
+            aPress { pickupFeederStation() }
+
             backToggle { climb() }
 
-            startPress{Drive.zeroGyro()}
-
+            startPress { Drive.zeroGyro() }
         }
 
         operatorController.createMappings {
