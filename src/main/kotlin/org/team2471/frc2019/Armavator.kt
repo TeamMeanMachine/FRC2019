@@ -2,12 +2,17 @@ package org.team2471.frc2019
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import com.ctre.phoenix.motorcontrol.can.TalonSRX
+import edu.wpi.first.networktables.NetworkTable
+import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.GenericHID
 import edu.wpi.first.wpilibj.Solenoid
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.team2471.frc.lib.actuators.MotorController
 import org.team2471.frc.lib.actuators.TalonID
 import org.team2471.frc.lib.actuators.VictorID
+import org.team2471.frc.lib.coroutines.MeanlibDispatcher
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.Subsystem
 import org.team2471.frc.lib.framework.use
@@ -111,6 +116,13 @@ object Armavator : Subsystem("Armavator") {
 
     init {
         elevatorMotors.position = 0.0
+        GlobalScope.launch(MeanlibDispatcher) {
+            val table = NetworkTableInstance.getDefault().getTable(name)
+            val heightEntry = table.getEntry("Height")
+            periodic {
+                heightEntry.setDouble(height.asInches)
+            }
+        }
     }
 
     fun intake(power: Double) {
