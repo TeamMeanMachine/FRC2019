@@ -46,7 +46,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     //private val gyro = SpinMaster16448()
     private val gyro = ADIS16448_IMU()
 
-    override val heading: Angle
+    override val headingWithDashboardSwitch: Angle
         get() {
             if (SmartDashboard.getBoolean("Use Gyro", false)) {
                 return -gyro.angleX.degrees.wrap()
@@ -55,7 +55,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             }
         }
 
-    override val headingRate: AngularVelocity
+    override val headingRateWithDashboardSwitch: AngularVelocity
         get() {
             if (SmartDashboard.getBoolean("Use Gyro", false))
                 return gyro.rate.degrees.perSecond
@@ -63,6 +63,11 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                 return 0.0.degrees.perSecond
         }
 
+    override val heading: Angle
+        get() = -gyro.angleX.degrees.wrap()
+
+    override val headingRate: AngularVelocity
+        get() = -gyro.rate.degrees.perSecond
 
     var myPosition = Vector2(0.0, 0.0)
 
@@ -82,25 +87,16 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 
     override val parameters: SwerveParameters = SwerveParameters(
         20.5, 21.0, 0.0,
-        kFeedForward = 0.06, kPosition = 0.2, kTurn = 0.013
-    ) //position 0.2
+        kFeedForward = 0.12, kPosition = 0.2, kTurn = 0.013
+    )
 
     fun zeroGyro() = gyro.reset()
 
     override suspend fun default() {
-/*
-        val table = NetworkTableInstance.getDefault().getTable(name)
-        val positionXEntry = table.getEntry("positionX")
-        val positionYEntry = table.getEntry("positionY")
-*/
         periodic {
             drive(OI.driveTranslation, OI.driveRotation, false)
 
             //println( "Odometry: Heading=$heading Position: ${position}")  // todo: send this to network tables to be displayed in visualizer
-/*
-            positionXEntry.setDouble(position.x)
-            positionYEntry.setDouble(position.y)
-*/
         }
     }
 
