@@ -18,29 +18,41 @@ import org.team2471.frc.lib.motion.following.drive
 import org.team2471.frc.lib.motion_profiling.following.SwerveParameters
 import org.team2471.frc.lib.units.*
 
+private var gyroOffset = 0.0.degrees
+
 object Drive : Subsystem("Drive"), SwerveDrive {
-    override val frontLeftModule = Module(
-        MotorController(TalonID(Talons.DRIVE_FRONTLEFT)),
-        MotorController(TalonID(Talons.STEER_FRONTLEFT)),
-        false
-    )
+    override val modules : Array<SwerveDrive.Module> = arrayOf(
+        Module(
+            MotorController(TalonID(Talons.DRIVE_FRONTLEFT)),
+            MotorController(TalonID(Talons.STEER_FRONTLEFT)),
+            false,
+            Vector2(-10.0, 10.5),
+            0.0.degrees
+        ),
 
-    override val frontRightModule = Module(
-        MotorController(TalonID(Talons.DRIVE_FRONTRIGHT)),
-        MotorController(TalonID(Talons.STEER_FRONTRIGHT)),
-        false
-    )
+        Module(
+            MotorController(TalonID(Talons.DRIVE_FRONTRIGHT)),
+            MotorController(TalonID(Talons.STEER_FRONTRIGHT)),
+            false,
+            Vector2(10.0, 10.5),
+            0.0.degrees
+        ),
 
-    override val backLeftModule = Module(
-        MotorController(TalonID(Talons.DRIVE_BACKLEFT)),
-        MotorController(TalonID(Talons.STEER_BACKLEFT)),
-        true
-    )
+        Module(
+            MotorController(TalonID(Talons.DRIVE_BACKLEFT)),
+            MotorController(TalonID(Talons.STEER_BACKLEFT)),
+            true,
+            Vector2(-10.0, -10.5),
+            0.0.degrees // could get rid of isBack and set this to 180 degrees
+        ),
 
-    override val backRightModule = Module(
-        MotorController(TalonID(Talons.DRIVE_BACKRIGHT)),
-        MotorController(TalonID(Talons.STEER_BACKRIGHT)),
-        true
+        Module(
+            MotorController(TalonID(Talons.DRIVE_BACKRIGHT)),
+            MotorController(TalonID(Talons.STEER_BACKRIGHT)),
+            true,
+            Vector2(10.0, -10.5),
+            0.0.degrees
+        )
     )
 
 //    private val gyro = SpinMaster16448()
@@ -48,28 +60,14 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 //    private val gyro = GuttedADIS()
 //    private val gyro = Gyro
 
-    override val headingWithDashboardSwitch: Angle
-        get() {
-            return if (SmartDashboard.getBoolean("Use Gyro", false)) {
-//                -gyro.angleX.degrees.wrap()
-                0.0.degrees
-            } else {
-                0.0.degrees
-            }
-        }
+    override var robotPivot = Vector2(0.0, 0.0) // location of rotational pivot in robot coordinates
 
-    override val headingRateWithDashboardSwitch: AngularVelocity
-        get() {
-            return if (SmartDashboard.getBoolean("Use Gyro", false)) {
-//                gyro.rate.degrees.perSecond
-                0.0.degrees.perSecond
-            } else {
-                0.0.degrees.perSecond
-            }
+    override var heading: Angle
+        get() = 0.degrees//(gyroOffset-gyro.angleX.degrees.wrap()
+        set(value) {
+            gyroOffset = value
+            //gyro.reset()
         }
-
-    override val heading: Angle
-        get() = 0.degrees//-gyro.angleX.degrees.wrap()
 
     override val headingRate: AngularVelocity
         get() = 0.degrees.perSecond//-gyro.rate.degrees.perSecond
@@ -140,9 +138,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         val positionYEntry = table.getEntry("positionY")
 */
         periodic {
-            drive(OI.driveTranslation, OI.driveRotation, false)
-
-            //println( "Odometry: Heading=$heading Position: ${position}")  // todo: send this to network tables to be displayed in visualizer
+            drive(OI.driveTranslation, OI.driveRotation, SmartDashboard.getBoolean("Use Gyro", true))
 /*
             positionXEntry.setDouble(position.x)
             positionYEntry.setDouble(position.y)
@@ -153,7 +149,9 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     class Module(
         val driveMotor: MotorController,
         private val turnMotor: MotorController,
-        isBack: Boolean
+        isBack: Boolean,
+        override val modulePosition: Vector2,
+        override val angleOffset: Angle
     ) : SwerveDrive.Module {
 
         companion object {
@@ -165,7 +163,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         }
 
         override val angle: Angle
-            get() = ((turnMotor.position - ANGLE_MIN) / (ANGLE_MAX - ANGLE_MIN) * 360).degrees.wrap()
+            get() = ((turnMotor.position - ANGLE_MIN) / (ANGLE_MAX - ANGLE_MIN) * 360 + angleOffset.asDegrees).degrees.wrap()
 
         val driveCurrent: Double
             get() = driveMotor.current
@@ -189,7 +187,30 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             driveMotor.position = 0.0
         }
 
-        var setPoint = Angle(0.0)
+        private var myAngleSetpoint = 0.0.radians
+
+        override var angleSetpoint
+            get() = myAngleSetpoint
+            set(value) {
+                myAngleSetpoint = value
+                val current = this.angle
+                val error = (myAngleSetpoint - current).wrap()
+                val turnPower = pdController.update(error.asDegrees)
+                turnMotor.setPercentOutput(turnPower)
+//            println(
+//                "Angle: %.3f\tTarget: %.3f\tError: %.3f\tPower: %.3f".format(
+//                    current.asDegrees,
+//                    angle.asDegrees,
+//                    error.asDegrees,
+//                    turnPower
+//                )
+//            )
+            }
+
+        override fun setDrivePower(power: Double)
+        {
+           driveMotor.setPercentOutput(power)
+        }
 
         val error: Angle
             get() = turnMotor.closedLoopError.degrees
@@ -215,39 +236,21 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                 val frAngleEntry = table.getEntry("Front Right Angle")
                 val blAngleEntry = table.getEntry("Back Left Angle")
                 val brAngleEntry = table.getEntry("Back Right Angle")
-                val flSPEntry = table.getEntry("Front Left SP")
-                val frSPEntry = table.getEntry("Front Right SP")
-                val blSPEntry = table.getEntry("Back Left SP")
-                val brSPEntry = table.getEntry("Back Right SP")
+//                val flSPEntry = table.getEntry("Front Left SP")
+//                val frSPEntry = table.getEntry("Front Right SP")
+//                val blSPEntry = table.getEntry("Back Left SP")
+//                val brSPEntry = table.getEntry("Back Right SP")
                 periodic {
-                    flAngleEntry.setDouble(frontLeftModule.angle.asDegrees)
-                    frAngleEntry.setDouble(frontRightModule.angle.asDegrees)
-                    blAngleEntry.setDouble(backLeftModule.angle.asDegrees)
-                    brAngleEntry.setDouble(backRightModule.angle.asDegrees)
-                    flSPEntry.setDouble(frontLeftModule.setPoint.asDegrees)
-                    frSPEntry.setDouble(frontRightModule.setPoint.asDegrees)
-                    blSPEntry.setDouble(backLeftModule.setPoint.asDegrees)
-                    brSPEntry.setDouble(backRightModule.setPoint.asDegrees)
+                    flAngleEntry.setDouble(modules[0].angle.asDegrees)
+                    frAngleEntry.setDouble(modules[1].angle.asDegrees)
+                    blAngleEntry.setDouble(modules[2].angle.asDegrees)
+                    brAngleEntry.setDouble(modules[3].angle.asDegrees)
+//                    flSPEntry.setDouble(modules[0].setPoint.asDegrees)
+//                    frSPEntry.setDouble(modules[1].setPoint.asDegrees)
+//                    blSPEntry.setDouble(modules[2].setPoint.asDegrees)
+//                    brSPEntry.setDouble(modules[3].setPoint.asDegrees)
                 }
             }
-        }
-
-        override fun drive(angle: Angle, power: Double) {
-            driveMotor.setPercentOutput(power)
-            setPoint = angle
-            val current = this.angle
-            val error = (setPoint - current).wrap()
-            val turnPower = pdController.update(error.asDegrees)
-//            println(
-//                "Angle: %.3f\tTarget: %.3f\tError: %.3f\tPower: %.3f".format(
-//                    current.asDegrees,
-//                    angle.asDegrees,
-//                    error.asDegrees,
-//                    turnPower
-//                )
-//            )
-
-            turnMotor.setPercentOutput(turnPower)
         }
 
         override fun driveWithDistance(angle: Angle, distance: Length) {
