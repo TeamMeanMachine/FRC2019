@@ -82,15 +82,9 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             myPosition = pos
         }
 
-    override var prevPosition = Vector2(0.0, 0.0)
-
-    override var prevTime = 0.0
-
     override var velocity = Vector2(0.0, 0.0)
 
-    override var prevPathPosition = Vector2(0.0, 0.0)
-
-    override val parameters: SwerveParameters = SwerveParameters(
+   override val parameters: SwerveParameters = SwerveParameters(
         20.5, 21.0, 0.0,
         kFeedForward = 0.06, kPosition = 0.2, kTurn = 0.013
     ) //position 0.2
@@ -180,12 +174,12 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         override val speed: Double
             get() = driveMotor.velocity
 
-        override val currentDistance: Double
+        override val currDistance: Double
             get() = driveMotor.position
 
         var myPrevDistance: Double = 0.0
 
-        override var previousDistance: Double
+        override var prevDistance: Double
             get() = myPrevDistance
             set(dist) {
                 myPrevDistance = dist
