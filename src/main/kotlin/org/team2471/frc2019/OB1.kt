@@ -85,14 +85,14 @@ object OB1 : Subsystem("OB1") {
     }
 
     fun intake(power: Double) {
-//        println(Thread.currentThread().stackTrace.drop(2).first().toString())
+        println("$power from ${Thread.currentThread().stackTrace.drop(2).first()}")
         intakeMotor.setPercentOutput(power)
     }
 
     override suspend fun default() {
         periodic {
-            intake(OI.operatorController.getTriggerAxis(GenericHID.Hand.kLeft))
-//            println("%.3f -> %.3f..%.3f".format(angle.asDegrees, collisionZone.start, collisionZone.endInclusive))
+            pivotSetpoint += (OI.obiControl * 80.0 * period).degrees
+
         }
     }
 
