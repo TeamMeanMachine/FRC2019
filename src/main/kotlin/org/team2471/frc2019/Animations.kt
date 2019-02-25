@@ -15,7 +15,7 @@ class Animation(private vararg val keyFrames: KeyFrame) {
         val START_TO_HANDOFF = Animation(
             KeyFrame(0.seconds, Pose.STARTING_POSITION),
             KeyFrame(1.seconds, Pose(3.inches, (-74).degrees, 45.degrees, true)),
-            KeyFrame(2.seconds, Pose(15.inches, (-74).degrees, 45.degrees, false, true)),
+            KeyFrame(2.seconds, Pose(18.inches, (-74).degrees, 45.degrees, false, true)),
             KeyFrame(3.seconds, Pose.HATCH_HANDOFF)
         )
 
@@ -25,24 +25,6 @@ class Animation(private vararg val keyFrames: KeyFrame) {
             KeyFrame(0.5.seconds, Pose(9.inches, (-20).degrees, 90.degrees, false)),
             KeyFrame(1.5.seconds, Pose.HATCH_CARRY)
         )
-
-        val SCORE_1
-            get() = Animation(
-                KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, false)),
-                KeyFrame(1.seconds, Pose.HATCH_LOW)
-            )
-
-        val SCORE_2
-            get() = Animation(
-                KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, false)),
-                KeyFrame(1.seconds, Pose.HATCH_MED)
-            )
-
-        val SCORE_3
-            get() = Animation(
-                KeyFrame(0.seconds, Pose(Armavator.height, Armavator.angle, OB1.angle, false)),
-                KeyFrame(1.seconds, Pose.HATCH_HIGH)
-            )
 
         val CURRENT_TO_HATCH_CARRY
             get() = Animation(

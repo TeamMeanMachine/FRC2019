@@ -76,7 +76,7 @@ object Armavator : Subsystem("Armavator") {
     var isClimbing = false
 
     private val heightRange: DoubleRange
-        get() = if(!isClimbing) -2.0..26.0 else Pose.LIFTED.elevatorHeight.asInches..26.0// inches
+        get() = if(!isClimbing) 0.0..26.0 else Pose.LIFTED.elevatorHeight.asInches..26.0// inches
 
     private val armRange: DoubleRange = -74.0..64.0 // degrees
 

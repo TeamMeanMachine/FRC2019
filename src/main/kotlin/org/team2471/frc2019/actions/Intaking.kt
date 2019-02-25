@@ -27,8 +27,9 @@ suspend fun intakeCargo(): Nothing = use(Armavator, OB1) {
 suspend fun intakeHatch() = use(Armavator, OB1) {
     OB1.intake(0.7)
     Animation.HOME_TO_HATCH_GROUND_PICKUP.play()
-    suspendUntil { println(OB1.intakeCurrent); OB1.intakeCurrent > 15.0 } //30.0 for final
-    OB1.intake(0.5)
+    suspendUntil { println(OB1.intakeCurrent); OB1.intakeCurrent > 12.5 } //30.0 for final
+    delay(0.35)
+    OB1.intake(0.25)
     Animation.GROUND_PICKUP_TO_HATCH_HANDOFF.play()
     Armavator.gamePiece = GamePiece.HATCH_PANEL
     delay(0.5)
@@ -49,7 +50,8 @@ suspend fun initialHandoff() = use(Armavator, OB1) {
 }
 
 suspend fun pickupFeederStation() {
-    check (!Pose.current.closeTo(Pose.HOME))
+    println("Current Pose: ${Pose.current}")
+    check (Pose.current.closeTo(Pose.HOME))
 
     use(Armavator, OB1) {
         Animation.HOME_TO_FEEDER_STATION.play()

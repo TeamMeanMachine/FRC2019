@@ -47,12 +47,12 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 //    private val gyro = ADIS16448_IMU()
 //    private val gyro = GuttedADIS()
 //    private val gyro = Gyro
+    private val gyro: ADIS16448_IMU? = null
 
     override val headingWithDashboardSwitch: Angle
         get() {
             return if (SmartDashboard.getBoolean("Use Gyro", false)) {
-//                -gyro.angleX.degrees.wrap()
-                0.0.degrees
+                -(gyro?.angleX ?: 0.0).degrees.wrap()
             } else {
                 0.0.degrees
             }
@@ -61,18 +61,18 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     override val headingRateWithDashboardSwitch: AngularVelocity
         get() {
             return if (SmartDashboard.getBoolean("Use Gyro", false)) {
-//                gyro.rate.degrees.perSecond
-                0.0.degrees.perSecond
+                (gyro?.rate ?: 0.0).degrees.perSecond
+//                0.0.degrees.perSecond
             } else {
                 0.0.degrees.perSecond
             }
         }
 
     override val heading: Angle
-        get() = 0.degrees//-gyro.angleX.degrees.wrap()
+        get() = -(gyro?.angleX ?: 0.0).degrees.wrap()
 
     override val headingRate: AngularVelocity
-        get() = 0.degrees.perSecond//-gyro.rate.degrees.perSecond
+        get() = -(gyro?.rate ?: 0.0).degrees.perSecond
 
     var myPosition = Vector2(0.0, 0.0)
 
@@ -98,46 +98,46 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     init {
         SmartDashboard.setPersistent("Use Gyro")
 
-//        GlobalScope.launch(MeanlibDispatcher) {
-//            val table = NetworkTableInstance.getDefault().getTable(name)
-//
-//            val headingEntry = table.getEntry("Heading")
-//
-//            val flAngleEntry = table.getEntry("Front Left Angle")
-//            val frAngleEntry = table.getEntry("Front Right Angle")
-//            val blAngleEntry = table.getEntry("Back Left Angle")
-//            val brAngleEntry = table.getEntry("Back Right Angle")
-//            val flSPEntry = table.getEntry("Front Left SP")
-//            val frSPEntry = table.getEntry("Front Right SP")
-//            val blSPEntry = table.getEntry("Back Left SP")
-//            val brSPEntry = table.getEntry("Back Right SP")
-//
-//            val flErrorEntry = table.getEntry("Front Left Error")
-//            val frErrorEntry = table.getEntry("Front Right Error")
-//            val blErrorEntry = table.getEntry("Back Left Error")
-//            val brErrorEntry = table.getEntry("Back Right Error")
-//
-//            periodic {
-//                flAngleEntry.setDouble(frontLeftModule.angle.asDegrees)
-//                frAngleEntry.setDouble(frontRightModule.angle.asDegrees)
-//                blAngleEntry.setDouble(backLeftModule.angle.asDegrees)
-//                brAngleEntry.setDouble(backRightModule.angle.asDegrees)
-//                flSPEntry.setDouble(frontLeftModule.setPoint.asDegrees)
-//                frSPEntry.setDouble(frontRightModule.setPoint.asDegrees)
-//                blSPEntry.setDouble(backLeftModule.setPoint.asDegrees)
-//                brSPEntry.setDouble(backRightModule.setPoint.asDegrees)
-//
-//                flErrorEntry.setDouble(frontLeftModule.error.asDegrees)
-//                frErrorEntry.setDouble(frontRightModule.error.asDegrees)
-//                blErrorEntry.setDouble(backLeftModule.error.asDegrees)
-//                brErrorEntry.setDouble(backRightModule.error.asDegrees)
-//
-//                headingEntry.setDouble(heading.asDegrees)
-//            }
-//        }
+        GlobalScope.launch(MeanlibDispatcher) {
+            val table = NetworkTableInstance.getDefault().getTable(name)
+
+            val headingEntry = table.getEntry("Heading")
+
+            val flAngleEntry = table.getEntry("Front Left Angle")
+            val frAngleEntry = table.getEntry("Front Right Angle")
+            val blAngleEntry = table.getEntry("Back Left Angle")
+            val brAngleEntry = table.getEntry("Back Right Angle")
+            val flSPEntry = table.getEntry("Front Left SP")
+            val frSPEntry = table.getEntry("Front Right SP")
+            val blSPEntry = table.getEntry("Back Left SP")
+            val brSPEntry = table.getEntry("Back Right SP")
+
+            val flErrorEntry = table.getEntry("Front Left Error")
+            val frErrorEntry = table.getEntry("Front Right Error")
+            val blErrorEntry = table.getEntry("Back Left Error")
+            val brErrorEntry = table.getEntry("Back Right Error")
+
+            periodic {
+                flAngleEntry.setDouble(frontLeftModule.angle.asDegrees)
+                frAngleEntry.setDouble(frontRightModule.angle.asDegrees)
+                blAngleEntry.setDouble(backLeftModule.angle.asDegrees)
+                brAngleEntry.setDouble(backRightModule.angle.asDegrees)
+                flSPEntry.setDouble(frontLeftModule.setPoint.asDegrees)
+                frSPEntry.setDouble(frontRightModule.setPoint.asDegrees)
+                blSPEntry.setDouble(backLeftModule.setPoint.asDegrees)
+                brSPEntry.setDouble(backRightModule.setPoint.asDegrees)
+
+                flErrorEntry.setDouble(frontLeftModule.error.asDegrees)
+                frErrorEntry.setDouble(frontRightModule.error.asDegrees)
+                blErrorEntry.setDouble(backLeftModule.error.asDegrees)
+                brErrorEntry.setDouble(backRightModule.error.asDegrees)
+
+                headingEntry.setDouble(heading.asDegrees)
+            }
+        }
     }
 
-    fun zeroGyro() = Unit//gyro.reset()
+    fun zeroGyro() = gyro?.reset()
 
     override suspend fun default() {
 /*
@@ -146,7 +146,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         val positionYEntry = table.getEntry("positionY")
 */
         periodic {
-            drive(OI.driveTranslation, OI.driveRotation, false)
+            drive(OI.driveTranslation, OI.driveRotation, true)
 
             //println( "Odometry: Heading=$heading Position: ${position}")  // todo: send this to network tables to be displayed in visualizer
 /*

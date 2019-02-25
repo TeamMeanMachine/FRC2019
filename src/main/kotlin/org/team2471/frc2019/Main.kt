@@ -66,9 +66,9 @@ object Robot: RobotProgram {
     }
 
     override suspend fun disable() {
-//        Armavator.disable()
-//        OB1.disable()
-//        Drive.disable()
+        Armavator.disable()
+        OB1.disable()
+        Drive.disable()
 
 
 //            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")

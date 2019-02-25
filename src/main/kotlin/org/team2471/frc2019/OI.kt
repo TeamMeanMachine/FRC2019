@@ -30,6 +30,10 @@ object OI {
     val operatorRightYStick: Double
         get() = -operatorController.getRawAxis(5).deadband(0.15)
 
+    val obiControl: Double
+        get() = operatorController.getTriggerAxis(GenericHID.Hand.kRight) -
+                operatorController.getTriggerAxis(GenericHID.Hand.kLeft)
+
     val rightYStick: Double
         get() = -driverController.getRawAxis(5).deadband(0.2)
 

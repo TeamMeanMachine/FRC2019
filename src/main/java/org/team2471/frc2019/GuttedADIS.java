@@ -550,9 +550,8 @@ public class GuttedADIS extends GyroBase implements Gyro, PIDSource, Sendable {
                         m_integ_gyro_y += (gyro_y - m_gyro_offset_y) * dt;
                         m_integ_gyro_z += (gyro_z - m_gyro_offset_z) * dt;
                     }
-                } else {
-                    System.out.println("Invalid CRC");
                 }
+
             }
         }
     }
