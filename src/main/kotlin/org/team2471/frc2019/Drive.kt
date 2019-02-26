@@ -55,14 +55,14 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         )
     )
 
-//    private val gyro = SpinMaster16448()
-//    private val gyro = ADIS16448_IMU()
-//    private val gyro = GuttedADIS()
-//    private val gyro = Gyro
-    private val gyro: ADIS16448_IMU? = null
+    private val gyro: SpinMaster16448? = SpinMaster16448()
+//  private val gyro = ADIS16448_IMU()
+//  private val gyro = GuttedADIS()
+//  private val gyro = Gyro
+//  private val gyro: ADIS16448_IMU? = null
 
     override var heading: Angle
-        get() = gyroOffset - ((gyro?.angleX ?: 0.0).degrees.wrap())
+        get() = gyroOffset - ((gyro?.angle ?: 0.0).degrees.wrap())
         set(value) {
             gyroOffset = value
             gyro?.reset()
@@ -85,11 +85,14 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     init {
         SmartDashboard.setPersistent("Use Gyro")
 
-/*        GlobalScope.launch(MeanlibDispatcher) {
+        //SmartDashboard.putData("Gyro", gyro2)
+
+        GlobalScope.launch(MeanlibDispatcher) {
             val table = NetworkTableInstance.getDefault().getTable(name)
 
             val headingEntry = table.getEntry("Heading")
 
+            /*
             val flAngleEntry = table.getEntry("Front Left Angle")
             val frAngleEntry = table.getEntry("Front Right Angle")
             val blAngleEntry = table.getEntry("Back Left Angle")
@@ -104,8 +107,9 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             val blErrorEntry = table.getEntry("Back Left Error")
             val brErrorEntry = table.getEntry("Back Right Error")
 
+        */
             periodic {
-                flAngleEntry.setDouble(frontLeftModule.angle.asDegrees)
+             /* flAngleEntry.setDouble(frontLeftModule.angle.asDegrees)
                 frAngleEntry.setDouble(frontRightModule.angle.asDegrees)
                 blAngleEntry.setDouble(backLeftModule.angle.asDegrees)
                 brAngleEntry.setDouble(backRightModule.angle.asDegrees)
@@ -117,12 +121,11 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                 flErrorEntry.setDouble(frontLeftModule.error.asDegrees)
                 frErrorEntry.setDouble(frontRightModule.error.asDegrees)
                 blErrorEntry.setDouble(backLeftModule.error.asDegrees)
-                brErrorEntry.setDouble(backRightModule.error.asDegrees)
+                brErrorEntry.setDouble(backRightModule.error.asDegrees)*/
 
                 headingEntry.setDouble(heading.asDegrees)
             }
         }
-        */
     }
 
     fun zeroGyro() = gyro?.reset()

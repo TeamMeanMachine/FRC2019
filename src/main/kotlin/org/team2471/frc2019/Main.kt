@@ -94,7 +94,7 @@ fun main() {
     Armavator
     OB1
 
-//    AutoChooser
+    AutoChooser
 
     runRobotProgram(Robot)
 }
