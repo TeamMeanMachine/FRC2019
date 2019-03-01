@@ -77,9 +77,12 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     override var robotPivot = Vector2(0.0, 0.0)
 
     override val parameters: SwerveParameters = SwerveParameters(
-        20.5, 21.0, 0.0,
-        kPositionFeedForward = 0.06, kPosition = 0.2, kHeading = 0.013
-    ) //position 0.2
+        gyroRateCorrection = 20.5,
+        kPositionFeedForward = 0.06,
+        kPosition = 0.2,
+        kHeading = 0.013,
+        kHeadingFeedForward = 0.0
+    )
 
     init {
         SmartDashboard.setPersistent("Use Gyro")
