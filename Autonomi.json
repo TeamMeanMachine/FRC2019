@@ -1306,7 +1306,7 @@
 								},
 								"m_prevSlopeMethod": "SLOPE_FLAT",
 								"m_prevTangent": {
-									"x": 0.6666666666666666,
+									"x": 2.0,
 									"y": 0.0
 								},
 								"m_timeAndValue": {
@@ -1316,7 +1316,7 @@
 							},
 							"m_nextSlopeMethod": "SLOPE_FLAT",
 							"m_nextTangent": {
-								"x": 1.3333333333333333,
+								"x": 4.0,
 								"y": 0.0
 							},
 							"m_prevAngleAndMagnitude": {
@@ -1369,7 +1369,7 @@
 									},
 									"m_prevSlopeMethod": "SLOPE_FLAT",
 									"m_prevTangent": {
-										"x": 0.16666666666666666,
+										"x": 0.5,
 										"y": 0.0
 									},
 									"m_timeAndValue": {
@@ -1379,8 +1379,8 @@
 								},
 								"m_nextSlopeMethod": "SLOPE_SMOOTH",
 								"m_nextTangent": {
-									"x": 0.3333333333333333,
-									"y": 9.00900900900901
+									"x": 1.0,
+									"y": 27.027027027027028
 								},
 								"m_prevAngleAndMagnitude": {
 									"x": 0.0,
@@ -1388,8 +1388,8 @@
 								},
 								"m_prevSlopeMethod": "SLOPE_SMOOTH",
 								"m_prevTangent": {
-									"x": 0.7766666666666666,
-									"y": 20.99099099099099
+									"x": 2.33,
+									"y": 62.972972972972975
 								},
 								"m_timeAndValue": {
 									"x": 4.0,
@@ -1504,7 +1504,7 @@
 								},
 								"m_prevSlopeMethod": "SLOPE_FLAT",
 								"m_prevTangent": {
-									"x": 0.8333333333333333,
+									"x": 2.5,
 									"y": 0.0
 								},
 								"m_timeAndValue": {
@@ -1514,7 +1514,7 @@
 							},
 							"m_nextSlopeMethod": "SLOPE_FLAT",
 							"m_nextTangent": {
-								"x": 1.6666666666666665,
+								"x": 5.0,
 								"y": 0.0
 							},
 							"m_prevAngleAndMagnitude": {
@@ -1702,7 +1702,7 @@
 								},
 								"m_prevSlopeMethod": "SLOPE_FLAT",
 								"m_prevTangent": {
-									"x": 0.5833333333333333,
+									"x": 1.75,
 									"y": 0.0
 								},
 								"m_timeAndValue": {
@@ -1712,7 +1712,7 @@
 							},
 							"m_nextSlopeMethod": "SLOPE_FLAT",
 							"m_nextTangent": {
-								"x": 1.1666666666666665,
+								"x": 3.5,
 								"y": 0.0
 							},
 							"m_prevAngleAndMagnitude": {
@@ -1875,7 +1875,7 @@
 								},
 								"m_prevSlopeMethod": "SLOPE_FLAT",
 								"m_prevTangent": {
-									"x": 0.5,
+									"x": 1.5,
 									"y": 0.0
 								},
 								"m_timeAndValue": {
@@ -1885,7 +1885,7 @@
 							},
 							"m_nextSlopeMethod": "SLOPE_FLAT",
 							"m_nextTangent": {
-								"x": 1.0,
+								"x": 3.0,
 								"y": 0.0
 							},
 							"m_prevAngleAndMagnitude": {
@@ -2048,7 +2048,7 @@
 								},
 								"m_prevSlopeMethod": "SLOPE_FLAT",
 								"m_prevTangent": {
-									"x": 0.5,
+									"x": 1.5,
 									"y": 0.0
 								},
 								"m_timeAndValue": {
@@ -2058,7 +2058,7 @@
 							},
 							"m_nextSlopeMethod": "SLOPE_FLAT",
 							"m_nextTangent": {
-								"x": 1.0,
+								"x": 3.0,
 								"y": 0.0
 							},
 							"m_prevAngleAndMagnitude": {
@@ -2189,6 +2189,135 @@
 						}
 					},
 					"name": "Cargo pit to mid rocket",
+					"robotDirection": "FORWARD",
+					"scrubFactor": 1.12,
+					"speed": 1.0,
+					"trackWidth": 2.0833333333333335
+				}
+			}
+		},
+		"Oregon City": {
+			"m_mirrored": false,
+			"name": "Oregon City",
+			"paths": {
+				"Platform to Rocket": {
+					"curveType": "EASE",
+					"m_easeCurve": {
+						"m_defaultValue": 0.0,
+						"m_headKey": {
+							"m_markBeginOrEndKeysToZeroSlope": true,
+							"m_nextAngleAndMagnitude": {
+								"x": 0.0,
+								"y": 1.0
+							},
+							"m_nextKey": {
+								"m_markBeginOrEndKeysToZeroSlope": true,
+								"m_nextAngleAndMagnitude": {
+									"x": 0.0,
+									"y": 1.0
+								},
+								"m_nextSlopeMethod": "SLOPE_FLAT",
+								"m_nextTangent": {
+									"x": 0.0,
+									"y": 0.0
+								},
+								"m_prevAngleAndMagnitude": {
+									"x": 0.0,
+									"y": 1.0
+								},
+								"m_prevSlopeMethod": "SLOPE_FLAT",
+								"m_prevTangent": {
+									"x": 2.5,
+									"y": 0.0
+								},
+								"m_timeAndValue": {
+									"x": 5.0,
+									"y": 1.0
+								}
+							},
+							"m_nextSlopeMethod": "SLOPE_FLAT",
+							"m_nextTangent": {
+								"x": 5.0,
+								"y": 0.0
+							},
+							"m_prevAngleAndMagnitude": {
+								"x": 0.0,
+								"y": 1.0
+							},
+							"m_prevSlopeMethod": "SLOPE_FLAT",
+							"m_prevTangent": {
+								"x": 0.0,
+								"y": 0.0
+							},
+							"m_timeAndValue": {
+								"x": 0.0,
+								"y": 0.0
+							}
+						},
+						"m_maxValue": 1.7976931348623157E308,
+						"m_minValue": -1.7976931348623157E308,
+						"m_postExtrapolation": "EXTRAPOLATION_CONSTANT",
+						"m_preExtrapolation": "EXTRAPOLATION_CONSTANT"
+					},
+					"m_headingCurve": {
+						"m_defaultValue": 0.0,
+						"m_maxValue": 1.7976931348623157E308,
+						"m_minValue": -1.7976931348623157E308,
+						"m_postExtrapolation": "EXTRAPOLATION_CONSTANT",
+						"m_preExtrapolation": "EXTRAPOLATION_CONSTANT"
+					},
+					"m_mirrored": false,
+					"m_xyCurve": {
+						"m_headPoint": {
+							"m_nextAngleAndMagnitude": {
+								"x": 33.29942053718416,
+								"y": 2.1796689715078745
+							},
+							"m_nextPoint": {
+								"m_nextAngleAndMagnitude": {
+									"x": -0.1253906454196212,
+									"y": 1.9
+								},
+								"m_nextSlopeMethod": "SLOPE_SMOOTH",
+								"m_nextTangent": {
+									"x": 6.648682649199414,
+									"y": 10.007233068968745
+								},
+								"m_position": {
+									"x": 10.875662311561388,
+									"y": 16.025692243207615
+								},
+								"m_prevAngleAndMagnitude": {
+									"x": -0.1253906454196212,
+									"y": 1.9636117660226677
+								},
+								"m_prevSlopeMethod": "SLOPE_SMOOTH",
+								"m_prevTangent": {
+									"x": 6.8712797255361755,
+									"y": 10.342273999767452
+								}
+							},
+							"m_nextSlopeMethod": "SLOPE_SMOOTH",
+							"m_nextTangent": {
+								"x": 0.04204090134247007,
+								"y": 13.782971414576743
+							},
+							"m_position": {
+								"x": 3.9001190280006877,
+								"y": 5.476471612403991
+							},
+							"m_prevAngleAndMagnitude": {
+								"x": 33.29942053718416,
+								"y": 1.9
+							},
+							"m_prevSlopeMethod": "SLOPE_SMOOTH",
+							"m_prevTangent": {
+								"x": 0.03664671727442759,
+								"y": 12.014505885992147
+							}
+						}
+					},
+					"name": "Platform to Rocket",
 					"robotDirection": "FORWARD",
 					"scrubFactor": 1.12,
 					"speed": 1.0,

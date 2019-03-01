@@ -61,9 +61,7 @@ private suspend fun score(position: ScoringPosition) {
             Armavator.intake(-0.5)
             delay(0.5)
         } else {
-            Armavator.isPinching = true
-            Armavator.intake(-0.5)
-            Armavator.isClamping = false
+            Armavator.intake(-1.0)
             delay(0.5)
         }
         Armavator.gamePiece = null

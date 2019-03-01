@@ -48,7 +48,7 @@ data class Pose(
         val LIFTED = Pose((-20).inches, 64.degrees, (-2).degrees, false, isClimbing = true)
         val CLIMB_LIFT_ELEVATOR = Pose(0.inches, 64.degrees, (-2).degrees, false, isClimbing = true)
 
-        val CARGO_GROUND_PICKUP = Pose(0.inches, (-72).degrees, 62.degrees, true, false)
+        val CARGO_GROUND_PICKUP = Pose(0.inches, (-72).degrees, 67.degrees, true, false)
         val CARGO_LOW = Pose(17.inches, (-57).degrees, 6.degrees, true, false)
         val CARGO_MED = Pose(0.inches, (57).degrees, 6.degrees, true, false)
         val CARGO_HIGH = Pose(26.inches, (64).degrees, 6.degrees, true, false)

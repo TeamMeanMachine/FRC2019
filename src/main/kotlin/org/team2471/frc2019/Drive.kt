@@ -1,6 +1,5 @@
 package org.team2471.frc2019
 
-import com.analog.adis16448.frc.ADIS16448_IMU
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
@@ -79,7 +78,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 
     override val parameters: SwerveParameters = SwerveParameters(
         20.5, 21.0, 0.0,
-        kFeedForward = 0.06, kPosition = 0.2, kTurn = 0.013
+        kPositionFeedForward = 0.06, kPosition = 0.2, kHeading = 0.013
     ) //position 0.2
 
     init {
@@ -226,7 +225,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                 inverted(isBack)
                 sensorPhase(isBack)
                 brakeMode()
-                feedbackCoefficient = 1 / 6000.0
+                feedbackCoefficient = 1 / 4687.5
                 currentLimit(30, 0, 0)
             }
             GlobalScope.launch(MeanlibDispatcher) {

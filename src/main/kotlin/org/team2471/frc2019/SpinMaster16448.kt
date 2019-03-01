@@ -12,6 +12,7 @@ import org.team2471.frc.lib.coroutines.delay
 class SpinMaster16448 : Gyro {
     @Volatile
     private var yaw = 0.0
+    @Volatile
     private var yawOffset = 0.0
 
     override fun calibrate() = Unit

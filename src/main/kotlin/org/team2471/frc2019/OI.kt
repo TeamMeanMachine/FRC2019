@@ -55,7 +55,7 @@ object OI {
         driverController.createMappings {
             leftBumperToggle { intakeCargo() }
 
-            bPress { ejectPiece() }
+            bPress { forceReset() }
 
             rightBumperToggle { intakeHatch() }
 
@@ -63,7 +63,7 @@ object OI {
 
             backToggle { climb() }
 
-            startPress { Drive.zeroGyro() }
+            leftThumbstickPress { Drive.zeroGyro() }
         }
 
         operatorController.createMappings {
