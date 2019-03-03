@@ -5,7 +5,9 @@ package org.team2471.frc2019
 import edu.wpi.first.wpilibj.Compressor
 import edu.wpi.first.wpilibj.SerialPort
 import edu.wpi.first.wpilibj.Solenoid
+import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
+import org.team2471.frc.lib.coroutines.delay
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.RobotProgram
 import org.team2471.frc.lib.framework.initializeWpilib
@@ -13,7 +15,6 @@ import org.team2471.frc.lib.framework.runRobotProgram
 import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.motion.following.drive
-import org.team2471.frc.lib.units.asDegrees
 import org.team2471.frc.lib.units.degrees
 import org.team2471.frc.lib.units.inches
 import org.team2471.frc2019.testing.steeringTests
@@ -51,7 +52,7 @@ object Robot: RobotProgram {
 //            }
 //        }
 
-        Drive.steeringTests()
+//        Drive.steeringTests()
 
 //        val startingHeight = Armavator.height
 //        val startingAngle = Armavator.angle
@@ -62,6 +63,11 @@ object Robot: RobotProgram {
 //
 //        OB1.animateToAngle(90.0.degrees)
 //        OB1.animateToAngle(0.degrees)
+        periodic {
+            val power = Math.sin(Timer.getFPGATimestamp() * 3.0) / 2.0 + 0.5
+
+            Jevois.ledRingLight.setPercentOutput(power)
+        }
     }
 
     override suspend fun disable() {
@@ -69,20 +75,10 @@ object Robot: RobotProgram {
         OB1.disable()
         Drive.disable()
 
-
+        periodic{
+            if (Jevois.targets.isNotEmpty()) println(Jevois.targets.joinToString())
 //            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
-
-//        periodic{
-//            println("Front Left: = ${Drive.frontLeftModule.angle} " +
-//                    "Front Right: = ${Drive.frontRightModule.angle} " +
-//                    "Back Left: = ${Drive.backLeftModule.angle} " +
-//                    "Back Right: = ${Drive.backRightModule.angle}")
-//            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
-//            println("BL: = ${Drive.backLeftModule.currDistance}, BR: = ${Drive.backRightModule.currDistance}, FL: = ${Drive.frontLeftModule.currDistance}, FR: = ${Drive.frontRightModule.currDistance},")
-
-
-//        }
-
+        }
     }
 }
 
@@ -92,6 +88,7 @@ fun main() {
     Drive
     Armavator
     OB1
+    Jevois
 
     AutoChooser
 

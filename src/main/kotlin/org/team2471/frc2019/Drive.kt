@@ -81,7 +81,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         kPositionFeedForward = 0.06,
         kPosition = 0.2,
         kHeading = 0.013,
-        kHeadingFeedForward = 0.0
+        kHeadingFeedForward = 0.00195
     )
 
     init {
@@ -148,7 +148,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     }
 
     class Module(
-        val driveMotor: MotorController,
+        private val driveMotor: MotorController,
         private val turnMotor: MotorController,
         isBack: Boolean,
         override val modulePosition: Vector2,
@@ -176,26 +176,17 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         override val currDistance: Double
             get() = driveMotor.position
 
-        var myPrevDistance: Double = 0.0
-
-        override var prevDistance: Double
-            get() = myPrevDistance
-            set(dist) {
-                myPrevDistance = dist
-            }
+        override var prevDistance: Double = 0.0
 
         override fun zeroEncoder() {
             driveMotor.position = 0.0
         }
 
-        private var myAngleSetpoint = 0.0.radians
-
-        override var angleSetpoint
-            get() = myAngleSetpoint
+        override var angleSetpoint = 0.degrees
             set(value) {
-                myAngleSetpoint = value
+                field = value
                 val current = this.angle
-                val error = (myAngleSetpoint - current).wrap()
+                val error = (field - current).wrap()
                 val turnPower = pdController.update(error.asDegrees)
                 turnMotor.setPercentOutput(turnPower)
 //            println(
@@ -208,8 +199,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 //            )
             }
 
-        override fun setDrivePower(power: Double)
-        {
+        override fun setDrivePower(power: Double) {
            driveMotor.setPercentOutput(power)
         }
 

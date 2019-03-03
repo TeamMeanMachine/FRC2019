@@ -55,15 +55,15 @@ object OI {
         driverController.createMappings {
             leftBumperToggle { intakeCargo() }
 
-            bPress { forceReset() }
-
             rightBumperToggle { intakeHatch() }
 
             aPress { pickupFeederStation() }
 
-            backToggle { climb() }
+            bPress { forceReset() }
 
-            leftThumbstickPress { Drive.zeroGyro() }
+            backPress { Drive.zeroGyro() }
+
+            yPress { climb() }  // put climb on dpad for safety
         }
 
         operatorController.createMappings {

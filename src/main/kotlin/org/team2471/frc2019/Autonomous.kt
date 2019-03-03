@@ -89,7 +89,7 @@ object AutoChooser {
         auto.isMirrored = false
 
         parallel({
-            Drive.driveAlongPath(auto["Platform to Rocket"], 0.0, true)
+            Drive.driveAlongPath(auto["Platform to Rocket"], true, 0.0)
         }, {
             //animateToPose(Pose.HATCH_HIGH)
         })
@@ -102,7 +102,7 @@ object AutoChooser {
         if (testPath != null) {
             val testAutonomous = autonomi["Tests"]
             val path = testAutonomous[testPath]
-            Drive.driveAlongPath(path, 0.0, true)
+            Drive.driveAlongPath(path, true, 0.0)
         }
     }
 }

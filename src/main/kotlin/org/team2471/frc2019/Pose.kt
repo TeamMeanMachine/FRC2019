@@ -36,7 +36,7 @@ data class Pose(
         val CARGO_SAFETY_POSE = Pose(14.inches, (-72).degrees, 6.degrees, true)
 
         val HATCH_GROUND_PICKUP = Pose(14.inches, (-72).degrees, 0.degrees, false, true)
-        val HATCH_HANDOFF = Pose(8.inches, (-25).degrees, 95.degrees, false, false)
+        val HATCH_HANDOFF = Pose(7.inches, (-25).degrees, 100.degrees, false, false)
         val HATCH_CARRY = Pose(11.inches, (-69).degrees, 6.degrees, false, false)
         val HATCH_INTERMEDIATE = Pose(7.inches, (-40).degrees, 6.degrees, false, false)
         val HATCH_LOW = Pose(0.inches, (-10).degrees, 6.degrees, false)
