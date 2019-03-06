@@ -6,6 +6,9 @@ import org.team2471.frc.lib.framework.*
 import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.math.deadband
 import org.team2471.frc.lib.math.squareWithSign
+import org.team2471.frc.lib.motion.following.driveAlongPath
+import org.team2471.frc.lib.motion_profiling.Path2D
+import org.team2471.frc.lib.units.degrees
 import org.team2471.frc2019.actions.*
 
 object OI {
@@ -63,7 +66,24 @@ object OI {
 
             backPress { Drive.zeroGyro() }
 
-            yPress { climb() }  // put climb on dpad for safety
+            yPress {
+                // put climb on dpad for safety
+//                val position1 = Vector2(0.0, 0.0)
+//                val tangent1 = Vector2(0.0, 3.0)
+//                val robotPosition = RobotPosition(Drive.position, Drive.heading)
+//                val initialPathPoint = robotToField(RobotPathPoint(position1, tangent1), robotPosition)
+//                val examplePath = Path2D().apply {
+//                    robotDirection = Path2D.RobotDirection.FORWARD
+//                    addPointAndTangent(initialPathPoint.position.x, initialPathPoint.position.y, 0.0, 1.0)
+//                    addPointAndTangent(initialPathPoint.position.x + 3.0, initialPathPoint.position.y + 1.0, 0.0, 4.0)
+//                    addEasePoint(0.0, 0.0)
+//                    addEasePoint(3.0, 1.0)
+//                    addHeadingPoint(0.0, Drive.heading.asDegrees)
+//                    addHeadingPoint(3.0, 45.0)
+//                }
+                driveToTarget()
+            }
+
         }
 
         operatorController.createMappings {

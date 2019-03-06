@@ -28,6 +28,7 @@ object Robot: RobotProgram {
         Armavator.enable()
         OB1.enable()
         Drive.enable()
+        Jevois.enable()
     }
 
     override suspend fun autonomous() {
@@ -63,17 +64,14 @@ object Robot: RobotProgram {
 //
 //        OB1.animateToAngle(90.0.degrees)
 //        OB1.animateToAngle(0.degrees)
-        periodic {
-            val power = Math.sin(Timer.getFPGATimestamp() * 3.0) / 2.0 + 0.5
-
-            Jevois.ledRingLight.setPercentOutput(power)
-        }
     }
 
     override suspend fun disable() {
         Armavator.disable()
         OB1.disable()
         Drive.disable()
+        Jevois.disable()
+        OI
 
         periodic{
             if (Jevois.targets.isNotEmpty()) println(Jevois.targets.joinToString())
