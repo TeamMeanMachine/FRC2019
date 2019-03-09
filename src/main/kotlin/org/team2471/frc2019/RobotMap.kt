@@ -31,6 +31,8 @@ object Victors {
     const val ARM_INTAKE = 6
 
     const val OB1_PIVOT_SLAVE = 10
+
+    const val LED_RING_LIGHT = 16
 }
 
 object Solenoids {

@@ -70,6 +70,11 @@ object OB1 : Subsystem("OB1") {
         intakeMotor.setPercentOutput(power)
     }
 
+    override fun reset() {
+        pivotSetpoint = angle
+        intake(0.0)
+    }
+
     override suspend fun default() {
         periodic {
             angleSetpoint += (OI.obiControl * 80.0 * period).degrees

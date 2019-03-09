@@ -153,6 +153,12 @@ object Armavator : Subsystem("Armavator") {
         println("Elevator Height: %.3f\tElevator Setpoint: %.3f".format(height.asInches, heightSetpoint.asInches))
     }
 
+    override fun reset() {
+        angleSetpoint = angle
+        heightSetpoint = height
+        intake(0.0)
+    }
+
     override suspend fun default() {
         periodic {
 //            printDebugInfo()

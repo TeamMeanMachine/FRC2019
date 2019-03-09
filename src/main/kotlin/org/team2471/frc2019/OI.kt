@@ -1,109 +1,125 @@
 package org.team2471.frc2019
 
-import org.team2471.frc.lib.coroutines.periodic
+import edu.wpi.first.wpilibj.GenericHID
+import edu.wpi.first.wpilibj.XboxController
 import org.team2471.frc.lib.framework.*
-import org.team2471.frc.lib.input.XboxController
-import org.team2471.frc.lib.input.toggleWhenTrue
-import org.team2471.frc.lib.input.whenTrue
+import org.team2471.frc.lib.input.Controller
 import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.math.deadband
 import org.team2471.frc.lib.math.squareWithSign
-import org.team2471.frc.lib.units.Length
-import org.team2471.frc2019.actions.intakeCargo
-import org.team2471.frc2019.actions.intakeHatch
+import org.team2471.frc.lib.motion.following.driveAlongPath
+import org.team2471.frc.lib.motion_profiling.Path2D
+import org.team2471.frc.lib.units.degrees
+import org.team2471.frc2019.actions.*
 
 object OI {
     val driverController = XboxController(0)
     val operatorController = XboxController(1)
 
-    private val driveTranslationX: Double
-        get() = driverController.leftThumbstickX.deadband(0.125).squareWithSign()
+    val driveTranslationX: Double
+        get() = driverController.getRawAxis(0).deadband(0.125).squareWithSign()
 
-    private val driveTranslationY: Double
-        get() = -driverController.leftThumbstickY.deadband(0.125).squareWithSign()
+    val driveTranslationY: Double
+        get() = -driverController.getRawAxis(1).deadband(0.125).squareWithSign()
 
     val driveTranslation: Vector2
         get() = Vector2(driveTranslationX, driveTranslationY)
 
     val driveRotation: Double
-        get() = (driverController.rightThumbstickX.deadband(0.125)).squareWithSign() * 0.5
+        get() = (driverController.getRawAxis(4).deadband(0.125)).squareWithSign() * 0.5
 
     val operatorLeftYStick: Double
-        get() = -operatorController.leftThumbstickY.deadband(0.15)
+        get() = -operatorController.getRawAxis(1).deadband(0.15)
 
     val operatorRightYStick: Double
-        get() = -operatorController.rightThumbstickY.deadband(0.15)
+        get() = -operatorController.getRawAxis(5).deadband(0.15)
 
     val obiControl: Double
-        get() = operatorController.rightTrigger -
-                operatorController.leftTrigger
+        get() = operatorController.getTriggerAxis(GenericHID.Hand.kRight) -
+                operatorController.getTriggerAxis(GenericHID.Hand.kLeft)
+
+    val rightYStick: Double
+        get() = -driverController.getRawAxis(5).deadband(0.2)
 
     val ejectPiece: Boolean
-        get() = driverController.rightTrigger > 0.5
+        get() = driverController.getTriggerAxis(GenericHID.Hand.kRight) > 0.5
 
     val activate: Boolean
-        get() = driverController.rightBumper
+        get() = driverController.getBumper(GenericHID.Hand.kRight)
 
     val startClimb: Boolean
-        get() = driverController.start
+        get() = driverController.startButton
 
     init {
-        driverController::leftBumper.toggleWhenTrue { intakeCargo() }
-        driverController::rightBumper.toggleWhenTrue { intakeHatch() }
-
 //        operatorController.createMappings {
 //            yToggle { OB1.intakeHatch() }
 //            bToggle { OB1.intakeCargo() }
 //            aHold { OB1.intake(1.0)}
 //        }
-//        driverController.createMappings {
-//            leftBumperToggle { intakeCargo() }
-//
-////            bPress { ejectPiece() }
-//
-//            rightBumperToggle { intakeHatch() }
-//
-//            aPress { pickupFeederStation() }
-//
-//            backToggle { climb() }
-//
-//            startPress { Drive.zeroGyro() }
-//            startPress { goToPose(Pose.STARTING_POSITION) }
-//            aPress { goToPose(Pose.HATCH_LOW) }
-//            xPress { goToPose(Pose.HATCH_MED) }
-//            yPress { goToPose(Pose.HATCH_HIGH) }
-//            bPress { goToPose(Pose.HOME) }
-//        }
+        driverController.createMappings {
+            leftBumperToggle { intakeCargo() }
 
-//        operatorController.createMappings {
-//            rightBumperPress {
-//                Armavator.isPinching = !Armavator.isPinching
-//            }
-//            leftBumperPress {
-//                Armavator.isClamping = !Armavator.isClamping
-//            }
-//
-//            backPress {
-//                Armavator.elevatorMotors.position = 0.0
-//            }
-//
-//            startPress { returnHome() }
-//
-//            aPress { scoreLow() }
-//            bPress { scoreMed() }
-//            yPress { scoreHigh() }
-//            xPress {
-//                scoreCargoShip()
-//
-////                Animation.CURRENT_TO_HOME.play()
-//            }
-//        }
-    }
-}
+            rightBumperToggle { intakeHatch() }
 
-suspend fun goToHeight(height: Length) = use(Armavator) {
-    periodic {
-        Armavator.heightSetpoint = height
-        if (Math.abs(Armavator.height.asInches - height.asInches) < 3.0) stop()
+            aPress { pickupFeederStation() }
+
+            bPress { forceReset() }
+
+            backPress { Drive.zeroGyro() }
+
+            yPress {
+//                val position1 = Vector2(0.0, 0.0)
+//                val tangent1 = Vector2(0.0, 3.0)
+//                val robotPosition = RobotPosition(Drive.position, Drive.heading)
+//                val initialPathPoint = robotToField(RobotPathPoint(position1, tangent1), robotPosition)
+//                val examplePath = Path2D().apply {
+//                    robotDirection = Path2D.RobotDirection.FORWARD
+//                    addPointAndTangent(initialPathPoint.position.x, initialPathPoint.position.y, 0.0, 1.0)
+//                    addPointAndTangent(initialPathPoint.position.x + 3.0, initialPathPoint.position.y + 1.0, 0.0, 4.0)
+//                    addEasePoint(0.0, 0.0)
+//                    addEasePoint(3.0, 1.0)
+//                    addHeadingPoint(0.0, Drive.heading.asDegrees)
+//                    addHeadingPoint(3.0, 45.0)
+//                }
+                driveToTarget()
+            }
+
+
+        }
+
+
+        // put climb on dpad for safety
+        // no idea how to map to dpad button
+
+/*
+        Events.whenActive( unit ->  driverController.dPad == Controller.Direction.UP, {
+            climb()
+        })
+*/
+
+
+        operatorController.createMappings {
+            rightBumperPress {
+                Armavator.isPinching = !Armavator.isPinching
+            }
+            leftBumperPress {
+                Armavator.isClamping = !Armavator.isClamping
+            }
+
+            backPress {
+                Armavator.elevatorMotors.position = 0.0
+            }
+
+            startPress { returnHome() }
+
+            aPress { scoreLow() }
+            bPress { scoreMed() }
+            yPress { scoreHigh() }
+            xPress {
+                scoreCargoShip()
+
+//                Animation.CURRENT_TO_HOME.play()
+            }
+        }
     }
 }

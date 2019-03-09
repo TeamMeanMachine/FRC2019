@@ -23,7 +23,7 @@ suspend fun climb() = use(Armavator, OB1) {
             periodic {
                  if (timer.get() >= 1.5) return@periodic stop()
                 OB1.intake(-0.7)
-                Drive.drive(Vector2(0.0, 0.6), 0.0, false)
+                Drive.drive(Vector2(0.0, 0.4), 0.0, false)
             }
             goToPose(Pose.LIFTED)
         }

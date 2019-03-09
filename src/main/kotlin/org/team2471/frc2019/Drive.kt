@@ -1,6 +1,5 @@
 package org.team2471.frc2019
 
-import com.analog.adis16448.frc.ADIS16448_IMU
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
@@ -55,14 +54,14 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         )
     )
 
-//    private val gyro = SpinMaster16448()
-//    private val gyro = ADIS16448_IMU()
-//    private val gyro = GuttedADIS()
-//    private val gyro = Gyro
-    private val gyro: ADIS16448_IMU? = null
+    private val gyro: SpinMaster16448? = SpinMaster16448()
+//  private val gyro = ADIS16448_IMU()
+//  private val gyro = GuttedADIS()
+//  private val gyro = Gyro
+//  private val gyro: ADIS16448_IMU? = null
 
     override var heading: Angle
-        get() = gyroOffset - ((gyro?.angleX ?: 0.0).degrees.wrap())
+        get() = gyroOffset - ((gyro?.angle ?: 0.0).degrees.wrap())
         set(value) {
             gyroOffset = value
             gyro?.reset()
@@ -78,18 +77,24 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     override var robotPivot = Vector2(0.0, 0.0)
 
     override val parameters: SwerveParameters = SwerveParameters(
-        20.5, 21.0, 0.0,
-        kFeedForward = 0.06, kPosition = 0.2, kTurn = 0.013
-    ) //position 0.2
+        gyroRateCorrection = 20.5,
+        kPositionFeedForward = 0.06,
+        kPosition = 0.2,
+        kHeading = 0.013,
+        kHeadingFeedForward = 0.00195
+    )
 
     init {
         SmartDashboard.setPersistent("Use Gyro")
 
-/*        GlobalScope.launch(MeanlibDispatcher) {
+        //SmartDashboard.putData("Gyro", gyro2)
+
+        GlobalScope.launch(MeanlibDispatcher) {
             val table = NetworkTableInstance.getDefault().getTable(name)
 
             val headingEntry = table.getEntry("Heading")
 
+            /*
             val flAngleEntry = table.getEntry("Front Left Angle")
             val frAngleEntry = table.getEntry("Front Right Angle")
             val blAngleEntry = table.getEntry("Back Left Angle")
@@ -104,8 +109,9 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             val blErrorEntry = table.getEntry("Back Left Error")
             val brErrorEntry = table.getEntry("Back Right Error")
 
+        */
             periodic {
-                flAngleEntry.setDouble(frontLeftModule.angle.asDegrees)
+             /* flAngleEntry.setDouble(frontLeftModule.angle.asDegrees)
                 frAngleEntry.setDouble(frontRightModule.angle.asDegrees)
                 blAngleEntry.setDouble(backLeftModule.angle.asDegrees)
                 brAngleEntry.setDouble(backRightModule.angle.asDegrees)
@@ -117,12 +123,11 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                 flErrorEntry.setDouble(frontLeftModule.error.asDegrees)
                 frErrorEntry.setDouble(frontRightModule.error.asDegrees)
                 blErrorEntry.setDouble(backLeftModule.error.asDegrees)
-                brErrorEntry.setDouble(backRightModule.error.asDegrees)
+                brErrorEntry.setDouble(backRightModule.error.asDegrees)*/
 
                 headingEntry.setDouble(heading.asDegrees)
             }
         }
-        */
     }
 
     fun zeroGyro() = gyro?.reset()
@@ -143,7 +148,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     }
 
     class Module(
-        val driveMotor: MotorController,
+        private val driveMotor: MotorController,
         private val turnMotor: MotorController,
         isBack: Boolean,
         override val modulePosition: Vector2,
@@ -171,26 +176,17 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         override val currDistance: Double
             get() = driveMotor.position
 
-        var myPrevDistance: Double = 0.0
-
-        override var prevDistance: Double
-            get() = myPrevDistance
-            set(dist) {
-                myPrevDistance = dist
-            }
+        override var prevDistance: Double = 0.0
 
         override fun zeroEncoder() {
             driveMotor.position = 0.0
         }
 
-        private var myAngleSetpoint = 0.0.radians
-
-        override var angleSetpoint
-            get() = myAngleSetpoint
+        override var angleSetpoint = 0.degrees
             set(value) {
-                myAngleSetpoint = value
+                field = value
                 val current = this.angle
-                val error = (myAngleSetpoint - current).wrap()
+                val error = (field - current).wrap()
                 val turnPower = pdController.update(error.asDegrees)
                 turnMotor.setPercentOutput(turnPower)
 //            println(
@@ -203,8 +199,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 //            )
             }
 
-        override fun setDrivePower(power: Double)
-        {
+        override fun setDrivePower(power: Double) {
            driveMotor.setPercentOutput(power)
         }
 
@@ -223,7 +218,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                 inverted(isBack)
                 sensorPhase(isBack)
                 brakeMode()
-                feedbackCoefficient = 1 / 6000.0
+                feedbackCoefficient = 1 / 4687.5
                 currentLimit(30, 0, 0)
             }
             GlobalScope.launch(MeanlibDispatcher) {
