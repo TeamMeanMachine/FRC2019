@@ -43,7 +43,7 @@ object AutoChooser {
         addOption("2 Foot Circle", "2 Foot Circle")
         addOption("4 Foot Circle", "4 Foot Circle")
         addOption("8 Foot Circle", "8 Foot Circle")
-        addOption("S Curve", "S Curve")
+        addOption("Hook Path", "Hook Path")
     }
 
     val autonomousChooser = SendableChooser<suspend () -> Unit>().apply {

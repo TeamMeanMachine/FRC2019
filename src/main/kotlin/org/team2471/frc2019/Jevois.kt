@@ -3,6 +3,7 @@ package org.team2471.frc2019
 import com.squareup.moshi.Moshi
 import edu.wpi.first.wpilibj.SerialPort
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import org.team2471.frc.lib.actuators.MotorController
@@ -72,20 +73,36 @@ object Jevois : Subsystem("Jevois") {
 }
 
 suspend fun driveToTarget() = use(Jevois) {
-    Jevois.isLightEnabled = true
-    lateinit var targets: Array<Jevois.Target>
-    withTimeout(1000) {
-        suspendUntil { targets = Jevois.targets; targets.isNotEmpty() }
-    }
-    var lastTarget = targets.minBy { it.distance.asInches }!!
 
-    use(Drive) driving@ {
-        val target = Jevois.targets.minBy { it.position.distance(lastTarget.position) } ?: return@driving
-        val (distance, angle, skew) = target
-        lastTarget = target
+    use(Drive) driving@{
+
+        val targetPositions = ArrayList<RobotPathPoint>()
+        Jevois.isLightEnabled = true
+        var totalDistance = 0.feet
+        var totalAngle = 0.degrees
+        var totalSkew = 0.degrees
+        repeat(5) {
+            lateinit var targets: Array<Jevois.Target>
+            withTimeout(1000) {
+                suspendUntil { targets = Jevois.targets; targets.isNotEmpty() }
+            }
+            val target = targets.minBy { it.distance.asInches }!!
+
+//            val target = Jevois.targets.minBy { it.position.distance(lastTarget.position) } ?: return@driving
+            val (d, a, s) = target
+//            lastTarget = target
+            totalDistance += d
+            totalAngle += a
+            totalSkew += s
+            println("SKEW: $s")
+            delay(100)
+        }
+        val distance = totalDistance/5.0
+        val angle = totalAngle/5.0
+        val skew = (totalSkew/5.0) * (1 - .1 * distance.asFeet)
         println("Angle: $angle, skew: $skew, distance: ${distance.asFeet}")
         val position1 = Vector2(0.0, 0.0)
-        val tangent1 = Vector2(0.0, (distance * 1.0).asFeet)
+        val tangent1 = Vector2(0.0, (distance * 0.0).asFeet)
 
         val fieldAngle = angle - skew
 
@@ -94,12 +111,27 @@ suspend fun driveToTarget() = use(Jevois) {
                 Vector2(0.0, -24.0 / 12.0).rotateDegrees(-fieldAngle.asDegrees)
 
         println("position2: $position2")
-        val tangent2 = Vector2(0.0, (distance * 1.0).asFeet).rotateDegrees(fieldAngle.asDegrees)
+        val tangent2 = Vector2(0.0, (distance * 0.0).asFeet).rotateDegrees(-fieldAngle.asDegrees)
         println("tangent2: $tangent2")
         val robotPosition = RobotPosition(Drive.position, Drive.heading)
         println("robot position: ${robotPosition.position}, robot angle: ${robotPosition.angle}")
+
         val initialPathPoint = robotToField(RobotPathPoint(position1, tangent1), robotPosition)
-        val finalPathPoint = robotToField(RobotPathPoint(position2, tangent2), robotPosition)
+        var finalPathPoint = robotToField(RobotPathPoint(position2, tangent2), robotPosition)
+
+        targetPositions.add(finalPathPoint)
+
+        finalPathPoint = RobotPathPoint(Vector2(0.0, 0.0), Vector2(0.0, 0.0))
+        for (i in 0..(targetPositions.size - 1)) {
+            finalPathPoint = RobotPathPoint(
+                finalPathPoint.position + targetPositions[i].position,
+                finalPathPoint.tangent + targetPositions[i].tangent
+            )
+        }
+        finalPathPoint = RobotPathPoint(
+            finalPathPoint.position / targetPositions.size.toDouble(),
+            finalPathPoint.tangent / targetPositions.size.toDouble()
+        )
 
         val path = Path2D().apply {
             robotDirection = Path2D.RobotDirection.FORWARD
@@ -111,8 +143,8 @@ suspend fun driveToTarget() = use(Jevois) {
                 finalPathPoint.position.x, finalPathPoint.position.y,
                 finalPathPoint.tangent.x, finalPathPoint.position.y
             )
-            val speed = 5.0
-            val time = (distance.asFeet/speed).seconds
+            val speed = 2.0
+            val time = (distance.asFeet / speed + 0.5).seconds
             addEasePoint(0.0, 0.0)
             addEasePoint(time.asSeconds, 1.0)
             addHeadingPoint(0.0, Drive.heading.asDegrees)

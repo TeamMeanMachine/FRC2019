@@ -3,6 +3,7 @@ package org.team2471.frc2019
 import edu.wpi.first.wpilibj.GenericHID
 import edu.wpi.first.wpilibj.XboxController
 import org.team2471.frc.lib.framework.*
+import org.team2471.frc.lib.input.Controller
 import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.math.deadband
 import org.team2471.frc.lib.math.squareWithSign
@@ -67,7 +68,6 @@ object OI {
             backPress { Drive.zeroGyro() }
 
             yPress {
-                // put climb on dpad for safety
 //                val position1 = Vector2(0.0, 0.0)
 //                val tangent1 = Vector2(0.0, 3.0)
 //                val robotPosition = RobotPosition(Drive.position, Drive.heading)
@@ -84,7 +84,19 @@ object OI {
                 driveToTarget()
             }
 
+
         }
+
+
+        // put climb on dpad for safety
+        // no idea how to map to dpad button
+
+/*
+        Events.whenActive( unit ->  driverController.dPad == Controller.Direction.UP, {
+            climb()
+        })
+*/
+
 
         operatorController.createMappings {
             rightBumperPress {
