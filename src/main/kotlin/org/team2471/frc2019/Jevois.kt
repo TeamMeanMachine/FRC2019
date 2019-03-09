@@ -12,7 +12,7 @@ import org.team2471.frc.lib.units.Length
 import org.team2471.frc.lib.units.asDegrees
 
 object Jevois {
-    data class Target(val distance: Length, val angle: Angle, val skew: Angle) {
+    data class Target(val distance: Length, val angle: Angle, val skewFactor: Double) {
         val position: Vector2 by lazy { Vector2(distance.asInches * sin(angle), distance.asInches * cos(angle)) }
     }
 

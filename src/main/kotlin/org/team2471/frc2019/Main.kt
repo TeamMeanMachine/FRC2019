@@ -2,28 +2,16 @@
 
 package org.team2471.frc2019
 
-import edu.wpi.first.wpilibj.Compressor
-import edu.wpi.first.wpilibj.SerialPort
-import edu.wpi.first.wpilibj.Solenoid
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.RobotProgram
 import org.team2471.frc.lib.framework.initializeWpilib
 import org.team2471.frc.lib.framework.runRobotProgram
-import org.team2471.frc.lib.framework.use
-import org.team2471.frc.lib.math.Vector2
-import org.team2471.frc.lib.motion.following.drive
-import org.team2471.frc.lib.units.asDegrees
-import org.team2471.frc.lib.units.degrees
-import org.team2471.frc.lib.units.inches
-import org.team2471.frc2019.testing.steeringTests
-import kotlin.concurrent.thread
 
 object Robot: RobotProgram {
     override suspend fun enable() {
         Armavator.heightSetpoint = Armavator.height
         Armavator.angleSetpoint = Armavator.angle
-        OB1.pivotSetpoint = OB1.angle
+        OB1.angleSetpoint = OB1.angle
         Armavator.enable()
         OB1.enable()
         Drive.enable()
@@ -38,7 +26,7 @@ object Robot: RobotProgram {
         Drive.zeroGyro()
         periodic {
    //         println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
-//            println(Pose.current.clawHeight<Pose.SAFETY_POSE.clawHeight)
+//            println(Pose.current.clawHeight<Pose.SAFETY.clawHeight)
     //        println("BL: = ${Drive.backLeftModule.currDistance}, BR: = ${Drive.backRightModule.currDistance}, FL: = ${Drive.frontLeftModule.currDistance}, FR: = ${Drive.frontRightModule.currDistance},")
 
 
@@ -51,8 +39,6 @@ object Robot: RobotProgram {
 //                Drive.drive(Vector2(0.0, 0.2), 0.0)
 //            }
 //        }
-
-        Drive.steeringTests()
 
 //        val startingHeight = Armavator.height
 //        val startingAngle = Armavator.angle
@@ -93,6 +79,7 @@ fun main() {
     Drive
     Armavator
     OB1
+    OI
 
 //    AutoChooser
 

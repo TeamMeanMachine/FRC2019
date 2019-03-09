@@ -31,6 +31,8 @@ import org.team2471.frc2019.Victors.ELEVATOR_SLAVE
 import org.team2471.frc2019.actions.returnHome
 import kotlin.math.abs
 
+
+
 object Armavator : Subsystem("Armavator") {
     private const val ARM_OFFSET = -119.22
     private const val ELEVATOR_FEED_FORWARD = 0.1
@@ -45,6 +47,8 @@ object Armavator : Subsystem("Armavator") {
         inverted(true)
         pid {
             p(0.001)
+            motionMagic(30.0,30.0)
+            f(0.0065)
         }
         currentLimit(15,0,0)
         brakeMode()
@@ -62,7 +66,12 @@ object Armavator : Subsystem("Armavator") {
             .setAnalogPosition((ARM_OFFSET / feedbackCoefficient).toInt(), 20)
 
         pid {
-            p(1.0)
+            p(0.5)
+            d(1.5)
+
+            f(13.0)
+
+            motionMagic(720.0, 180.0)
         }
         currentLimit(15,0,0)
     }
@@ -72,6 +81,7 @@ object Armavator : Subsystem("Armavator") {
     private val gearShifter = Solenoid(SHIFTER)
     private val clawSolenoid = Solenoid(BALL_INTAKE)
     private val pinchSolenoid = Solenoid(HATCH_INTAKE)
+    private val table = NetworkTableInstance.getDefault().getTable(name)
 
     var isClimbing = false
 
@@ -98,26 +108,25 @@ object Armavator : Subsystem("Armavator") {
 
     var angleSetpoint: Angle = angle
         set(value) {
+            table.getEntry("Arm Error").setDouble(armMotors.closedLoopError)
+            table.getEntry("Arm Output").setDouble(armMotors.output)
+
             field = value.asDegrees.coerceIn(armRange).degrees
-
-            if(abs(field.asDegrees - angle.asDegrees) > ARM_SAFETY_CAP) {
-                DriverStation.reportWarning("The Arm is moving too fast!", false)
-            }
-
-            armMotors.setPositionSetpoint((field.asDegrees - ARM_OFFSET))
+            armMotors.setMotionMagicSetpoint((field.asDegrees - ARM_OFFSET))
         }
 
     var heightSetpoint: Length = height
         set(value) {
+            table.getEntry("Elevator Error").setDouble(elevatorMotors.closedLoopError)
+            table.getEntry("Elevator Output").setDouble(elevatorMotors.output)
             field = value.asInches.coerceIn(heightRange).inches
-            elevatorMotors.setPositionSetpoint(field.asInches, ELEVATOR_FEED_FORWARD)
+            elevatorMotors.setMotionMagicSetpoint(field.asInches, ELEVATOR_FEED_FORWARD)
             gearShifter.set(isClimbing)
         }
 
     init {
         elevatorMotors.position = 0.0
         GlobalScope.launch(MeanlibDispatcher) {
-            val table = NetworkTableInstance.getDefault().getTable(name)
             val heightEntry = table.getEntry("Height")
             val angleEntry = table.getEntry("Angle")
             periodic {
