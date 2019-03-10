@@ -1,7 +1,9 @@
 package org.team2471.frc2019
 
+import com.analog.adis16448.frc.ADIS16448_IMU
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import edu.wpi.first.networktables.NetworkTableInstance
+import edu.wpi.first.wpilibj.interfaces.Gyro
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -57,11 +59,9 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         )
     )
 
-    private val gyro: SpinMaster16448? = SpinMaster16448()
-//  private val gyro = ADIS16448_IMU()
-//  private val gyro = GuttedADIS()
-//  private val gyro = Gyro
-//  private val gyro: ADIS16448_IMU? = null
+//    private val gyro: SpinMaster16448? = SpinMaster16448()
+//  private val gyro: Gyro? = null
+    private val gyro: Gyro? = ADISWrapper()
 
     override var heading: Angle
         get() = gyroOffset - ((gyro?.angle ?: 0.0).degrees.wrap())
