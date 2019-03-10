@@ -4,10 +4,9 @@ package org.team2471.frc2019
 
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.use
-import org.team2471.frc.lib.units.Length
-import org.team2471.frc.lib.units.asDegrees
 import org.team2471.frc.lib.units.degrees
 import org.team2471.frc.lib.units.inches
+import kotlin.math.absoluteValue
 import kotlin.math.max
 
 //suspend fun goToPose2(targetPose: Pose) = use(Armavator, OB1) {
@@ -43,7 +42,6 @@ private fun Pose.confined(): Boolean {
 }
 
 suspend fun goToPose(targetPose: Pose) {
-
     val targetConfined = targetPose.confined()
     println("Target: $targetPose, confined: $targetConfined")
     check(!(targetConfined && !targetPose.isClamping)) { "Illegal pose: confined and not clamping" }
@@ -86,7 +84,12 @@ suspend fun goToPose(targetPose: Pose) {
                 OB1.angleSetpoint = targetPose.obiAngle
                 Armavator.isClamping = targetPose.isClamping
 
-                if (false) {
+                val armError = Armavator.angleSetpoint - Armavator.angle
+                val elevatorError = Armavator.heightSetpoint - Armavator.height
+                val obiError = OB1.angleSetpoint - OB1.angle
+                if (armError.asDegrees.absoluteValue < 10.0 &&
+                    elevatorError.asInches.absoluteValue < 6.0 &&
+                    obiError.asDegrees.absoluteValue < 10.0) {
                     stop()
                 }
             }

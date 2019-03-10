@@ -47,7 +47,7 @@ object Armavator : Subsystem("Armavator") {
         inverted(true)
         pid {
             p(0.001)
-            motionMagic(30.0,30.0)
+            motionMagic(200.0,50.0)
             f(0.0065)
         }
         currentLimit(15,0,0)
@@ -66,8 +66,8 @@ object Armavator : Subsystem("Armavator") {
             .setAnalogPosition((ARM_OFFSET / feedbackCoefficient).toInt(), 20)
 
         pid {
-            p(0.5)
-            d(1.5)
+            p(0.75)
+            d(1.0)
 
             f(13.0)
 
@@ -98,7 +98,10 @@ object Armavator : Subsystem("Armavator") {
 
     var isClamping: Boolean
         get() = !clawSolenoid.get()
-        set(value) = clawSolenoid.set(!value)
+        set(value) {
+            if (value != isClamping) println("Clamping: $value from ${Thread.currentThread().stackTrace.drop(2).first()}")
+            clawSolenoid.set(!value)
+        }
 
     var isPinching: Boolean
         get() = !pinchSolenoid.get()
@@ -137,7 +140,7 @@ object Armavator : Subsystem("Armavator") {
     }
 
     fun intake(power: Double) {
-        intakeMotors.setPercentOutput(-power)
+        intakeMotors.setPercentOutput(power)
     }
 
     fun elevateRaw(power: Double) {
@@ -151,6 +154,10 @@ object Armavator : Subsystem("Armavator") {
     fun printDebugInfo() {
         println("Arm Angle: %.3f\tArm Setpoint: %.3f".format(angle.asDegrees, angleSetpoint.asDegrees))
         println("Elevator Height: %.3f\tElevator Setpoint: %.3f".format(height.asInches, heightSetpoint.asInches))
+    }
+
+    fun zero() {
+       elevatorMotors.position = 0.0
     }
 
     override fun reset() {

@@ -30,8 +30,9 @@ object OB1 : Subsystem("OB1") {
 
         pid {
             p(8.0)
-            f(78.0)
-            motionMagic(360.0, 180.0)
+            d(8.0)
+            f(50.0)
+            motionMagic(360.0, 300.0)
         }
     }
 
@@ -71,7 +72,7 @@ object OB1 : Subsystem("OB1") {
     }
 
     override fun reset() {
-        pivotSetpoint = angle
+        angleSetpoint = angle
         intake(0.0)
     }
 

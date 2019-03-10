@@ -10,12 +10,15 @@ import org.team2471.frc.lib.actuators.TalonID
 import org.team2471.frc.lib.control.PDController
 import org.team2471.frc.lib.coroutines.MeanlibDispatcher
 import org.team2471.frc.lib.coroutines.periodic
+import org.team2471.frc.lib.coroutines.suspendUntil
 import org.team2471.frc.lib.framework.Subsystem
+import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.motion.following.SwerveDrive
 import org.team2471.frc.lib.motion.following.drive
 import org.team2471.frc.lib.motion_profiling.following.SwerveParameters
 import org.team2471.frc.lib.units.*
+import kotlin.math.withSign
 
 private var gyroOffset = 0.0.degrees
 
@@ -255,4 +258,11 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             turnMotor.stop()
         }
     }
+}
+
+
+suspend fun Drive.driveDistance(distance: Length, speed: Double) = use(Drive) {
+    drive(Vector2(0.0, speed.withSign(distance.asInches)), 0.0)
+    val initialPosition = position
+    suspendUntil { position.distance(initialPosition) > distance.asFeet }
 }
