@@ -24,7 +24,8 @@ object Robot: RobotProgram {
     override suspend fun enable() {
         Armavator.heightSetpoint = Armavator.height
         Armavator.angleSetpoint = Armavator.angle
-        OB1.pivotSetpoint = OB1.angle
+        OB1.angleSetpoint = OB1.angle
+        if (Armavator.height.asInches < 0.0) Armavator.reset()
         Armavator.enable()
         OB1.enable()
         Drive.enable()

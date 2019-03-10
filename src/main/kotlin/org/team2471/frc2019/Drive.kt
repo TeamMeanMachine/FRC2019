@@ -1,7 +1,9 @@
 package org.team2471.frc2019
 
+import com.analog.adis16448.frc.ADIS16448_IMU
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import edu.wpi.first.networktables.NetworkTableInstance
+import edu.wpi.first.wpilibj.interfaces.Gyro
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -10,12 +12,15 @@ import org.team2471.frc.lib.actuators.TalonID
 import org.team2471.frc.lib.control.PDController
 import org.team2471.frc.lib.coroutines.MeanlibDispatcher
 import org.team2471.frc.lib.coroutines.periodic
+import org.team2471.frc.lib.coroutines.suspendUntil
 import org.team2471.frc.lib.framework.Subsystem
+import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.motion.following.SwerveDrive
 import org.team2471.frc.lib.motion.following.drive
 import org.team2471.frc.lib.motion_profiling.following.SwerveParameters
 import org.team2471.frc.lib.units.*
+import kotlin.math.withSign
 
 private var gyroOffset = 0.0.degrees
 
@@ -54,11 +59,9 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         )
     )
 
-    private val gyro: SpinMaster16448? = SpinMaster16448()
-//  private val gyro = ADIS16448_IMU()
-//  private val gyro = GuttedADIS()
-//  private val gyro = Gyro
-//  private val gyro: ADIS16448_IMU? = null
+//    private val gyro: SpinMaster16448? = SpinMaster16448()
+//  private val gyro: Gyro? = null
+    private val gyro: Gyro? = ADISWrapper()
 
     override var heading: Angle
         get() = gyroOffset - ((gyro?.angle ?: 0.0).degrees.wrap())
@@ -255,4 +258,11 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             turnMotor.stop()
         }
     }
+}
+
+
+suspend fun Drive.driveDistance(distance: Length, speed: Double) = use(Drive) {
+    drive(Vector2(0.0, speed.withSign(distance.asInches)), 0.0)
+    val initialPosition = position
+    suspendUntil { position.distance(initialPosition) > distance.asFeet }
 }

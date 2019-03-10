@@ -12,20 +12,20 @@ import org.team2471.frc2019.*
 
 suspend fun climb() = use(Armavator, OB1) {
 
-    Animation.HOME_TO_START_CLIMB.play()
+    goToPose(Pose.CLIMB_START)
     suspendUntil { OI.startClimb }
 
     // climbing cannot be canceled in this stage
     withContext(NonCancellable) {
         use(Drive) {
-            Animation.START_CLIMB_TO_LIFTED.play()
+            goToPose(Pose.CLIMB_LIFT_ELEVATOR)
             val timer = Timer().apply { start() }
             periodic {
                  if (timer.get() >= 1.5) return@periodic stop()
                 OB1.intake(-0.7)
                 Drive.drive(Vector2(0.0, 0.4), 0.0, false)
             }
-            Animation.LIFTED_TO_LIFT_ELEVATOR.play()
+            goToPose(Pose.LIFTED)
         }
     }
 }
