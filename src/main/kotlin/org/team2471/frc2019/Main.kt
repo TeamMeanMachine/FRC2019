@@ -74,10 +74,8 @@ object Robot: RobotProgram {
         Jevois.disable()
         OI
 
-        periodic{
             if (Jevois.targets.isNotEmpty()) println(Jevois.targets.joinToString())
 //            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
-        }
     }
 }
 
