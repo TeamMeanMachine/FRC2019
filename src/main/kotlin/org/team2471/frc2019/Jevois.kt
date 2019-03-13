@@ -1,6 +1,9 @@
 package org.team2471.frc2019
 
 import com.squareup.moshi.Moshi
+import edu.wpi.cscore.MjpegServer
+import edu.wpi.cscore.UsbCamera
+import edu.wpi.cscore.VideoMode
 import edu.wpi.first.wpilibj.SerialPort
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -19,15 +22,24 @@ import org.team2471.frc.lib.units.Angle.Companion.cos
 import org.team2471.frc.lib.units.Angle.Companion.sin
 
 object Jevois : Subsystem("Jevois") {
-    data class Target(val distance: Length, val angle: Angle, val skew: Angle) {
-        val position: Vector2
-            get() = Vector2(distance.asInches * sin(angle), distance.asInches * cos(angle))
+    private val serialPort = SerialPort(115200, SerialPort.Port.kUSB1).apply {
+        enableTermination()
     }
 
     private val ledRingLight = MotorController(VictorID(Victors.LED_RING_LIGHT))
 
     var isLightEnabled = false
         set(value) {
+            if (field != value) {
+                if (value) {
+                    serialPort.writeString("setcam absexp 3\n")
+                    serialPort.writeString("setcam gain 16\n")
+                } else {
+                    serialPort.writeString("setcam absexp 1000\n")
+                    serialPort.writeString("setcam gain 100\n")
+                }
+            }
+
             field = value
             ledRingLight.setPercentOutput(if (value) 1.0 else 0.0)
         }
@@ -39,11 +51,20 @@ object Jevois : Subsystem("Jevois") {
         isLightEnabled = false
     }
 
+    private val camera = UsbCamera("Jevois", 0).apply {
+        setResolution(320, 240)
+        setFPS(30)
+//        setPixelFormat(VideoMode.PixelFormat.kYUYV)
+        setPixelFormat(VideoMode.PixelFormat.kMJPEG)
+    }
+
+    private val server = MjpegServer("Camera Server", 5805).apply {
+        source = camera
+    }
+
     init {
         GlobalScope.launch(MeanlibDispatcher) {
-            val serialPort = SerialPort(115200, SerialPort.Port.kUSB1)
             serialPort.enableTermination()
-
             // setup
             println("Starting jevois...")
             serialPort.writeString("setmapping2 YUYV 640 480 30 TeamMeanMachine DeepSpace\n")
@@ -67,6 +88,11 @@ object Jevois : Subsystem("Jevois") {
                 }
             }
         }
+    }
+
+    data class Target(val distance: Length, val angle: Angle, val skew: Angle) {
+        val position: Vector2
+            get() = Vector2(distance.asInches * sin(angle), distance.asInches * cos(angle))
     }
 }
 

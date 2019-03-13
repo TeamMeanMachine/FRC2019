@@ -35,6 +35,7 @@ class DeepSpace:
         self.timer = jevois.Timer("processing timer", 100, jevois.LOG_INFO)
         self.profiler = jevois.Profiler("Profiler", 100, jevois.LOG_INFO)
 
+        self.active = False
         self.w = None
         self.h = None
         self.fov = 90.0  # degrees
@@ -64,67 +65,74 @@ class DeepSpace:
         self.h = h
         # Start measuring image processing time (NOTE: does not account for input conversion time):
         self.timer.start()
-        self.profiler.start()
 
-        hsv = cv2.cvtColor(inimg, cv2.COLOR_BGR2HSV)
-        threshold = cv2.inRange(hsv, self.hsv_min, self.hsv_max)
-        self.profiler.checkpoint("HSV Thresholding")
+        if self.active:
+            self.profiler.start()
 
-        opened = cv2.morphologyEx(threshold, cv2.MORPH_OPEN, self.open_kernel)
-        self.profiler.checkpoint("Morph open")
+            hsv = cv2.cvtColor(inimg, cv2.COLOR_BGR2HSV)
+            threshold = cv2.inRange(hsv, self.hsv_min, self.hsv_max)
+            self.profiler.checkpoint("HSV Thresholding")
 
-        contours, _ = cv2.findContours(opened, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-        self.profiler.checkpoint("Find contours")
+            opened = cv2.morphologyEx(threshold, cv2.MORPH_OPEN, self.open_kernel)
+            self.profiler.checkpoint("Morph open")
 
-        rects = [cv2.minAreaRect(c) for c in contours if valid_contour(c)]
+            contours, _ = cv2.findContours(opened, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+            self.profiler.checkpoint("Find contours")
 
-        rects.sort(key=lambda r: r[0][0])
-        self.profiler.checkpoint("Find rects")
+            rects = [cv2.minAreaRect(c) for c in contours if valid_contour(c)]
 
-        pairs = self.group_rects(rects)
-        self.profiler.checkpoint("Pair rects")
+            rects.sort(key=lambda r: r[0][0])
+            self.profiler.checkpoint("Find rects")
 
-        targets = []
-        for left, right in pairs:
-            l_center, l_size, l_angle = left
-            r_center, r_size, r_angle = right
+            pairs = self.group_rects(rects)
+            self.profiler.checkpoint("Pair rects")
 
-            ldist = self.tape_diag * self.tape_fw / math.hypot(*l_size)
-            rdist = self.tape_diag * self.tape_fw / math.hypot(*r_size)
-            skew_angle = math.degrees(math.asin((rdist - ldist) / self.target_w))
-            act_dist = (ldist + rdist) / 2.0
-            center_x = (l_center[0] + r_center[0]) / 2.0
-            angle = (center_x / self.w - 0.5) * self.fov
+            targets = []
+            for left, right in pairs:
+                l_center, l_size, l_angle = left
+                r_center, r_size, r_angle = right
 
-            targets.append({
-                'distance': act_dist,
-                'angle': angle,
-                'skew': skew_angle
-            })
+                ldist = self.tape_diag * self.tape_fw / math.hypot(*l_size)
+                rdist = self.tape_diag * self.tape_fw / math.hypot(*r_size)
+                skew_angle = math.degrees(math.asin((rdist - ldist) / self.target_w))
+                act_dist = (ldist + rdist) / 2.0
+                center_x = (l_center[0] + r_center[0]) / 2.0
+                angle = (center_x / self.w - 0.5) * self.fov
 
-        jevois.sendSerial(json.dumps(targets))
+                targets.append({
+                    'distance': act_dist,
+                    'angle': angle,
+                    'skew': skew_angle
+                })
+
+            jevois.sendSerial(json.dumps(targets))
+            outimg = inimg
+        else:
+            outimg = cv2.GaussianBlur(inimg, (5, 5), 0)
 
         fps = self.timer.stop()
         if outframe is not None:
             # Drawing stuff
             outimg = inimg
 
-            cv2.drawContours(outimg, contours, -1, (255, 0, 0), 3)
-            cv2.drawContours(outimg, [np.int0(cv2.boxPoints(r)) for r in rects], -1, (0, 0, 255), 2)
 
-            for (left, right) in pairs:
-                cv2.line(outimg, (int(left[0][0]), int(left[0][1])),
-                         (int(right[0][0]), int(right[0][1])), (0, 255, 0), 2)
+            if self.active:
+                cv2.drawContours(outimg, contours, -1, (255, 0, 0), 3)
+                cv2.drawContours(outimg, [np.int0(cv2.boxPoints(r)) for r in rects], -1, (0, 0, 255), 2)
 
-                ldist = self.tape_diag * self.tape_fw / math.hypot(*left[1])
-                rdist = self.tape_diag * self.tape_fw / math.hypot(*right[1])
-                skew_angle = math.degrees(math.asin((rdist - ldist) / self.target_w))
+                for (left, right) in pairs:
+                    cv2.line(outimg, (int(left[0][0]), int(left[0][1])),
+                             (int(right[0][0]), int(right[0][1])), (0, 255, 0), 2)
 
-                x = (left[0][0] + right[0][0]) / 2.0
-                y = (left[0][1] + right[0][1]) / 2.0 + 35
-                cv2.putText(outimg, "{0:.3f}, {1:.3f}, {2:.3f}".format(ldist, rdist, skew_angle), (int(x), int(y)),
-                            cv2.FONT_HERSHEY_SIMPLEX,
-                            0.5, (255, 255, 255))
+                    ldist = self.tape_diag * self.tape_fw / math.hypot(*left[1])
+                    rdist = self.tape_diag * self.tape_fw / math.hypot(*right[1])
+                    skew_angle = math.degrees(math.asin((rdist - ldist) / self.target_w))
+
+                    x = (left[0][0] + right[0][0]) / 2.0
+                    y = (left[0][1] + right[0][1]) / 2.0 + 35
+                    cv2.putText(outimg, "{0:.3f}, {1:.3f}, {2:.3f}".format(ldist, rdist, skew_angle), (int(x), int(y)),
+                                cv2.FONT_HERSHEY_SIMPLEX,
+                                0.5, (255, 255, 255))
 
             # Write frames/s info from our timer into the edge map (NOTE: does not account for output conversion time):
             height = outimg.shape[0]
