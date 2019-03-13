@@ -1,6 +1,9 @@
 package org.team2471.frc2019
 
 import com.squareup.moshi.Moshi
+import edu.wpi.cscore.MjpegServer
+import edu.wpi.cscore.UsbCamera
+import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.wpilibj.SerialPort
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -29,7 +32,7 @@ object Jevois : Subsystem("Jevois") {
     var isLightEnabled = false
         set(value) {
             field = value
-            ledRingLight.setPercentOutput(if (value) 1.0 else 0.0)
+            ledRingLight.setPercentOutput(if (value) 0.6 else 0.0)
         }
 
     var targets: Array<Target> = emptyArray()
@@ -44,6 +47,14 @@ object Jevois : Subsystem("Jevois") {
             val serialPort = SerialPort(115200, SerialPort.Port.kUSB1)
             serialPort.enableTermination()
 
+            val camera = UsbCamera("Jevois", 0).apply {
+                setResolution(320,240)
+                setFPS(20)
+            }
+
+            val stream = MjpegServer("Server", 5805).apply {
+                source = camera
+            }
             // setup
             println("Starting jevois...")
             serialPort.writeString("setmapping2 YUYV 640 480 30 TeamMeanMachine DeepSpace\n")
@@ -59,7 +70,6 @@ object Jevois : Subsystem("Jevois") {
                     delay(1.0 / 30.0)
                     continue
                 }
-
                 val data = serialPort.readString().takeWhile { it != '\n' }
                 try {
                     targets = dataAdapter.fromJson(data)!!
@@ -72,6 +82,7 @@ object Jevois : Subsystem("Jevois") {
 
 
 suspend fun driveToTarget() = use(Jevois) {
+    val table = NetworkTableInstance.getDefault().getTable(Jevois.name)
 
     use(Drive) driving@{
         Jevois.isLightEnabled = true
@@ -92,6 +103,10 @@ suspend fun driveToTarget() = use(Jevois) {
                 val angle = a
                 val skew = (s) * (1 - .1 * distance.asFeet)
 
+                val turn = a - s
+
+                val targetTurn = targetAngle - targetSkew
+
                 val distError = targetDistance - distance
                 val angleError = targetAngle - angle
                 val skewError = targetSkew - skew
@@ -99,17 +114,18 @@ suspend fun driveToTarget() = use(Jevois) {
                 var translation = Vector2(0.0, 0.0)
 
                 val translateXError = (angleError + skewError).wrap()
-                val turnError = (skewError - angleError).wrap()
+                val turnError = (targetTurn - turn).wrap()
+                table.getEntry("Turn Error").setDouble(turnError.asDegrees)
                 println("Turn Error: $turnError, Angle Error: $angleError, Skew Error: $skewError")
 
                 translation.x = translateXController.update(translateXError.asDegrees)
                 translation.y = translateYController.update(distError.asFeet)
-                val turn = turnController.update(turnError.asDegrees)
+                val rotation = turnController.update(turnError.asDegrees)
 
-                Drive.drive(translation, turn, false)
+                Drive.drive(translation, rotation, false)
 
                 if (Math.abs(turnError.asDegrees) < 2.0) {
-                    return@periodic
+                    stop()
                 }
             }
         }

@@ -2,7 +2,10 @@ package org.team2471.frc2019
 
 import com.analog.adis16448.frc.ADIS16448_IMU
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
+import com.kauailabs.navx.frc.AHRS
 import edu.wpi.first.networktables.NetworkTableInstance
+import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.wpilibj.SPI
 import edu.wpi.first.wpilibj.interfaces.Gyro
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlinx.coroutines.GlobalScope
@@ -20,12 +23,13 @@ import org.team2471.frc.lib.motion.following.SwerveDrive
 import org.team2471.frc.lib.motion.following.drive
 import org.team2471.frc.lib.motion_profiling.following.SwerveParameters
 import org.team2471.frc.lib.units.*
+import kotlin.math.absoluteValue
 import kotlin.math.withSign
 
 private var gyroOffset = 0.0.degrees
 
 object Drive : Subsystem("Drive"), SwerveDrive {
-    override val modules : Array<SwerveDrive.Module> = arrayOf(
+    override val modules: Array<SwerveDrive.Module> = arrayOf(
         Module(
             MotorController(TalonID(Talons.DRIVE_FRONTLEFT)),
             MotorController(TalonID(Talons.STEER_FRONTLEFT)),
@@ -59,9 +63,10 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         )
     )
 
-//    private val gyro: SpinMaster16448? = SpinMaster16448()
+    //    private val gyro: SpinMaster16448? = SpinMaster16448()
 //  private val gyro: Gyro? = null
-    private val gyro: Gyro? = ADISWrapper()
+//    private val gyro: Gyro? = ADISWrapper()
+    private val gyro: NavxWrapper? = NavxWrapper()
 
     override var heading: Angle
         get() = gyroOffset - ((gyro?.angle ?: 0.0).degrees.wrap())
@@ -80,7 +85,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     override var robotPivot = Vector2(0.0, 0.0)
 
     override val parameters: SwerveParameters = SwerveParameters(
-        gyroRateCorrection = 20.5,
+        gyroRateCorrection = 0.0,
         kPositionFeedForward = 0.06,
         kPosition = 0.2,
         kHeading = 0.013,
@@ -90,7 +95,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     init {
         SmartDashboard.setPersistent("Use Gyro")
 
-        //SmartDashboard.putData("Gyro", gyro2)
+        SmartDashboard.putData("Gyro", gyro!!.getNavX())
 
         GlobalScope.launch(MeanlibDispatcher) {
             val table = NetworkTableInstance.getDefault().getTable(name)
@@ -114,19 +119,19 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 
         */
             periodic {
-             /* flAngleEntry.setDouble(frontLeftModule.angle.asDegrees)
-                frAngleEntry.setDouble(frontRightModule.angle.asDegrees)
-                blAngleEntry.setDouble(backLeftModule.angle.asDegrees)
-                brAngleEntry.setDouble(backRightModule.angle.asDegrees)
-                flSPEntry.setDouble(frontLeftModule.setPoint.asDegrees)
-                frSPEntry.setDouble(frontRightModule.setPoint.asDegrees)
-                blSPEntry.setDouble(backLeftModule.setPoint.asDegrees)
-                brSPEntry.setDouble(backRightModule.setPoint.asDegrees)
+                /* flAngleEntry.setDouble(frontLeftModule.angle.asDegrees)
+                   frAngleEntry.setDouble(frontRightModule.angle.asDegrees)
+                   blAngleEntry.setDouble(backLeftModule.angle.asDegrees)
+                   brAngleEntry.setDouble(backRightModule.angle.asDegrees)
+                   flSPEntry.setDouble(frontLeftModule.setPoint.asDegrees)
+                   frSPEntry.setDouble(frontRightModule.setPoint.asDegrees)
+                   blSPEntry.setDouble(backLeftModule.setPoint.asDegrees)
+                   brSPEntry.setDouble(backRightModule.setPoint.asDegrees)
 
-                flErrorEntry.setDouble(frontLeftModule.error.asDegrees)
-                frErrorEntry.setDouble(frontRightModule.error.asDegrees)
-                blErrorEntry.setDouble(backLeftModule.error.asDegrees)
-                brErrorEntry.setDouble(backRightModule.error.asDegrees)*/
+                   flErrorEntry.setDouble(frontLeftModule.error.asDegrees)
+                   frErrorEntry.setDouble(frontRightModule.error.asDegrees)
+                   blErrorEntry.setDouble(backLeftModule.error.asDegrees)
+                   brErrorEntry.setDouble(backRightModule.error.asDegrees)*/
 
                 headingEntry.setDouble(heading.asDegrees)
             }
@@ -142,7 +147,8 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         val positionYEntry = table.getEntry("positionY")
 */
         periodic {
-            drive(OI.driveTranslation, OI.driveRotation, SmartDashboard.getBoolean("Use Gyro", true))
+
+            drive(OI.driveTranslation, OI.driveRotation, SmartDashboard.getBoolean("Use Gyro", !DriverStation.getInstance().isAutonomous))
 /*
             positionXEntry.setDouble(position.x)
             positionYEntry.setDouble(position.y)
@@ -203,7 +209,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             }
 
         override fun setDrivePower(power: Double) {
-           driveMotor.setPercentOutput(power)
+            driveMotor.setPercentOutput(power)
         }
 
         val error: Angle
@@ -262,7 +268,10 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 
 
 suspend fun Drive.driveDistance(distance: Length, speed: Double) = use(Drive) {
-    drive(Vector2(0.0, speed.withSign(distance.asInches)), 0.0)
     val initialPosition = position
-    suspendUntil { position.distance(initialPosition) > distance.asFeet }
+    periodic {
+        drive(Vector2(0.0, speed.withSign(distance.asInches)), 0.0, false)
+
+        if(position.distance(initialPosition) > distance.asFeet.absoluteValue) stop()
+    }
 }

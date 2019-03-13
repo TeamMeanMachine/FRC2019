@@ -2,12 +2,10 @@
 
 package org.team2471.frc2019
 
-import edu.wpi.first.wpilibj.Compressor
-import edu.wpi.first.wpilibj.SerialPort
-import edu.wpi.first.wpilibj.Solenoid
-import edu.wpi.first.wpilibj.Timer
+import edu.wpi.first.wpilibj.*
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import org.team2471.frc.lib.coroutines.delay
+import org.team2471.frc.lib.coroutines.halt
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.RobotProgram
 import org.team2471.frc.lib.framework.initializeWpilib
@@ -19,6 +17,8 @@ import org.team2471.frc.lib.units.degrees
 import org.team2471.frc.lib.units.inches
 import org.team2471.frc2019.testing.steeringTests
 import kotlin.concurrent.thread
+
+val PDP = PowerDistributionPanel()
 
 object Robot: RobotProgram {
     override suspend fun enable() {
@@ -48,6 +48,10 @@ object Robot: RobotProgram {
     }
 
     override suspend fun test() {
+        use(Jevois) {
+            Jevois.isLightEnabled = true
+            halt()
+        }
 //        use(Drive) {
 //            periodic {
 //                Drive.drive(Vector2(0.0, 0.2), 0.0)

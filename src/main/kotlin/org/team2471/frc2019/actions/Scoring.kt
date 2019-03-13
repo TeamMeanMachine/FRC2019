@@ -6,6 +6,7 @@ import org.team2471.frc.lib.coroutines.delay
 import org.team2471.frc.lib.coroutines.suspendUntil
 import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.math.Vector2
+import org.team2471.frc.lib.units.inches
 import org.team2471.frc2019.*
 
 suspend fun scoreLow() = score(ScoringPosition.ROCKET_LOW)
@@ -59,18 +60,15 @@ private suspend fun score(position: ScoringPosition) {
             }
             GamePiece.CARGO -> {
                 suspendUntil { OI.ejectPiece }
-                Armavator.intake(-0.5)
+                Armavator.intake(-1.0)
                 Armavator.isPinching = true
                 delay(0.2)
             }
         }
         Armavator.gamePiece = null
+
+        Drive.driveDistance((-6).inches, 0.4)
         val drivePosition = Drive.position
-
-        withContext(NonCancellable) {
-            suspendUntil { Drive.position.distance(drivePosition) > 0.5 }
-        }
-
         suspendUntil { Drive.position.distance(drivePosition) > 1.5 }
 
         returnHome()
