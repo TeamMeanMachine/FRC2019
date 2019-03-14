@@ -1,42 +1,42 @@
 package org.team2471.frc2019
 
-import org.team2471.frc.lib.input.Controller
-import org.team2471.frc.lib.input.XboxController
-import org.team2471.frc.lib.input.toggleWhenTrue
-import org.team2471.frc.lib.input.whenTrue
+import org.team2471.frc.lib.input.*
 import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.math.deadband
 import org.team2471.frc.lib.math.squareWithSign
 import org.team2471.frc.lib.motion_profiling.Path2D
 import org.team2471.frc2019.actions.*
 
+private val deadBandDriver = 0.05
+private val deadBandOperator = 0.150
+
 object OI {
-    private val driverController = XboxController(0)
+    public val driverController = XboxController(0)
     private val operatorController = XboxController(1)
 
     private val driveTranslationX: Double
-        get() = driverController.leftThumbstickX.deadband(0.125).squareWithSign()
+        get() = driverController.leftThumbstickX.deadband(deadBandDriver).squareWithSign()
 
     private val driveTranslationY: Double
-        get() = -driverController.leftThumbstickY.deadband(0.125).squareWithSign()
+        get() = -driverController.leftThumbstickY.deadband(deadBandDriver).squareWithSign()
 
     val driveTranslation: Vector2
         get() = Vector2(driveTranslationX, driveTranslationY)
 
     val driveRotation: Double
-        get() = (driverController.rightThumbstickX.deadband(0.125)).squareWithSign() * 0.5
+        get() = (driverController.rightThumbstickX.deadband(deadBandDriver)).squareWithSign() * 0.5
 
     val operatorLeftYStick: Double
-        get() = -operatorController.leftThumbstickY.deadband(0.15)
+        get() = -operatorController.leftThumbstickY.deadband(deadBandOperator)
 
     val operatorRightYStick: Double
-        get() = -operatorController.rightThumbstickY.deadband(0.15)
+        get() = -operatorController.rightThumbstickY.deadband(deadBandOperator)
 
     val obiControl: Double
         get() = operatorController.rightTrigger - operatorController.leftTrigger
 
     val rightYStick: Double
-        get() = -driverController.rightThumbstickY.deadband(0.2)
+        get() = -driverController.rightThumbstickY.deadband(deadBandOperator)
 
     val ejectPiece: Boolean
         get() = driverController.rightTrigger > 0.5
@@ -80,6 +80,7 @@ object OI {
         operatorController::b.whenTrue { scoreMed() }
         operatorController::x.whenTrue { scoreCargoShip() }
         operatorController::y.whenTrue { scoreHigh() }
+        operatorController::start.whileTrue { OB1.evacuateBall() }
         operatorController::leftBumper.whenTrue{ Armavator.toggleClamping()}
         operatorController::rightBumper.whenTrue{ Armavator.togglePinching()}
         ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }

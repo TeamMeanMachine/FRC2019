@@ -50,7 +50,7 @@ suspend fun goToPose(targetPose: Pose) {
     val timer = Timer().apply { start() }
     check(!(targetConfined && !targetPose.isClamping)) { "Illegal pose: confined and not clamping" }
 
-    use(Armavator, OB1) {
+    use(Armavator, OB1, name = "Go To Pose") {
         // part 1, avoid collisisons
         periodic {
             Armavator.isPinching = targetPose.isPinching

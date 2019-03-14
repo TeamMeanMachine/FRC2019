@@ -3,6 +3,7 @@ package org.team2471.frc2019.actions
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import org.team2471.frc.lib.coroutines.delay
+import org.team2471.frc.lib.coroutines.parallel
 import org.team2471.frc.lib.coroutines.suspendUntil
 import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.math.Vector2
@@ -17,7 +18,7 @@ suspend fun scoreCargoShip() =
 
 private suspend fun score(position: ScoringPosition) {
     val gamePiece = Armavator.gamePiece ?: return
-    use(Armavator, OB1) {
+    use(Armavator, OB1, name = "Score") {
         goToPose(
             when (gamePiece) {
                 GamePiece.HATCH_PANEL -> when (position) {
@@ -67,13 +68,18 @@ private suspend fun score(position: ScoringPosition) {
         }
         Armavator.gamePiece = null
 
-        Drive.driveDistance((-6).inches, 0.4)
-        val drivePosition = Drive.position
-        suspendUntil { Drive.position.distance(drivePosition) > 1.5 }
-
+        parallel({
+            Drive.driveDistance((-6).inches, 0.2)
+            val drivePosition = Drive.position
+            suspendUntil { Drive.position.distance(drivePosition) > 1.5 }
+        }, {
+            Armavator.heightSetpoint = Armavator.height - 2.inches
+        })
+        Armavator.intake(-0.7)
         returnHome()
         Armavator.intake(0.0)
     }
 }
+
 
 private enum class ScoringPosition { ROCKET_LOW, ROCKET_MED, ROCKET_HIGH, CARGO_SHIP }
