@@ -3,6 +3,7 @@ package org.team2471.frc2019
 import com.squareup.moshi.Moshi
 import edu.wpi.cscore.MjpegServer
 import edu.wpi.cscore.UsbCamera
+import edu.wpi.cscore.VideoMode
 import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.wpilibj.SerialPort
 import kotlinx.coroutines.GlobalScope
@@ -50,11 +51,13 @@ object Jevois : Subsystem("Jevois") {
             val camera = UsbCamera("Jevois", 0).apply {
                 setResolution(320,240)
                 setFPS(20)
+                setPixelFormat(VideoMode.PixelFormat.kMJPEG)
             }
 
-            val stream = MjpegServer("Server", 5805).apply {
+            val stream = MjpegServer("Server", 5810).apply {
                 source = camera
             }
+
             // setup
             println("Starting jevois...")
             serialPort.writeString("setmapping2 YUYV 640 480 30 TeamMeanMachine DeepSpace\n")
