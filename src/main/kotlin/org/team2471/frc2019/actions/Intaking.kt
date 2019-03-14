@@ -5,41 +5,48 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import org.team2471.frc.lib.coroutines.delay
 import org.team2471.frc.lib.coroutines.halt
+import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.coroutines.suspendUntil
 import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.units.inches
 import org.team2471.frc2019.*
 
-suspend fun intakeCargo(): Nothing = use(Armavator, OB1) {
+suspend fun intakeCargo() = use(Armavator, OB1) {
     OB1.intake(1.0)
     Armavator.intake(0.75)
     goToPose(Pose.CARGO_GROUND_PICKUP)
     try {
-        halt()
-    } finally {
-        println("Intake Cargo finally")
+        delay(0.2)
+        suspendUntil { Armavator.intakeCurrent > 8.0 }
         Armavator.gamePiece = GamePiece.CARGO
+    } finally {
         withContext(NonCancellable) {
-            goToPose(Pose.HOME)
-            Armavator.intake(0.0)
+            returnHome()
         }
     }
 }
 
 suspend fun intakeHatch() = use(Armavator, OB1) {
-    OB1.intake(0.7)
-    goToPose(Pose.HATCH_GROUND_PICKUP)
-    delay(0.3)
-    suspendUntil { println(OB1.intakeCurrent); OB1.intakeCurrent > 20.0 } //30.0 for final
-    delay(0.2)
-    OB1.intake(0.15)
-    goToPose(Pose.HATCH_HANDOFF)
-    Armavator.gamePiece = GamePiece.HATCH_PANEL
-    delay(0.2)
-    OB1.intake(-0.2)
-    goToPose(Pose.HATCH_INTERMEDIATE)
+    try {
+        OB1.intake(0.7)
+        goToPose(Pose.HATCH_GROUND_PICKUP)
+        delay(0.3)
+        suspendUntil { OB1.intakeCurrent > 20.0 } //30.0 for final
+        delay(0.2)
+        OB1.intake(0.15)
+        goToPose(Pose.HATCH_HANDOFF)
+        Armavator.gamePiece = GamePiece.HATCH_PANEL
+        delay(0.2)
+        OB1.intake(-0.2)
+        goToPose(Pose.HATCH_INTERMEDIATE)
 
-    goToPose(Pose.HATCH_CARRY)
+        goToPose(Pose.HATCH_CARRY)
+    } finally {
+        Armavator.isClamping = false
+//        withContext(NonCancellable) {
+//            returnHome()
+        }
+//    }
 }
 
 suspend fun initialHandoff() = use(Armavator, OB1) {

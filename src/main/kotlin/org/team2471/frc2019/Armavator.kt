@@ -4,9 +4,7 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import com.ctre.phoenix.motorcontrol.can.TalonSRX
 import edu.wpi.first.networktables.NetworkTable
 import edu.wpi.first.networktables.NetworkTableInstance
-import edu.wpi.first.wpilibj.DriverStation
-import edu.wpi.first.wpilibj.GenericHID
-import edu.wpi.first.wpilibj.Solenoid
+import edu.wpi.first.wpilibj.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.team2471.frc.lib.actuators.MotorController
@@ -38,18 +36,22 @@ object Armavator : Subsystem("Armavator") {
     private const val ELEVATOR_FEED_FORWARD = 0.1
     const val ELEVATOR_HEIGHT = 21.5 //inches
     const val ARM_LENGTH = 28.0 //inches
-    private const val COLLISION_SAFETY_FACTOR = 6.0 //inches
-    private const val ARM_SAFETY_CAP = 30.0 // degrees
+
+    private const val ELEVATOR_VELOCITY = 50.0
+    private const val ELEVATOR_ACCELERATION = 150.0
+    private const val ELEVATOR_CLIMB_VELOCITY = ELEVATOR_VELOCITY * 0.2
+    private const val ELEVATOR_CLIMB_ACCELERATION = ELEVATOR_ACCELERATION * 0.2
 
     val elevatorMotors = MotorController(TalonID(ELEVATOR_MASTER), VictorID(ELEVATOR_SLAVE)).config {
         encoderType(FeedbackDevice.Analog)
         feedbackCoefficient = .75 * Math.PI / 1023
         inverted(true)
-        pid {
+        pid(0) {
             p(0.001)
-            motionMagic(200.0,50.0)
             f(0.0065)
+            motionMagic(ELEVATOR_ACCELERATION, ELEVATOR_VELOCITY)
         }
+
         currentLimit(15,0,0)
         brakeMode()
     }
@@ -71,7 +73,7 @@ object Armavator : Subsystem("Armavator") {
 
             f(13.0)
 
-            motionMagic(720.0, 180.0)
+            motionMagic(560.0, 180.0)
         }
         currentLimit(15,0,0)
     }
@@ -81,9 +83,23 @@ object Armavator : Subsystem("Armavator") {
     private val gearShifter = Solenoid(SHIFTER)
     private val clawSolenoid = Solenoid(BALL_INTAKE)
     private val pinchSolenoid = Solenoid(HATCH_INTAKE)
+
     private val table = NetworkTableInstance.getDefault().getTable(name)
 
     var isClimbing = false
+        set(value) {
+            if (value != isClimbing) elevatorMotors.config(0) {
+                pid {
+                    if (value) {
+                        motionMagic(ELEVATOR_CLIMB_ACCELERATION, ELEVATOR_CLIMB_VELOCITY)
+                    } else {
+                        motionMagic(ELEVATOR_ACCELERATION, ELEVATOR_VELOCITY)
+                    }
+                }
+            }
+            gearShifter.set(value)
+            field = value
+        }
 
     private val heightRange: DoubleRange
         get() = if(!isClimbing) 0.0..26.0 else Pose.LIFTED.elevatorHeight.asInches..26.0// inches
@@ -96,10 +112,13 @@ object Armavator : Subsystem("Armavator") {
     val angle: Angle
         get() = armMotors.position.degrees + ARM_OFFSET.degrees
 
+    val intakeCurrent: Double
+        get() = PDP.getCurrent(Victors.ARM_INTAKE)
+
     var isClamping: Boolean
         get() = !clawSolenoid.get()
         set(value) {
-            if (value != isClamping) println("Clamping: $value from ${Thread.currentThread().stackTrace.drop(2).first()}")
+//            if (value != isClamping) println("Clamping: $value from ${Thread.currentThread().stackTrace.drop(2).first()}")
             clawSolenoid.set(!value)
         }
 
@@ -120,11 +139,11 @@ object Armavator : Subsystem("Armavator") {
 
     var heightSetpoint: Length = height
         set(value) {
+//            println("Height: $value from ${Thread.currentThread().stackTrace.drop(2).first()}")
             table.getEntry("Elevator Error").setDouble(elevatorMotors.closedLoopError)
             table.getEntry("Elevator Output").setDouble(elevatorMotors.output)
             field = value.asInches.coerceIn(heightRange).inches
             elevatorMotors.setMotionMagicSetpoint(field.asInches, ELEVATOR_FEED_FORWARD)
-            gearShifter.set(isClimbing)
         }
 
     init {
@@ -161,6 +180,7 @@ object Armavator : Subsystem("Armavator") {
     }
 
     override fun reset() {
+        isClimbing = false
         angleSetpoint = angle
         heightSetpoint = height
         intake(0.0)
@@ -168,9 +188,7 @@ object Armavator : Subsystem("Armavator") {
 
     override suspend fun default() {
         periodic {
-//            printDebugInfo()
-            angleSetpoint += (OI.operatorRightYStick * 50.0 * period).degrees
-            heightSetpoint += (OI.operatorLeftYStick * 7 * period).inches
+            if(gamePiece == GamePiece.CARGO)  intake(-0.15)
         }
     }
 }
@@ -207,6 +225,14 @@ suspend fun Armavator.animate(height: Length, angle: Angle, time: Time = 1.5.sec
             stop()
         }
     }
+}
+
+suspend fun Armavator.togglePinching() = use(this){
+    isPinching = !isPinching
+}
+
+suspend fun Armavator.toggleClamping() = use(this){
+    isClamping = !isClamping
 }
 
 enum class GamePiece { HATCH_PANEL, CARGO }

@@ -1,5 +1,6 @@
 package org.team2471.frc2019
 
+import org.team2471.frc.lib.input.Controller
 import org.team2471.frc.lib.input.XboxController
 import org.team2471.frc.lib.input.toggleWhenTrue
 import org.team2471.frc.lib.input.whenTrue
@@ -55,7 +56,7 @@ object OI {
         driverController::rightBumper::toggleWhenTrue { intakeHatch() }
         driverController::b.whenTrue { Armavator.gamePiece = null; returnHome() }
         driverController::a.whenTrue { pickupFeederStation() }
-        driverController::start.whenTrue { Drive.zeroGyro() }
+        driverController::back.whenTrue { Drive.zeroGyro() }
 
         driverController::y.whenTrue {
             val position1 = Vector2(0.0, 0.0)
@@ -79,6 +80,9 @@ object OI {
         operatorController::b.whenTrue { scoreMed() }
         operatorController::x.whenTrue { scoreCargoShip() }
         operatorController::y.whenTrue { scoreHigh() }
+        operatorController::leftBumper.whenTrue{ Armavator.toggleClamping()}
+        operatorController::rightBumper.whenTrue{ Armavator.togglePinching()}
+        ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }
 
 //        driverController.createMappings {
 //            leftBumperToggle { intakeCargo() }

@@ -3,9 +3,12 @@ package org.team2471.frc2019
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.wpilibj.Timer
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.team2471.frc.lib.actuators.MotorController
 import org.team2471.frc.lib.actuators.TalonID
 import org.team2471.frc.lib.actuators.VictorID
+import org.team2471.frc.lib.coroutines.MeanlibDispatcher
 import org.team2471.frc.lib.coroutines.halt
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.Subsystem
@@ -17,9 +20,11 @@ import org.team2471.frc2019.Talons.OB1_PIVOT_MASTER
 import org.team2471.frc2019.Victors.OB1_PIVOT_SLAVE
 import kotlin.math.abs
 
+private const val PIVOT_F = 50.0
+
 object OB1 : Subsystem("OB1") {
     private val pivotMotors = MotorController(TalonID(OB1_PIVOT_MASTER), VictorID(OB1_PIVOT_SLAVE)).config {
-        currentLimit(10, 0, 0)
+        currentLimit(30, 0, 0)
         encoderType(FeedbackDevice.Analog)
         feedbackCoefficient = 1 / 2.6
         sensorPhase(false)
@@ -31,7 +36,7 @@ object OB1 : Subsystem("OB1") {
         pid {
             p(8.0)
             d(8.0)
-            f(50.0)
+            f(PIVOT_F)
             motionMagic(360.0, 300.0)
         }
     }
@@ -45,11 +50,38 @@ object OB1 : Subsystem("OB1") {
 
     private val pivotRange = -2.0..180.0
 
+    var isClimbing = false
+        set(value) {
+            if (value != isClimbing) {
+                pivotMotors.config {
+                    pid {
+                        f(if (value) 0.0 else PIVOT_F)
+                    }
+                }
+            }
+            field = value
+        }
+
+    init {
+        GlobalScope.launch(MeanlibDispatcher) {
+            val angleEntry = table.getEntry("Angle")
+            val outputEntry = table.getEntry("Output")
+            periodic {
+                angleSetpoint += (OI.obiControl * 80.0 * period).degrees
+                angleEntry.setDouble(angle.asDegrees)
+                table.getEntry("Setpoint").setDouble(angleSetpoint.asDegrees)
+            }
+        }
+    }
+
     val intakeCurrent: Double
         get() = intakeMotor.current
 
     val angle: Angle
         get() = pivotMotors.position.degrees
+
+    val output: Double
+        get() = pivotMotors.output
 
     const val BALL_INTAKE_PRESET = 63.0
 
@@ -61,27 +93,27 @@ object OB1 : Subsystem("OB1") {
             table.getEntry("OB1 Output").setDouble(pivotMotors.output)
         }
 
+    fun climb(setpoint: Angle, feedForward: Double) {
+        pivotMotors.setPositionSetpoint(setpoint.asDegrees, feedForward)
+//        pivotMotors.setPercentOutput(if (setpoint < angle) -1.0 else feedForward)
+    }
+
     fun pivotRaw(power: Double) {
         pivotMotors.setPercentOutput(power)
 //        println(angle.asDegrees)
     }
 
     fun intake(power: Double) {
-        println("$power from ${Thread.currentThread().stackTrace.drop(2).first()}")
+//        println("$power from ${Thread.currentThread().stackTrace.drop(2).first()}")
         intakeMotor.setPercentOutput(power)
     }
 
     override fun reset() {
         angleSetpoint = angle
         intake(0.0)
+        isClimbing = false
     }
 
-    override suspend fun default() {
-        periodic {
-            angleSetpoint += (OI.obiControl * 80.0 * period).degrees
-
-        }
-    }
 
 }
 
