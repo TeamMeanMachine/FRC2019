@@ -21,6 +21,8 @@ suspend fun climb() = use(Armavator, OB1) {
     val thetaOffset = 58.degrees
     val heightStep = 8.inches
 
+
+    goToPose(Pose.BEFORE_CLIMB)
     goToPose(Pose.CLIMB_START)
     suspendUntil { OI.startClimb }
 
@@ -41,7 +43,7 @@ suspend fun climb() = use(Armavator, OB1) {
             OB1.climb(obiSetpoint, -0.3 * (OB1.angle - thetaOffset).cos())
 
             Armavator.angleSetpoint = Pose.LIFTED.armAngle
-            if (height < Armavator.heightSetpoint + 2.inches && OB1.angle < OB1.angleSetpoint + 5.degrees) {
+            if (height < Armavator.heightSetpoint + 2.inches && OB1.angle < OB1.angleSetpoint + 2.degrees) {
                 stop()
             }
         }
@@ -50,7 +52,7 @@ suspend fun climb() = use(Armavator, OB1) {
         periodic {
             OB1.climb(Pose.LIFTED.obiAngle, -0.3 * (OB1.angle - thetaOffset).cos())
             OB1.intake(-0.7)
-            if (timer.get() < 1.3) {
+            if (timer.get() < 2) {
                 Drive.drive(Vector2(0.0, 0.4), 0.0, false)
                 Armavator.heightSetpoint = Pose.LIFTED.elevatorHeight
                 Armavator.angleSetpoint = Pose.LIFTED.armAngle
@@ -65,8 +67,6 @@ suspend fun climb() = use(Armavator, OB1) {
                 ).degrees
             }
         }
-
-
 //            goToPose(Pose.CLIMB_LIFT_ELEVATOR)
 //            val timer = Timer().apply { start() }
 //            periodic {

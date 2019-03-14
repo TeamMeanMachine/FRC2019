@@ -150,3 +150,11 @@ suspend fun OB1.intakeCargo(): Nothing = use(OB1) {
         OB1.intake(0.0)
     }
 }
+
+suspend fun OB1.evacuateBall() = use(OB1) {
+    periodic {
+        angleSetpoint = Pose.CARGO_GROUND_PICKUP.obiAngle
+        intake(-1.0)
+        Armavator.intake(-1.0)
+    }
+}
