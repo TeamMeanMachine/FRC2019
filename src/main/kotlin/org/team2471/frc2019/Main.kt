@@ -76,11 +76,10 @@ object Robot: RobotProgram {
         OB1.disable()
         Drive.disable()
         Jevois.disable()
-        OI
+
 
 //            if (Jevois.targets.isNotEmpty()) println(Jevois.targets.joinToString())
 //            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
-        println("Joystick LeftX=${OI.driverController.leftThumbstickX} LeftY=${OI.driverController.leftThumbstickY} RightX=${OI.driverController.rightThumbstickX}")
     }
 }
 
@@ -91,6 +90,7 @@ fun main() {
     Armavator
     OB1
     Jevois
+    OI
 
     AutoChooser
 

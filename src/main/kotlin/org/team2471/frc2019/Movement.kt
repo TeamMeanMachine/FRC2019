@@ -32,7 +32,7 @@ import kotlin.math.max
 
 private const val OBI_SAFETY_LINE_MIN = 6.0
 private const val OBI_SAFETY_ANGLE = 35.0
-private const val ARM_SAFETY_TOLERANCE = 4
+private const val ARM_SAFETY_TOLERANCE = 5
 private const val ELEVATOR_SAFETY_TOLERANCE = 3.0
 
 private fun Pose.confined(): Boolean {

@@ -57,10 +57,10 @@ suspend fun climb() = use(Armavator, OB1) {
                 Armavator.heightSetpoint = Pose.LIFTED.elevatorHeight
                 Armavator.angleSetpoint = Pose.LIFTED.armAngle
             } else {
-                Drive.drive(Vector2(0.0, 0.15), 0.0, false)
+                Drive.drive(Vector2(0.0, 0.15 * OI.driverController.rightTrigger), 0.0, false)
                 Armavator.isClimbing = false
                 OB1.isClimbing = false
-                Armavator.heightSetpoint = Pose.HOME.elevatorHeight
+                Armavator.heightSetpoint = Pose.HOME.elevatorHeight - 17.5.inches
                 Armavator.angleSetpoint = Armavator.height.asInches.linearMap(
                     Pose.LIFTED.armAngle.asDegrees..Pose.HOME.armAngle.asDegrees,
                     Pose.LIFTED.elevatorHeight.asInches..Pose.HOME.elevatorHeight.asInches

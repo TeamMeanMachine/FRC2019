@@ -148,7 +148,11 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 */
         periodic {
 
-            drive(OI.driveTranslation, OI.driveRotation, SmartDashboard.getBoolean("Use Gyro", !DriverStation.getInstance().isAutonomous))
+            drive(OI.driveTranslation,
+                OI.driveRotation,
+                SmartDashboard.getBoolean("Use Gyro", true) && !DriverStation.getInstance().isAutonomous,
+                OI.operatorTranslation,
+                OI.operatorRotation)
 /*
             positionXEntry.setDouble(position.x)
             positionYEntry.setDouble(position.y)

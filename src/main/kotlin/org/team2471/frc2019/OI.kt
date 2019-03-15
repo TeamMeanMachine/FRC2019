@@ -26,8 +26,20 @@ object OI {
     val driveRotation: Double
         get() = (driverController.rightThumbstickX.deadband(deadBandDriver)).squareWithSign() * 0.5
 
+    val operatorTranslation: Vector2
+        get() = Vector2(operatorLeftXStick, operatorLeftYStick) * 0.5
+
+    val operatorRotation: Double
+        get() = operatorRightXStick.squareWithSign() * 0.25
+
+    val operatorLeftXStick: Double
+        get() = operatorController.leftThumbstickY.deadband(deadBandOperator)
+
     val operatorLeftYStick: Double
         get() = -operatorController.leftThumbstickY.deadband(deadBandOperator)
+
+    val operatorRightXStick: Double
+        get() = operatorController.leftThumbstickY.deadband(deadBandOperator)
 
     val operatorRightYStick: Double
         get() = -operatorController.rightThumbstickY.deadband(deadBandOperator)
@@ -50,11 +62,14 @@ object OI {
     val pickupFromFeederStation: Boolean
         get() = driverController.x
 
+    val rightTriggerDown: Boolean
+        get() = operatorController.rightTrigger > 0.2
+
     init {
         // owen mappings
         driverController::leftBumper::toggleWhenTrue { intakeCargo() }
         driverController::rightBumper::toggleWhenTrue { intakeHatch() }
-        driverController::b.whenTrue { Armavator.gamePiece = null; returnHome() }
+        driverController::b.whenTrue { returnHome(true) }
         driverController::a.whenTrue { pickupFeederStation() }
         driverController::back.whenTrue { Drive.zeroGyro() }
 

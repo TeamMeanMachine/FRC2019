@@ -17,7 +17,8 @@ suspend fun scoreCargoShip() =
     score(ScoringPosition.CARGO_SHIP)
 
 private suspend fun score(position: ScoringPosition) {
-    val gamePiece = Armavator.gamePiece ?: return
+//    val gamePiece = Armavator.gamePiece ?: return
+    val gamePiece = Armavator.gamePiece ?: GamePiece.CARGO
     use(Armavator, OB1, name = "Score") {
         goToPose(
             when (gamePiece) {

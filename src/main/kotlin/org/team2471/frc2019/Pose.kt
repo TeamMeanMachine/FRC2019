@@ -45,7 +45,7 @@ data class Pose(
                 Armavator.isClimbing
             )
         val STARTING_POSITION = Pose(0.inches, (-74).degrees, 145.degrees, true)
-        val HOME = Pose(1.inches, (-74).degrees, 6.degrees, true)
+        val HOME = Pose(0.inches, (-74).degrees, 6.degrees, true)
         val SAFETY = Pose(14.inches, (-74).degrees, 6.degrees, false)
         val CARGO_SAFETY_POSE = Pose(14.inches, (-74).degrees, 6.degrees, true)
 
@@ -60,7 +60,7 @@ data class Pose(
 
         val BEFORE_CLIMB = Pose(6.inches, (-74).degrees, 6.degrees, true)
         val CLIMB_START = Pose(1.inches, 18.degrees, 120.degrees, false, true,  true)
-        val LIFTED = Pose((-21.5).inches, 64.degrees, (-2).degrees, false, true, true)
+        val LIFTED = Pose((-21.5).inches, 64.degrees, (-2).degrees, false, true, true) //21.5
         val CLIMB_LIFT_ELEVATOR = Pose(0.inches, 64.degrees, (-2).degrees, false, true, true)
 
         val CARGO_GROUND_PICKUP = Pose(0.inches, (-74).degrees, 66.degrees, true, false)

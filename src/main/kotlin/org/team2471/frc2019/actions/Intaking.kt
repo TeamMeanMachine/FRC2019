@@ -1,11 +1,6 @@
 package org.team2471.frc2019.actions
 
-import javafx.geometry.Pos
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.withContext
 import org.team2471.frc.lib.coroutines.delay
-import org.team2471.frc.lib.coroutines.halt
-import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.coroutines.suspendUntil
 import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.units.inches
@@ -15,15 +10,10 @@ suspend fun intakeCargo() = use(Armavator, OB1) {
     OB1.intake(1.0)
     Armavator.intake(0.75)
     goToPose(Pose.CARGO_GROUND_PICKUP)
-    try {
-        delay(0.2)
-        suspendUntil { Armavator.intakeCurrent > 8.0 }
-        Armavator.gamePiece = GamePiece.CARGO
-    } finally {
-        withContext(NonCancellable) {
-            returnHome()
-        }
-    }
+    delay(0.2)
+    suspendUntil { Armavator.intakeCurrent > 8.0 }
+    Armavator.gamePiece = GamePiece.CARGO
+    returnHome()
 }
 
 suspend fun intakeHatch() = use(Armavator, OB1) {
@@ -45,7 +35,7 @@ suspend fun intakeHatch() = use(Armavator, OB1) {
         Armavator.isClamping = false
 //        withContext(NonCancellable) {
 //            returnHome()
-        }
+    }
 //    }
 }
 
@@ -72,20 +62,24 @@ suspend fun pickupFeederStation() {
     }
 }
 
-suspend fun returnHome() = use(Armavator, OB1) {
-    withContext(NonCancellable) {
-        if (Armavator.gamePiece == GamePiece.HATCH_PANEL) {
-            goToPose(Pose.HATCH_CARRY)
-        } else {
-            goToPose(Pose.HOME)
-        }
+suspend fun returnHome(resetGamePiece: Boolean = false) = use(Armavator, OB1) {
+    if (resetGamePiece) {
+        Armavator.gamePiece = null
+        goToPose(Pose.HOME)
+        return@use
+    }
+
+    if (Armavator.gamePiece == GamePiece.HATCH_PANEL) {
+        goToPose(Pose.HATCH_CARRY)
+    } else {
+        goToPose(Pose.HOME)
     }
 }
 
 suspend fun ejectPiece() {
     val gamePiece = Armavator.gamePiece ?: return
     use(Armavator, OB1) {
-        when(gamePiece) {
+        when (gamePiece) {
             GamePiece.CARGO -> Armavator.intake(-0.7)
             GamePiece.HATCH_PANEL -> Armavator.isPinching = true
         }
