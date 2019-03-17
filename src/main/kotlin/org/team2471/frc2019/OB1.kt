@@ -67,8 +67,8 @@ object OB1 : Subsystem("OB1") {
             val angleEntry = table.getEntry("Angle")
             val outputEntry = table.getEntry("Output")
             periodic {
-                angleSetpoint += (OI.obiControl * 80.0 * period).degrees
                 angleEntry.setDouble(angle.asDegrees)
+                outputEntry.setDouble(pivotMotors.output)
                 table.getEntry("Setpoint").setDouble(angleSetpoint.asDegrees)
             }
         }
@@ -110,7 +110,8 @@ object OB1 : Subsystem("OB1") {
 
     override suspend fun default() {
         periodic {
-            angleSetpoint = angle
+            angleSetpoint = angleSetpoint
+            angleSetpoint += (OI.obiControl * 80.0 * period).degrees
         }
     }
 

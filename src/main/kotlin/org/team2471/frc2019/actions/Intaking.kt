@@ -3,7 +3,9 @@ package org.team2471.frc2019.actions
 import org.team2471.frc.lib.coroutines.delay
 import org.team2471.frc.lib.coroutines.suspendUntil
 import org.team2471.frc.lib.framework.use
+import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.units.inches
+import org.team2471.frc.lib.units.seconds
 import org.team2471.frc2019.*
 
 suspend fun intakeCargo() = use(Armavator, OB1) {
@@ -11,7 +13,8 @@ suspend fun intakeCargo() = use(Armavator, OB1) {
     Armavator.intake(0.75)
     goToPose(Pose.CARGO_GROUND_PICKUP)
     delay(0.2)
-    suspendUntil { Armavator.intakeCurrent > 8.0 }
+    println("Armavator current: ${Armavator.intakeCurrent}")
+    suspendUntil { println(Armavator.intakeCurrent);Armavator.intakeCurrent > 8.0 }
     Armavator.gamePiece = GamePiece.CARGO
     returnHome()
 }
@@ -21,8 +24,8 @@ suspend fun intakeHatch() = use(Armavator, OB1) {
         OB1.intake(0.7)
         goToPose(Pose.HATCH_GROUND_PICKUP)
         delay(0.3)
-        suspendUntil { OB1.intakeCurrent > 20.0 } //30.0 for final
-        delay(0.2)
+        suspendUntil { OB1.intakeCurrent > 25.0 } //20.0 for practice
+        delay(0.4)
         OB1.intake(0.15)
         goToPose(Pose.HATCH_HANDOFF)
         Armavator.gamePiece = GamePiece.HATCH_PANEL
@@ -57,7 +60,7 @@ suspend fun pickupFeederStation() {
         Armavator.isPinching = false
         Armavator.gamePiece = GamePiece.HATCH_PANEL
         delay(0.5)
-        Drive.driveDistance((-6).inches, 0.4)
+//        Drive.driveTime(Vector2(0.0, -0.4), 0.75.seconds)
         returnHome()
     }
 }

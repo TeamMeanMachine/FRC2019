@@ -6,6 +6,7 @@ import com.kauailabs.navx.frc.AHRS
 import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.SPI
+import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.interfaces.Gyro
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlinx.coroutines.GlobalScope
@@ -14,6 +15,7 @@ import org.team2471.frc.lib.actuators.MotorController
 import org.team2471.frc.lib.actuators.TalonID
 import org.team2471.frc.lib.control.PDController
 import org.team2471.frc.lib.coroutines.MeanlibDispatcher
+import org.team2471.frc.lib.coroutines.delay
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.coroutines.suspendUntil
 import org.team2471.frc.lib.framework.Subsystem
@@ -148,11 +150,13 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 */
         periodic {
 
-            drive(OI.driveTranslation,
+            drive(
+                OI.driveTranslation,
                 OI.driveRotation,
                 SmartDashboard.getBoolean("Use Gyro", true) && !DriverStation.getInstance().isAutonomous,
                 OI.operatorTranslation,
-                OI.operatorRotation)
+                OI.operatorRotation
+            )
 /*
             positionXEntry.setDouble(position.x)
             positionYEntry.setDouble(position.y)
@@ -270,12 +274,22 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     }
 }
 
-
 suspend fun Drive.driveDistance(distance: Length, speed: Double) = use(Drive) {
+    // TODO: fix this
     val initialPosition = position
     periodic {
         drive(Vector2(0.0, speed.withSign(distance.asInches)), 0.0, false)
 
-        if(position.distance(initialPosition) > distance.asFeet.absoluteValue) stop()
+        val traveled = initialPosition.distance(position)
+        println("Position: $position, initial: $initialPosition, distance: $traveled")
+        if (traveled > distance.asFeet.absoluteValue) stop()
+    }
+}
+
+suspend fun Drive.driveTime(translation: Vector2, time: Time) {
+    val timer = Timer().apply { start() }
+    periodic {
+        drive(translation, 0.0, false)
+        if (timer.get() > time.asSeconds) stop()
     }
 }

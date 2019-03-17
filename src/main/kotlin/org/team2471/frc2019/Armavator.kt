@@ -39,7 +39,7 @@ object Armavator : Subsystem("Armavator") {
 
     private const val ELEVATOR_VELOCITY = 50.0
     private const val ELEVATOR_ACCELERATION = 120.0
-    private const val ELEVATOR_CLIMB_VELOCITY = 30.0
+    private const val ELEVATOR_CLIMB_VELOCITY = 10.0
     private const val ELEVATOR_CLIMB_ACCELERATION = 10.0
 
     val elevatorMotors = MotorController(TalonID(ELEVATOR_MASTER), VictorID(ELEVATOR_SLAVE)).config {
@@ -193,7 +193,7 @@ object Armavator : Subsystem("Armavator") {
 
     override suspend fun default() {
         periodic {
-            if(gamePiece == GamePiece.CARGO)  intake(-0.15)
+            intake(if(gamePiece == GamePiece.CARGO) 0.15 else 0.0)
             Armavator.heightSetpoint = Armavator.heightSetpoint
             Armavator.angleSetpoint = Armavator.angleSetpoint
         }
