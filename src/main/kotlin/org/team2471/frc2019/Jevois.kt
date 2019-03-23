@@ -13,7 +13,6 @@ import org.team2471.frc.lib.control.PDController
 import org.team2471.frc.lib.coroutines.MeanlibDispatcher
 import org.team2471.frc.lib.coroutines.delay
 import org.team2471.frc.lib.coroutines.periodic
-import org.team2471.frc.lib.coroutines.suspendUntil
 import org.team2471.frc.lib.framework.Subsystem
 import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.math.Vector2
@@ -46,10 +45,10 @@ object Jevois : Subsystem("Jevois") {
             }
 
             field = value
-            ledRingLight.setPercentOutput(if (value) 1.0 else 0.0)
+            ledRingLight.setPercentOutput(if (value) 0.5 else 0.0)
         }
 
-    var targets: Array<Target> = emptyArray()
+    var target: Target? = null
         private set
 
     override fun reset() {
@@ -79,7 +78,7 @@ object Jevois : Subsystem("Jevois") {
             serialPort.writeString("setpar serout USB\n")
             serialPort.writeString("streamon\n")
 
-            val dataAdapter = Moshi.Builder().build().adapter(Array<Target>::class.java)
+            val dataAdapter = Moshi.Builder().build().adapter(Target::class.java)
 
             while (true) {
                 if (serialPort.bytesReceived == 0) {
@@ -89,7 +88,7 @@ object Jevois : Subsystem("Jevois") {
 
                 val data = serialPort.readString().takeWhile { it != '\n' }
                 try {
-                    targets = dataAdapter.fromJson(data)!!
+                    target = dataAdapter.fromJson(data)!!
                 } catch (_: Throwable) {
                 }
             }
@@ -116,9 +115,8 @@ suspend fun driveToTarget() = use(Jevois) {
         val targetSkew = 1.degrees
 
         periodic {
-            val targets: Array<Jevois.Target> = Jevois.targets
-            if (targets.isNotEmpty()) {
-                val target = targets.minBy { it.distance.asInches }!!
+            val target = Jevois.target
+            if (target != null) {
                 val (d, a, s) = target
                 val distance = d
                 val angle = a
@@ -159,13 +157,13 @@ suspend fun driveToTarget() = use(Jevois) {
 //        var totalAngle = 0.degrees
 //        var totalSkew = 0.degrees
 //        repeat(5) {
-//            lateinit var targets: Array<Jevois.Target>
+//            lateinit var target: Array<Jevois.Target>
 //            withTimeout(1000) {
-//                suspendUntil { targets = Jevois.targets; targets.isNotEmpty() }
+//                suspendUntil { target = Jevois.target; target.isNotEmpty() }
 //            }
-//            val target = targets.minBy { it.distance.asInches }!!
+//            val target = target.minBy { it.distance.asInches }!!
 //
-////            val target = Jevois.targets.minBy { it.position.distance(lastTarget.position) } ?: return@driving
+////            val target = Jevois.target.minBy { it.position.distance(lastTarget.position) } ?: return@driving
 //            val (d, a, s) = target
 ////            lastTarget = target
 //            totalDistance += d
