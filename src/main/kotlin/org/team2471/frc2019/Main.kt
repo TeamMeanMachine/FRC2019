@@ -55,10 +55,10 @@ object Robot: RobotProgram {
     }
 
     override suspend fun test() {
-//        use(Jevois) {
-//            Jevois.isLightEnabled = true
-//            halt()
-//        }
+        use(Jevois) {
+            Jevois.isLightEnabled = true
+            halt()
+        }
 //        use(Drive) {
 //            periodic {
 //                Drive.drive(Vector2(0.0, 0.2), 0.0)
@@ -85,7 +85,7 @@ object Robot: RobotProgram {
         Jevois.disable()
 
 
-//            if (Jevois.targets.isNotEmpty()) println(Jevois.targets.joinToString())
+//            if (Jevois.target.isNotEmpty()) println(Jevois.target.joinToString())
 //            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
     }
 }
