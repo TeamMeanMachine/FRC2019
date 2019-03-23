@@ -11,8 +11,8 @@ private val deadBandDriver = 0.05
 private val deadBandOperator = 0.150
 
 object OI {
-    public val driverController = XboxController(0)
-    private val operatorController = XboxController(1)
+    val driverController = XboxController(0)
+    val operatorController = XboxController(1)
 
     private val driveTranslationX: Double
         get() = driverController.leftThumbstickX.deadband(deadBandDriver).squareWithSign()
@@ -26,8 +26,20 @@ object OI {
     val driveRotation: Double
         get() = (driverController.rightThumbstickX.deadband(deadBandDriver)).squareWithSign() * 0.5
 
+    val operatorTranslation: Vector2
+        get() = Vector2(operatorLeftXStick, operatorLeftYStick) * 0.5
+
+    val operatorRotation: Double
+        get() = operatorRightXStick.squareWithSign() * 0.25
+
+    val operatorLeftXStick: Double
+        get() = operatorController.leftThumbstickY.deadband(deadBandOperator)
+
     val operatorLeftYStick: Double
         get() = -operatorController.leftThumbstickY.deadband(deadBandOperator)
+
+    val operatorRightXStick: Double
+        get() = operatorController.leftThumbstickY.deadband(deadBandOperator)
 
     val operatorRightYStick: Double
         get() = -operatorController.rightThumbstickY.deadband(deadBandOperator)
@@ -50,30 +62,33 @@ object OI {
     val pickupFromFeederStation: Boolean
         get() = driverController.x
 
+    val rightTriggerDown: Boolean
+        get() = operatorController.rightTrigger > 0.2
+
     init {
         // owen mappings
         driverController::leftBumper::toggleWhenTrue { intakeCargo() }
         driverController::rightBumper::toggleWhenTrue { intakeHatch() }
-        driverController::b.whenTrue { Armavator.gamePiece = null; returnHome() }
+        driverController::b.whenTrue { returnHome(true) }
         driverController::a.whenTrue { pickupFeederStation() }
         driverController::back.whenTrue { Drive.zeroGyro() }
 
-        driverController::y.whenTrue {
-            val position1 = Vector2(0.0, 0.0)
-            val tangent1 = Vector2(0.0, 3.0)
-            val robotPosition = RobotPosition(Drive.position, Drive.heading)
-            val initialPathPoint = robotToField(RobotPathPoint(position1, tangent1), robotPosition)
-            val examplePath = Path2D().apply {
-                robotDirection = Path2D.RobotDirection.FORWARD
-                addPointAndTangent(initialPathPoint.position.x, initialPathPoint.position.y, 0.0, 1.0)
-                addPointAndTangent(initialPathPoint.position.x + 3.0, initialPathPoint.position.y + 1.0, 0.0, 4.0)
-                addEasePoint(0.0, 0.0)
-                addEasePoint(3.0, 1.0)
-                addHeadingPoint(0.0, Drive.heading.asDegrees)
-                addHeadingPoint(3.0, 45.0)
-            }
-            driveToTarget()
-        }
+//        driverController::y.whenTrue {
+//            val position1 = Vector2(0.0, 0.0)
+//            val tangent1 = Vector2(0.0, 3.0)
+//            val robotPosition = RobotPosition(Drive.position, Drive.heading)
+//            val initialPathPoint = robotToField(RobotPathPoint(position1, tangent1), robotPosition)
+//            val examplePath = Path2D().apply {
+//                robotDirection = Path2D.RobotDirection.FORWARD
+//                addPointAndTangent(initialPathPoint.position.x, initialPathPoint.position.y, 0.0, 1.0)
+//                addPointAndTangent(initialPathPoint.position.x + 3.0, initialPathPoint.position.y + 1.0, 0.0, 4.0)
+//                addEasePoint(0.0, 0.0)
+//                addEasePoint(3.0, 1.0)
+//                addHeadingPoint(0.0, Drive.heading.asDegrees)
+//                addHeadingPoint(3.0, 45.0)
+//            }
+//            driveToTarget()
+//        }
 
         // justine mappings
         operatorController::a.whenTrue { scoreLow() }
@@ -84,6 +99,7 @@ object OI {
         operatorController::leftBumper.whenTrue{ Armavator.toggleClamping()}
         operatorController::rightBumper.whenTrue{ Armavator.togglePinching()}
         ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }
+        ({operatorController.dPad == Controller.Direction.DOWN}).whenTrue{ climb2() }
 
         operatorController::back.whenTrue{ turnToTarget() }
 //        driverController.createMappings {

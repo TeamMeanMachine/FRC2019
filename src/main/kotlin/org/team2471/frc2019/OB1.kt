@@ -24,7 +24,7 @@ private const val PIVOT_F = 50.0
 
 object OB1 : Subsystem("OB1") {
     private val pivotMotors = MotorController(TalonID(OB1_PIVOT_MASTER), VictorID(OB1_PIVOT_SLAVE)).config {
-        currentLimit(30, 0, 0)
+        currentLimit(35, 0, 0)
         encoderType(FeedbackDevice.Analog)
         feedbackCoefficient = 1 / 2.6
         sensorPhase(false)
@@ -67,8 +67,8 @@ object OB1 : Subsystem("OB1") {
             val angleEntry = table.getEntry("Angle")
             val outputEntry = table.getEntry("Output")
             periodic {
-                angleSetpoint += (OI.obiControl * 80.0 * period).degrees
                 angleEntry.setDouble(angle.asDegrees)
+                outputEntry.setDouble(pivotMotors.output)
                 table.getEntry("Setpoint").setDouble(angleSetpoint.asDegrees)
             }
         }
@@ -106,6 +106,13 @@ object OB1 : Subsystem("OB1") {
     fun intake(power: Double) {
 //        println("$power from ${Thread.currentThread().stackTrace.drop(2).first()}")
         intakeMotor.setPercentOutput(power)
+    }
+
+    override suspend fun default() {
+        periodic {
+            angleSetpoint = angleSetpoint
+            angleSetpoint += (OI.obiControl * 80.0 * period).degrees
+        }
     }
 
     override fun reset() {

@@ -27,11 +27,11 @@ suspend fun climb() = use(Armavator, OB1) {
     suspendUntil { OI.startClimb }
 
 //    // climbing cannot be canceled in this stage
-    val timer = Timer().apply { start() }
     use(Drive) {
-        Armavator.isClimbing = true
         OB1.isClimbing = true
         periodic {
+            Armavator.isClimbing = true
+            OB1.intake(-0.7)
             Armavator.heightSetpoint = Pose.LIFTED.elevatorHeight
 //                OB1.angleSetpoint = Math.asin(
 //                    (Armavator.heightSetpoint.asInches -
@@ -40,7 +40,7 @@ suspend fun climb() = use(Armavator, OB1) {
             val height = Armavator.height
             val obiSetpoint =
                 thetaOffset + Angle.asin((height.asInches - heightOffset.asInches + heightStep.asInches) / pivotToRollers.asInches)
-            OB1.climb(obiSetpoint, -0.3 * (OB1.angle - thetaOffset).cos())
+            OB1.climb(obiSetpoint, -0.7 * (OB1.angle - thetaOffset).cos() - 0.1)
 
             Armavator.angleSetpoint = Pose.LIFTED.armAngle
             if (height < Armavator.heightSetpoint + 2.inches && OB1.angle < OB1.angleSetpoint + 2.degrees) {
@@ -48,25 +48,30 @@ suspend fun climb() = use(Armavator, OB1) {
             }
         }
 
-        timer.reset()
         periodic {
             OB1.climb(Pose.LIFTED.obiAngle, -0.3 * (OB1.angle - thetaOffset).cos())
             OB1.intake(-0.7)
-            if (timer.get() < 2) {
-                Drive.drive(Vector2(0.0, 0.4), 0.0, false)
-                Armavator.heightSetpoint = Pose.LIFTED.elevatorHeight
-                Armavator.angleSetpoint = Pose.LIFTED.armAngle
-            } else {
-                Drive.drive(Vector2(0.0, 0.15), 0.0, false)
-                Armavator.isClimbing = false
-                OB1.isClimbing = false
-                Armavator.heightSetpoint = Pose.HOME.elevatorHeight
-                Armavator.angleSetpoint = Armavator.height.asInches.linearMap(
-                    Pose.LIFTED.armAngle.asDegrees..Pose.HOME.armAngle.asDegrees,
-                    Pose.LIFTED.elevatorHeight.asInches..Pose.HOME.elevatorHeight.asInches
-                ).degrees
-            }
+            Drive.drive(Vector2(0.0, 0.4 * OI.driverController.rightTrigger), OI.driveRotation * 0.4, false)
+            Armavator.heightSetpoint = Pose.LIFTED.elevatorHeight
+            Armavator.angleSetpoint = Pose.LIFTED.armAngle
+            if (OI.driverController.x) stop()
         }
+
+        periodic {
+            OB1.climb(Pose.LIFTED.obiAngle, -0.3 * (OB1.angle - thetaOffset).cos())
+            OB1.intake(-0.7)
+            Drive.drive(Vector2(0.0, 0.15), 0.0, false)
+            Armavator.isClimbing = false
+            OB1.isClimbing = false
+            Armavator.heightSetpoint = Pose.CLIMB_LIFT_ELEVATOR.elevatorHeight
+            Armavator.angleSetpoint = Pose.CLIMB_LIFT_ELEVATOR.armAngle
+//            Armavator.angleSetpoint = Armavator.height.asInches.linearMap(
+//                Pose.LIFTED.armAngle.asDegrees..Pose.HOME.armAngle.asDegrees,
+//                Pose.LIFTED.elevatorHeight.asInches..Pose.HOME.elevatorHeight.asInches
+//            ).degrees
+        }
+    }
+}
 //            goToPose(Pose.CLIMB_LIFT_ELEVATOR)
 //            val timer = Timer().apply { start() }
 //            periodic {
@@ -75,5 +80,32 @@ suspend fun climb() = use(Armavator, OB1) {
 //                Drive.drive(Vector2(0.0, 0.4), 0.0, false)
 //            }
 //            goToPose(Pose.LIFTED)
+
+suspend fun climb2() = use(Armavator, OB1) {
+    goToPose(Pose.BEFORE_CLIMB)
+    goToPose(Pose.CLIMB_START)
+    suspendUntil { OI.startClimb }
+
+    use(Drive) {
+        periodic {
+            Drive.drive(Vector2(0.0, 0.4 * OI.driverController.rightTrigger), OI.driveRotation * 0.4, false)
+            OB1.intake(-0.4)
+            OB1.isClimbing = true
+            Armavator.isClimbing = true
+            Armavator.heightSetpoint = Pose.LIFTED2.elevatorHeight
+            OB1.angleSetpoint = Pose.LIFTED2.obiAngle
+            Armavator.angleSetpoint = Pose.LIFTED2.armAngle
+            if (OI.driverController.x) stop()
+        }
+        periodic {
+            OB1.intake(-0.5)
+            Drive.drive(Vector2(0.0, 0.15), 0.0, false)
+//            Armavator.isClimbing = false
+            OB1.isClimbing = false
+            OB1.angleSetpoint = Pose.LIFTED2.obiAngle
+            Armavator.heightSetpoint = Pose.CLIMB_LIFT_ELEVATOR.elevatorHeight
+            Armavator.angleSetpoint = Pose.CLIMB_LIFT_ELEVATOR.armAngle
+        }
     }
+
 }

@@ -45,7 +45,7 @@ data class Pose(
                 Armavator.isClimbing
             )
         val STARTING_POSITION = Pose(0.inches, (-74).degrees, 145.degrees, true)
-        val HOME = Pose(1.inches, (-74).degrees, 6.degrees, true)
+        val HOME = Pose(0.inches, (-74).degrees, 6.degrees, true)
         val SAFETY = Pose(14.inches, (-74).degrees, 6.degrees, false)
         val CARGO_SAFETY_POSE = Pose(14.inches, (-74).degrees, 6.degrees, true)
 
@@ -53,20 +53,22 @@ data class Pose(
         val HATCH_HANDOFF = Pose(3.inches, (-26).degrees, 90.degrees, false, true)
         val HATCH_CARRY = Pose(15.inches, (-50).degrees, 6.degrees, false, false)
         val HATCH_INTERMEDIATE = Pose(15.inches, (-26).degrees, 90.degrees, false, false)
-        val HATCH_LOW = Pose(0.inches, (-20).degrees, 6.degrees, false)
+        val HATCH_LOW = Pose((-1).inches, (-30).degrees, 6.degrees, false)
         val HATCH_MED = Pose(2.inches, 33.degrees, 6.degrees, false)
         val HATCH_HIGH = Pose(25.8.inches, 40.degrees, 6.degrees, false)
         val HATCH_FEEDER_PICKUP = Pose(1.inches, (-35).degrees, 6.degrees, false, true)
 
         val BEFORE_CLIMB = Pose(6.inches, (-74).degrees, 6.degrees, true)
         val CLIMB_START = Pose(1.inches, 18.degrees, 120.degrees, false, true,  true)
-        val LIFTED = Pose((-21.5).inches, 64.degrees, (-2).degrees, false, true, true)
-        val CLIMB_LIFT_ELEVATOR = Pose(0.inches, 64.degrees, (-2).degrees, false, true, true)
+        val CLIMB_START2 = Pose(1.inches, 18.degrees, 50.degrees, false, true,  true)
+        val LIFTED = Pose((-21.5).inches, 64.degrees, (-3).degrees, false, true, true) //21.5
+        val LIFTED2 = Pose((-9.25).inches, 64.degrees, (-3).degrees, false, true, true)
+        val CLIMB_LIFT_ELEVATOR = Pose(0.inches, -17.5.degrees, 30.degrees, false, true, true)
 
         val CARGO_GROUND_PICKUP = Pose(0.inches, (-74).degrees, 66.degrees, true, false)
         val CARGO_LOW = Pose(17.inches, (-57).degrees, 6.degrees, true, false)
         val CARGO_MED = Pose(0.inches, (57).degrees, 6.degrees, true, false)
         val CARGO_HIGH = Pose(26.inches, (64).degrees, 6.degrees, true, false)
-        val CARGO_SHIP_SCORE = Pose(0.inches, (30).degrees, 6.degrees, true, false)
+        val CARGO_SHIP_SCORE = Pose(0.inches, (20).degrees, 6.degrees, true, false)
     }
 }

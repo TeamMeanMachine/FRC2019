@@ -13,6 +13,7 @@ import org.team2471.frc.lib.control.PDController
 import org.team2471.frc.lib.coroutines.MeanlibDispatcher
 import org.team2471.frc.lib.coroutines.delay
 import org.team2471.frc.lib.coroutines.periodic
+import org.team2471.frc.lib.coroutines.suspendUntil
 import org.team2471.frc.lib.framework.Subsystem
 import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.math.Vector2
@@ -22,8 +23,12 @@ import org.team2471.frc.lib.units.Angle.Companion.cos
 import org.team2471.frc.lib.units.Angle.Companion.sin
 
 object Jevois : Subsystem("Jevois") {
-    private val serialPort = SerialPort(115200, SerialPort.Port.kUSB1).apply {
-        enableTermination()
+    private val serialPort = try {
+        SerialPort(115200, SerialPort.Port.kUSB1).apply {
+            enableTermination()
+        }
+    } catch(_: Throwable) {
+        null
     }
 
     private val ledRingLight = MotorController(VictorID(Victors.LED_RING_LIGHT))
@@ -32,11 +37,11 @@ object Jevois : Subsystem("Jevois") {
         set(value) {
             if (field != value) {
                 if (value) {
-                    serialPort.writeString("setcam absexp 3\n")
-                    serialPort.writeString("setcam gain 16\n")
+                    serialPort?.writeString("setcam absexp 3\n")
+                    serialPort?.writeString("setcam gain 16\n")
                 } else {
-                    serialPort.writeString("setcam absexp 1000\n")
-                    serialPort.writeString("setcam gain 100\n")
+                    serialPort?.writeString("setcam absexp 1000\n")
+                    serialPort?.writeString("setcam gain 100\n")
                 }
             }
 
@@ -64,6 +69,7 @@ object Jevois : Subsystem("Jevois") {
 
     init {
         GlobalScope.launch(MeanlibDispatcher) {
+            if (serialPort == null) return@launch
             serialPort.enableTermination()
             // setup
             println("Starting jevois...")

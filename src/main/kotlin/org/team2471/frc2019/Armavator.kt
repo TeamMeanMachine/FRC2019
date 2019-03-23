@@ -28,19 +28,19 @@ import org.team2471.frc2019.Victors.ARM_SLAVE
 import org.team2471.frc2019.Victors.ELEVATOR_SLAVE
 import org.team2471.frc2019.actions.returnHome
 import kotlin.math.abs
-
+import kotlin.math.min
 
 
 object Armavator : Subsystem("Armavator") {
     private const val ARM_OFFSET = -119.22
-    private const val ELEVATOR_FEED_FORWARD = 0.1
+    private const val ELEVATOR_FEED_FORWARD = 0.0
     const val ELEVATOR_HEIGHT = 21.5 //inches
     const val ARM_LENGTH = 28.0 //inches
 
     private const val ELEVATOR_VELOCITY = 50.0
-    private const val ELEVATOR_ACCELERATION = 150.0
-    private const val ELEVATOR_CLIMB_VELOCITY = ELEVATOR_VELOCITY * 0.2
-    private const val ELEVATOR_CLIMB_ACCELERATION = ELEVATOR_ACCELERATION * 0.2
+    private const val ELEVATOR_ACCELERATION = 120.0
+    private const val ELEVATOR_CLIMB_VELOCITY = 10.0
+    private const val ELEVATOR_CLIMB_ACCELERATION = 10.0
 
     val elevatorMotors = MotorController(TalonID(ELEVATOR_MASTER), VictorID(ELEVATOR_SLAVE)).config {
         encoderType(FeedbackDevice.Analog)
@@ -48,7 +48,7 @@ object Armavator : Subsystem("Armavator") {
         inverted(true)
         pid(0) {
             p(0.001)
-            f(0.0065)
+            f(0.006)
             motionMagic(ELEVATOR_ACCELERATION, ELEVATOR_VELOCITY)
         }
 
@@ -102,7 +102,7 @@ object Armavator : Subsystem("Armavator") {
         }
 
     private val heightRange: DoubleRange
-        get() = if(!isClimbing) 0.0..26.0 else Pose.LIFTED.elevatorHeight.asInches..26.0// inches
+        get() = if(!isClimbing) min(0.0, height.asInches)..26.0 else Pose.LIFTED.elevatorHeight.asInches..26.0// inches
 
     private val armRange: DoubleRange = -74.0..64.0 // degrees
 
@@ -126,6 +126,7 @@ object Armavator : Subsystem("Armavator") {
         get() = !pinchSolenoid.get()
         set(value) = pinchSolenoid.set(!value)
 
+    @Volatile
     var gamePiece: GamePiece? = null
 
     var angleSetpoint: Angle = angle
@@ -151,9 +152,13 @@ object Armavator : Subsystem("Armavator") {
         GlobalScope.launch(MeanlibDispatcher) {
             val heightEntry = table.getEntry("Height")
             val angleEntry = table.getEntry("Angle")
+            val heightSetpointEntry = table.getEntry("Height Setpoint")
+            val angleSetpointEntry = table.getEntry("Angle Setpoint")
             periodic {
                 heightEntry.setDouble(height.asInches)
                 angleEntry.setDouble(angle.asDegrees)
+                heightSetpointEntry.setDouble(heightSetpoint.asInches)
+                angleSetpointEntry.setDouble(angleSetpoint.asDegrees)
             }
         }
     }
@@ -188,7 +193,9 @@ object Armavator : Subsystem("Armavator") {
 
     override suspend fun default() {
         periodic {
-            if(gamePiece == GamePiece.CARGO)  intake(-0.15)
+            intake(if(gamePiece == GamePiece.CARGO) 0.15 else 0.0)
+            Armavator.heightSetpoint = Armavator.heightSetpoint
+            Armavator.angleSetpoint = Armavator.angleSetpoint
         }
     }
 }

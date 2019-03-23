@@ -15,6 +15,10 @@ import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.motion.following.drive
 import org.team2471.frc.lib.units.degrees
 import org.team2471.frc.lib.units.inches
+import org.team2471.frc.lib.units.seconds
+import org.team2471.frc2019.actions.intakeHatch
+import org.team2471.frc2019.actions.scoreCargoShip
+import org.team2471.frc2019.actions.scoreLow
 import org.team2471.frc2019.testing.steeringTests
 import kotlin.concurrent.thread
 
@@ -34,7 +38,10 @@ object Robot: RobotProgram {
 
     override suspend fun autonomous() {
         Drive.zeroGyro()
-        AutoChooser.autonomous()
+//        AutoChooser.autonomous()
+        goToPose(Pose.HOME)
+        intakeHatch()
+        scoreCargoShip()
     }
 
     override suspend fun teleop() {
@@ -48,10 +55,10 @@ object Robot: RobotProgram {
     }
 
     override suspend fun test() {
-        use(Jevois) {
-            Jevois.isLightEnabled = true
-            halt()
-        }
+//        use(Jevois) {
+//            Jevois.isLightEnabled = true
+//            halt()
+//        }
 //        use(Drive) {
 //            periodic {
 //                Drive.drive(Vector2(0.0, 0.2), 0.0)
@@ -76,11 +83,10 @@ object Robot: RobotProgram {
         OB1.disable()
         Drive.disable()
         Jevois.disable()
-        OI
+
 
 //            if (Jevois.targets.isNotEmpty()) println(Jevois.targets.joinToString())
 //            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
-        println("Joystick LeftX=${OI.driverController.leftThumbstickX} LeftY=${OI.driverController.leftThumbstickY} RightX=${OI.driverController.rightThumbstickX}")
     }
 }
 
@@ -91,6 +97,7 @@ fun main() {
     Armavator
     OB1
     Jevois
+    OI
 
     AutoChooser
 
