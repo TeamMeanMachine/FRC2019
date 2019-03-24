@@ -101,7 +101,7 @@ object OI {
         ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }
         ({operatorController.dPad == Controller.Direction.DOWN}).whenTrue{ climb2() }
 
-        operatorController::back.whenTrue{ turnToTarget() }
+        operatorController::back.whileTrue{ driveToTarget() }
 //        driverController.createMappings {
 //            leftBumperToggle { intakeCargo() }
 //
