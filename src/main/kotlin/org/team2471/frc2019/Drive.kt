@@ -288,7 +288,7 @@ suspend fun Drive.driveDistance(distance: Length, speed: Double) = use(Drive) {
     }
 }
 
-suspend fun Drive.driveTime(translation: Vector2, time: Time) {
+suspend fun Drive.driveTime(translation: Vector2, time: Time) = use(Drive) {
     val timer = Timer().apply { start() }
     periodic {
         drive(translation, 0.0, false)
