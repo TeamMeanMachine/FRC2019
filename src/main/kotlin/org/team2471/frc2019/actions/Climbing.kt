@@ -15,8 +15,8 @@ import org.team2471.frc.lib.units.inches
 import org.team2471.frc2019.*
 
 
-suspend fun climb() = use(Armavator, OB1) {
-    val heightOffset = (-2.8).inches
+suspend fun climb() = use(Armavator) {
+   /* val heightOffset = (-2.8).inches
     val pivotToRollers = 13.inches
     val thetaOffset = 58.degrees
     val heightStep = 8.inches
@@ -70,7 +70,7 @@ suspend fun climb() = use(Armavator, OB1) {
 //                Pose.LIFTED.elevatorHeight.asInches..Pose.HOME.elevatorHeight.asInches
 //            ).degrees
         }
-    }
+    }*/
 }
 //            goToPose(Pose.CLIMB_LIFT_ELEVATOR)
 //            val timer = Timer().apply { start() }
@@ -81,8 +81,8 @@ suspend fun climb() = use(Armavator, OB1) {
 //            }
 //            goToPose(Pose.LIFTED)
 
-suspend fun climb2() = use(Armavator, OB1) {
-    goToPose(Pose.BEFORE_CLIMB)
+suspend fun climb2() = use(Armavator) {
+   /* goToPose(Pose.BEFORE_CLIMB)
     goToPose(Pose.CLIMB_START)
     suspendUntil { OI.startClimb }
 
@@ -106,6 +106,6 @@ suspend fun climb2() = use(Armavator, OB1) {
             Armavator.heightSetpoint = Pose.CLIMB_LIFT_ELEVATOR.elevatorHeight
             Armavator.angleSetpoint = Pose.CLIMB_LIFT_ELEVATOR.armAngle
         }
-    }
+    }*/
 
 }

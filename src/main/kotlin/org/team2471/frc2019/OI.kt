@@ -69,8 +69,7 @@ object OI {
         // owen mappings
         driverController::leftBumper::toggleWhenTrue { intakeCargo() }
         driverController::rightBumper::toggleWhenTrue { intakeHatch() }
-        driverController::b.whenTrue { returnHome(true) }
-        driverController::a.whenTrue { pickupFeederStation() }
+        driverController::b.whenTrue { goToPose(Pose.HOME) }
         driverController::back.whenTrue { Drive.zeroGyro() }
 
 //        driverController::y.whenTrue {
@@ -95,8 +94,7 @@ object OI {
         operatorController::b.whenTrue { scoreMed() }
         operatorController::x.whenTrue { scoreCargoShip() }
         operatorController::y.whenTrue { scoreHigh() }
-        operatorController::start.whileTrue { OB1.evacuateBall() }
-        operatorController::leftBumper.whenTrue{ Armavator.toggleClamping()}
+        operatorController::leftBumper.whenTrue{ Armavator.toggleExtention()}
         operatorController::rightBumper.whenTrue{ Armavator.togglePinching()}
         ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }
         ({operatorController.dPad == Controller.Direction.DOWN}).whenTrue{ climb2() }
@@ -148,7 +146,7 @@ object OI {
 //                Armavator.isPinching = !Armavator.isPinching
 //            }
 //            leftBumperPress {
-//                Armavator.isClamping = !Armavator.isClamping
+//                Armavator.isExtending = !Armavator.isExtending
 //            }
 //
 //            backPress {
