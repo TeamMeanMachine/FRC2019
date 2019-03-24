@@ -23,7 +23,7 @@ suspend fun intakeHatch() = use(Armavator) {
     Armavator.isExtending = true
     suspendUntil { OI.pickupFromFeederStation }
     Armavator.isPinching = false
-    delay(0.25)
+    delay(0.35)
     Armavator.isExtending = false
     Drive.driveTime(Vector2(0.0, -0.4), 0.75.seconds)
     goToPose(Pose.HOME)

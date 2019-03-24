@@ -9,13 +9,13 @@ import org.team2471.frc.lib.motion.following.stop
 import org.team2471.frc2019.Drive
 import org.team2471.frc2019.Jevois
 
-const val DISTANCE_OFFSET = 24 //inches
+const val DISTANCE_OFFSET = 30 //inches
 const val ANGLE_OFFSET = 4 //degrees
 const val SKEW_OFFSET = 5 //degrees
 
 suspend fun driveToTarget() = use(Drive, Jevois, name = "Drive To Target") {
     Jevois.isLightEnabled = true
-    val turnController = PDController(0.01, 4.0)
+    val turnController = PDController(0.0125, 8.0)
     val distanceController = PDController(0.01, 0.02)
     val strafeController = PDController(0.005, 0.0)
 
@@ -26,7 +26,7 @@ suspend fun driveToTarget() = use(Drive, Jevois, name = "Drive To Target") {
         val strafe = strafeController.update(target.skew.asDegrees - SKEW_OFFSET)
 
         println(target)
-        Drive.drive(Vector2(strafe, distance), turn, false)
+        Drive.drive(Vector2(0.0, distance), turn, false)
 
     }
 }
