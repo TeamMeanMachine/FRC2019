@@ -34,13 +34,13 @@ object OI {
         get() = operatorRightXStick.squareWithSign() * 0.25
 
     val operatorLeftXStick: Double
-        get() = operatorController.leftThumbstickY.deadband(deadBandOperator)
+        get() = operatorController.leftThumbstickX.deadband(deadBandOperator)
 
     val operatorLeftYStick: Double
         get() = -operatorController.leftThumbstickY.deadband(deadBandOperator)
 
     val operatorRightXStick: Double
-        get() = operatorController.leftThumbstickY.deadband(deadBandOperator)
+        get() = operatorController.rightThumbstickX.deadband(deadBandOperator)
 
     val operatorRightYStick: Double
         get() = -operatorController.rightThumbstickY.deadband(deadBandOperator)
