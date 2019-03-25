@@ -4,6 +4,7 @@ import com.squareup.moshi.Moshi
 import edu.wpi.cscore.MjpegServer
 import edu.wpi.cscore.UsbCamera
 import edu.wpi.cscore.VideoMode
+import edu.wpi.first.wpilibj.DigitalOutput
 import edu.wpi.first.wpilibj.SerialPort
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -22,6 +23,16 @@ import org.team2471.frc.lib.units.Angle.Companion.cos
 import org.team2471.frc.lib.units.Angle.Companion.sin
 
 object Jevois : Subsystem("Jevois") {
+    private val blueOutput = DigitalOutput(0)
+    private val greenOutput = DigitalOutput(1)
+    private val redOutput = DigitalOutput(2)
+
+   init {
+       redOutput.set(false)
+       greenOutput.set(false)
+       blueOutput.set(false)
+   }
+
     private val serialPort = try {
         SerialPort(115200, SerialPort.Port.kUSB1).apply {
             enableTermination()
