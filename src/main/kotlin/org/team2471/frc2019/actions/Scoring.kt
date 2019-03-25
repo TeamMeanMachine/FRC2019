@@ -45,6 +45,7 @@ private suspend fun score(position: ScoringPosition) {
 
         when (gamePiece) {
             GamePiece.HATCH_PANEL -> {
+                Armavator.isExtending = true
                 suspendUntil { OI.ejectPiece }
                 Armavator.isExtending = true
                 Armavator.isPinching = true

@@ -230,6 +230,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                 inverted(true)
                 sensorPhase(true)
                 currentLimit(30, 0, 0)
+                openLoopRamp(0.2)
             }
             driveMotor.config {
                 inverted(isBack)
@@ -237,6 +238,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                 brakeMode()
                 feedbackCoefficient = 1 / 4687.5
                 currentLimit(30, 0, 0)
+                openLoopRamp(0.15)
             }
             GlobalScope.launch(MeanlibDispatcher) {
                 val table = NetworkTableInstance.getDefault().getTable(name)

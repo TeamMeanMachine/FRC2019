@@ -101,50 +101,50 @@ object Jevois : Subsystem("Jevois") {
     }
 }
 
-
-suspend fun driveToTarget() = use(Jevois) {
-
-    use(Drive) driving@{
-        Jevois.isLightEnabled = true
-        val translateYController = PDController(0.0, 0.0)
-        val translateXController = PDController(0.0, 0.0)
-        val turnController = PDController(0.01, 0.0)
-
-        val targetDistance = 1.858.feet
-        val targetAngle = 14.8.degrees
-        val targetSkew = 1.degrees
-
-        periodic {
-            val target = Jevois.target
-            if (target != null) {
-                val (d, a, s) = target
-                val distance = d
-                val angle = a
-                val skew = (s) * (1 - .1 * distance.asFeet)
-
-                val distError = targetDistance - distance
-                val angleError = targetAngle - angle
-                val skewError = targetSkew - skew
-
-                var translation = Vector2(0.0, 0.0)
-
-                val translateXError = (angleError + skewError).wrap()
-                val turnError = (skewError - angleError).wrap()
-                println("Turn Error: $turnError, Angle Error: $angleError, Skew Error: $skewError")
-
-                translation.x = translateXController.update(translateXError.asDegrees)
-                translation.y = translateYController.update(distError.asFeet)
-                val turn = turnController.update(turnError.asDegrees)
-
-                Drive.drive(translation, turn, false)
-
-                if (Math.abs(turnError.asDegrees) < 2.0) {
-                    return@periodic
-                }
-            }
-        }
-    }
-}
+//
+//suspend fun driveToTarget() = use(Jevois) {
+//
+//    use(Drive) driving@{
+//        Jevois.isLightEnabled = true
+//        val translateYController = PDController(0.0, 0.0)
+//        val translateXController = PDController(0.0, 0.0)
+//        val turnController = PDController(0.01, 0.0)
+//
+//        val targetDistance = 1.858.feet
+//        val targetAngle = 14.8.degrees
+//        val targetSkew = 1.degrees
+//
+//        periodic {
+//            val target = Jevois.target
+//            if (target != null) {
+//                val (d, a, s) = target
+//                val distance = d
+//                val angle = a
+//                val skew = (s) * (1 - .1 * distance.asFeet)
+//
+//                val distError = targetDistance - distance
+//                val angleError = targetAngle - angle
+//                val skewError = targetSkew - skew
+//
+//                var translation = Vector2(0.0, 0.0)
+//
+//                val translateXError = (angleError + skewError).wrap()
+//                val turnError = (skewError - angleError).wrap()
+////                println("Turn Error: $turnError, Angle Error: $angleError, Skew Error: $skewError")
+//
+//                translation.x = translateXController.update(translateXError.asDegrees)
+//                translation.y = translateYController.update(distError.asFeet)
+//                val turn = turnController.update(turnError.asDegrees)
+//
+//                Drive.drive(translation, turn, false)
+//
+//                if (Math.abs(turnError.asDegrees) < 2.0) {
+//                    return@periodic
+//                }
+//            }
+//        }
+//    }
+//}
 
 //
 //suspend fun driveToTarget() = use(Jevois) {

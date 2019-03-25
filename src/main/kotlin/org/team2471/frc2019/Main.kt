@@ -25,6 +25,11 @@ import kotlin.concurrent.thread
 val PDP = PowerDistributionPanel()
 
 object Robot: RobotProgram {
+
+    fun init() {
+        Drive.zeroGyro()
+    }
+
     override suspend fun enable() {
         Armavator.heightSetpoint = Armavator.height
         Armavator.angleSetpoint = Armavator.angle
