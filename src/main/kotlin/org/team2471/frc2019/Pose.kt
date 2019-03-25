@@ -22,7 +22,7 @@ data class Pose(val elevatorHeight: Length, val armAngle: Angle) {
 //        val LIFTED2 = Pose((-9.25).inches, 64.degrees, (-3).degrees, false, true, true)
 //        val CLIMB_LIFT_ELEVATOR = Pose(0.inches, -17.5.degrees, 30.degrees, false, true, true)
 
-        val CARGO_GROUND_PICKUP = Pose((-9).inches, (-50).degrees)
+        val CARGO_GROUND_PICKUP = Pose((-9.5).inches, (-50).degrees)
         val CARGO_LOW = Pose(7.inches, (-40).degrees)
         val CARGO_MED = Pose((0).inches, (32).degrees)
         val CARGO_HIGH = Pose(17.inches, (57).degrees)

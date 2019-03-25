@@ -45,16 +45,16 @@ private suspend fun score(position: ScoringPosition) {
 
         when (gamePiece) {
             GamePiece.HATCH_PANEL -> {
+                Armavator.isExtending = true
                 suspendUntil { OI.ejectPiece }
                 Armavator.isExtending = true
-                delay(0.75)
                 Armavator.isPinching = true
                 delay(0.25)
                 Armavator.isExtending = false
             }
             GamePiece.CARGO -> {
                 suspendUntil { OI.ejectPiece }
-                Armavator.intake(-0.6)
+                Armavator.intake(-1.0)
                 delay(0.35)
                 Armavator.intake(0.0)
             }
@@ -63,7 +63,7 @@ private suspend fun score(position: ScoringPosition) {
         parallel({
             val placePosition = Drive.position
             val placeHeading = Drive.heading
-            Drive.driveTime(Vector2(0.0, -0.4), 0.35.seconds)
+            Drive.driveTime(Vector2(0.0, -0.3), 0.35.seconds)
             suspendUntil { Drive.position.distance(placePosition) > 1.5 || abs(Drive.heading.asDegrees - placeHeading.asDegrees) > 60.0 }
         }, {
             Armavator.heightSetpoint = Armavator.height - 2.inches
