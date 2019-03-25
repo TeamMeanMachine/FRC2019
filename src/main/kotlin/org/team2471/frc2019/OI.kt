@@ -2,6 +2,7 @@ package org.team2471.frc2019
 
 import org.team2471.frc.lib.input.*
 import org.team2471.frc.lib.math.Vector2
+import org.team2471.frc.lib.math.cube
 import org.team2471.frc.lib.math.deadband
 import org.team2471.frc.lib.math.squareWithSign
 import org.team2471.frc.lib.motion_profiling.Path2D
@@ -24,7 +25,7 @@ object OI {
         get() = Vector2(driveTranslationX, driveTranslationY)
 
     val driveRotation: Double
-        get() = (driverController.rightThumbstickX.deadband(deadBandDriver)).squareWithSign() * 0.5
+        get() = (driverController.rightThumbstickX.deadband(deadBandDriver)).cube() * 0.5
 
     val operatorTranslation: Vector2
         get() = Vector2(operatorLeftXStick, operatorLeftYStick) * 0.5

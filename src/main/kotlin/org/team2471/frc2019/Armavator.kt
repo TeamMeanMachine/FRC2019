@@ -64,7 +64,7 @@ object Armavator : Subsystem("Armavator") {
             .setAnalogPosition((ARM_OFFSET / feedbackCoefficient).toInt(), 20)
 
         pid {
-            p(1.5)
+            p(2.0)
             d(1.0)
 
             f(10.0)
