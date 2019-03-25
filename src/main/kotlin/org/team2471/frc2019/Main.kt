@@ -26,8 +26,9 @@ val PDP = PowerDistributionPanel()
 
 object Robot: RobotProgram {
 
-    fun init() {
+    init {
         Drive.zeroGyro()
+        Drive.heading = 0.0.degrees
     }
 
     override suspend fun enable() {
@@ -85,7 +86,6 @@ object Robot: RobotProgram {
         Armavator.disable()
         Drive.disable()
         Jevois.disable()
-
 
 //            if (Jevois.target.isNotEmpty()) println(Jevois.target.joinToString())
 //            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
