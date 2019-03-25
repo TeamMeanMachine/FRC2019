@@ -13,7 +13,7 @@ data class Pose(val elevatorHeight: Length, val armAngle: Angle) {
         val HATCH_LOW = Pose((0).inches, (-63).degrees)
         val HATCH_MED = Pose(17.inches, (-40).degrees)
         val HATCH_HIGH = Pose(5.inches, 48.degrees)
-        val HATCH_FEEDER_PICKUP = Pose((-6).inches, (-45).degrees)
+        val HATCH_FEEDER_PICKUP = Pose((-6).inches, (-48).degrees)
 
         //        val BEFORE_CLIMB = Pose(6.inches, (-74).degrees, 6.degrees, true)
 //        val CLIMB_START = Pose(1.inches, 18.degrees, 120.degrees, false, true,  true)

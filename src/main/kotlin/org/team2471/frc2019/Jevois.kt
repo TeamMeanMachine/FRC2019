@@ -23,9 +23,9 @@ import org.team2471.frc.lib.units.Angle.Companion.cos
 import org.team2471.frc.lib.units.Angle.Companion.sin
 
 object Jevois : Subsystem("Jevois") {
-    private val blueOutput = DigitalOutput(0)
-    private val greenOutput = DigitalOutput(1)
-    private val redOutput = DigitalOutput(2)
+    val blueOutput = DigitalOutput(0)
+    val redOutput = DigitalOutput(1)
+    val greenOutput = DigitalOutput(2)
 
    init {
        redOutput.set(false)
