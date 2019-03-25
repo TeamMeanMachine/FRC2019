@@ -48,7 +48,7 @@ private suspend fun score(position: ScoringPosition) {
                 suspendUntil { OI.ejectPiece }
                 Armavator.isExtending = true
                 Armavator.isPinching = true
-                delay(0.25)
+                delay(0.5)
                 Armavator.isExtending = false
             }
             GamePiece.CARGO -> {
