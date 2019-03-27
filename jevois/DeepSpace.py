@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import math
 import json
+from time import time
 
 
 def valid_contour(contour):
@@ -45,6 +46,9 @@ class DeepSpace:
         self.hsv_max = (90, 255, 255)
         self.open_kernel = np.ones((7, 7), np.uint8)
         self.stretch_factor = 16.0
+        self.last_ping = None
+        self.time_offset = None
+        self.requested_time = None
 
     def processNoUSB(self, inframe):
         self.process(inframe)
@@ -66,6 +70,10 @@ class DeepSpace:
 
         self.profiler.start()
 
+        if self.time_offset is None:
+            t = time()
+
+        # process things
         hsv = cv2.cvtColor(inimg, cv2.COLOR_BGR2HSV)
         threshold = cv2.inRange(hsv, self.hsv_min, self.hsv_max)
         self.profiler.checkpoint("HSV Thresholding")
@@ -104,7 +112,7 @@ class DeepSpace:
 
 
         target = min(targets, default=None, key=lambda x: x['angle'])
-        jevois.sendSerial(json.dumps(target))
+        jevois.sendSerial("DATA {}".format(json.dumps(target)))
         outimg = inimg
 
         fps = self.timer.stop()
@@ -138,6 +146,19 @@ class DeepSpace:
         self.profiler.stop()
 
         # Convert our output image to video output format and send to host over USB:
+
+    def parseSerial(self, data):
+        if data.startswith('PING'):
+            self.last_ping = time()
+            jevois.sendSerial('PONG')
+            if not self.time_offset:
+                self.requested_time = time()
+                jevois.sendSerial('TIME')
+        elif data.startswith('TIME') and self.requested_time:
+            split = data.split(' ')
+            rio_time = float(split[1])
+            self.time_offset = rio_time + (time() - self.requested_time) / 2.0
+            self.requested_time = None
 
     def group_rects(self, rects):
         pairs = []

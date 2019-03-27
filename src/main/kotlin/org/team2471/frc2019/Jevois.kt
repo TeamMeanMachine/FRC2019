@@ -5,28 +5,34 @@ import edu.wpi.cscore.MjpegServer
 import edu.wpi.cscore.UsbCamera
 import edu.wpi.cscore.VideoMode
 import edu.wpi.first.wpilibj.SerialPort
+import edu.wpi.first.wpilibj.Timer
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.team2471.frc.lib.actuators.MotorController
 import org.team2471.frc.lib.actuators.VictorID
-import org.team2471.frc.lib.control.PDController
 import org.team2471.frc.lib.coroutines.MeanlibDispatcher
 import org.team2471.frc.lib.coroutines.delay
-import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.Subsystem
-import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.math.Vector2
-import org.team2471.frc.lib.motion.following.drive
-import org.team2471.frc.lib.units.*
+import org.team2471.frc.lib.units.Angle
 import org.team2471.frc.lib.units.Angle.Companion.cos
 import org.team2471.frc.lib.units.Angle.Companion.sin
+import org.team2471.frc.lib.units.Length
+import org.team2471.frc.lib.units.asRadians
 
 object Jevois : Subsystem("Jevois") {
+    private const val PING_INTERVAL = 5.0
+
+    private val pingTimer = Timer().apply { start() }
+    private val pongTimer = Timer().apply { start() }
+
+
     private val serialPort = try {
         SerialPort(115200, SerialPort.Port.kUSB1).apply {
             enableTermination()
         }
-    } catch(_: Throwable) {
+    } catch (_: Throwable) {
         null
     }
 
@@ -81,15 +87,25 @@ object Jevois : Subsystem("Jevois") {
             val dataAdapter = Moshi.Builder().build().adapter(Target::class.java)
 
             while (true) {
+                if (pingTimer.get() > PING_INTERVAL) {
+                    serialPort.writeString("PING")
+                    pingTimer.reset()
+                }
+
                 if (serialPort.bytesReceived == 0) {
-                    delay(1.0 / 30.0)
+                    delay(2)
                     continue
                 }
 
                 val data = serialPort.readString().takeWhile { it != '\n' }
-                try {
-                    target = dataAdapter.fromJson(data)!!
-                } catch (_: Throwable) {
+
+                when {
+                    data.startsWith("PONG") -> pongTimer.reset()
+                    data.startsWith("TIME") -> serialPort.writeString("TIME ${Timer.getFPGATimestamp()}")
+                    data.startsWith("DATA") -> try {
+                        target = dataAdapter.fromJson(data.drop(5))!!
+                    } catch (_: Throwable) {
+                    }
                 }
             }
         }
