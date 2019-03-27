@@ -37,6 +37,7 @@ object Robot: RobotProgram {
         if (Armavator.height.asInches < 0.0) Armavator.reset()
         Armavator.enable()
         Drive.enable()
+        OB.enable()
         Jevois.enable()
     }
 
@@ -59,10 +60,10 @@ object Robot: RobotProgram {
     }
 
     override suspend fun test() {
-        use(Jevois) {
-            Jevois.isLightEnabled = true
-            halt()
-        }
+//        use(Jevois) {
+//            Jevois.isLightEnabled = true
+//            halt()
+//        }
 //        use(Drive) {
 //            periodic {
 //                Drive.drive(Vector2(0.0, 0.2), 0.0)
@@ -85,6 +86,7 @@ object Robot: RobotProgram {
     override suspend fun disable() {
         Armavator.disable()
         Drive.disable()
+        OB.disable()
         Jevois.disable()
 
 //            if (Jevois.target.isNotEmpty()) println(Jevois.target.joinToString())
@@ -98,6 +100,7 @@ fun main() {
     Drive
     Armavator
     Jevois
+    OB
     OI
 
     AutoChooser

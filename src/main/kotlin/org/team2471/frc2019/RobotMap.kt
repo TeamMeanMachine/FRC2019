@@ -19,9 +19,9 @@ object Talons {
 
     const val ARM_MASTER = 8
 
-    const val OB1_INTAKE = 7
+    const val OB_PIVOT_LEFT = 7
 
-    const val OB1_PIVOT_MASTER = 11
+    const val OB_PIVOT_RIGHT = 11
 }
 
 object Victors {
@@ -30,7 +30,7 @@ object Victors {
 
     const val ARM_INTAKE = 6
 
-    const val OB1_PIVOT_SLAVE = 10
+    const val OB_CLIMB_ROLLERS = 10
 
     const val LED_RING_LIGHT = 16
 }

@@ -1,6 +1,7 @@
 package org.team2471.frc2019.actions
 
 import edu.wpi.first.wpilibj.Timer
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import org.team2471.frc.lib.coroutines.periodic
@@ -81,31 +82,33 @@ suspend fun climb() = use(Armavator) {
 //            }
 //            goToPose(Pose.LIFTED)
 
-suspend fun climb2() = use(Armavator) {
-   /* goToPose(Pose.BEFORE_CLIMB)
-    goToPose(Pose.CLIMB_START)
-    suspendUntil { OI.startClimb }
+suspend fun climb2() {
+   val body: suspend CoroutineScope.() -> Unit = {
+      /* goToPose(Pose.BEFORE_CLIMB)
+  goToPose(Pose.CLIMB_START)
+  suspendUntil { OI.startClimb }
 
-    use(Drive) {
-        periodic {
-            Drive.drive(Vector2(0.0, 0.4 * OI.driverController.rightTrigger), OI.driveRotation * 0.4, false)
-            OB1.intake(-0.4)
-            OB1.isClimbing = true
-            Armavator.isClimbing = true
-            Armavator.heightSetpoint = Pose.LIFTED2.elevatorHeight
-            OB1.angleSetpoint = Pose.LIFTED2.obiAngle
-            Armavator.angleSetpoint = Pose.LIFTED2.armAngle
-            if (OI.driverController.x) stop()
-        }
-        periodic {
-            OB1.intake(-0.5)
-            Drive.drive(Vector2(0.0, 0.15), 0.0, false)
+  use(Drive) {
+      periodic {
+          Drive.drive(Vector2(0.0, 0.4 * OI.driverController.rightTrigger), OI.driveRotation * 0.4, false)
+          OB1.intake(-0.4)
+          OB1.isClimbing = true
+          Armavator.isClimbing = true
+          Armavator.heightSetpoint = Pose.LIFTED2.elevatorHeight
+          OB1.angleSetpoint = Pose.LIFTED2.obiAngle
+          Armavator.angleSetpoint = Pose.LIFTED2.armAngle
+          if (OI.driverController.x) stop()
+      }
+      periodic {
+          OB1.intake(-0.5)
+          Drive.drive(Vector2(0.0, 0.15), 0.0, false)
 //            Armavator.isClimbing = false
-            OB1.isClimbing = false
-            OB1.angleSetpoint = Pose.LIFTED2.obiAngle
-            Armavator.heightSetpoint = Pose.CLIMB_LIFT_ELEVATOR.elevatorHeight
-            Armavator.angleSetpoint = Pose.CLIMB_LIFT_ELEVATOR.armAngle
-        }
-    }*/
+          OB1.isClimbing = false
+          OB1.angleSetpoint = Pose.LIFTED2.obiAngle
+          Armavator.heightSetpoint = Pose.CLIMB_LIFT_ELEVATOR.elevatorHeight
+          Armavator.angleSetpoint = Pose.CLIMB_LIFT_ELEVATOR.armAngle
+      }
+  }*/
 
+   }
 }
