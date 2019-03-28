@@ -2,7 +2,7 @@ package org.team2471.frc2019
 
 import org.team2471.frc.lib.units.*
 
-data class Pose(val elevatorHeight: Length, val armAngle: Angle) {
+data class Pose(val elevatorHeight: Length, val armAngle: Angle, val obAngle: Angle = 200.degrees) {
 
     companion object {
         val current: Pose
@@ -15,10 +15,12 @@ data class Pose(val elevatorHeight: Length, val armAngle: Angle) {
         val HATCH_HIGH = Pose(5.inches, 48.degrees)
         val HATCH_FEEDER_PICKUP = Pose((-6).inches, (-48).degrees)
 
-        //        val BEFORE_CLIMB = Pose(6.inches, (-74).degrees, 6.degrees, true)
+        val BEFORE_BEFORE_CLIMB = Pose(-8.5.inches, 45.degrees)
+        val BEFORE_CLIMB = Pose((-8.5).inches, 45.degrees, 120.degrees)
 //        val CLIMB_START = Pose(1.inches, 18.degrees, 120.degrees, false, true,  true)
 //        val CLIMB_START2 = Pose(1.inches, 18.degrees, 50.degrees, false, true,  true)
-        val LIFTED = Pose((-21.5).inches, 64.degrees) //21.5
+        val LIFTED = Pose((-28.5).inches, 64.degrees, 0.degrees) //21.5
+        val AFTER_LIFTED = Pose(-8.5.inches, 0.degrees)
 //        val LIFTED2 = Pose((-9.25).inches, 64.degrees, (-3).degrees, false, true, true)
 //        val CLIMB_LIFT_ELEVATOR = Pose(0.inches, -17.5.degrees, 30.degrees, false, true, true)
 

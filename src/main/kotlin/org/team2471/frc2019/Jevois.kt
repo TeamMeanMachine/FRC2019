@@ -4,6 +4,7 @@ import com.squareup.moshi.Moshi
 import edu.wpi.cscore.MjpegServer
 import edu.wpi.cscore.UsbCamera
 import edu.wpi.cscore.VideoMode
+import edu.wpi.first.wpilibj.DigitalOutput
 import edu.wpi.first.wpilibj.SerialPort
 import edu.wpi.first.wpilibj.Timer
 import kotlinx.coroutines.GlobalScope

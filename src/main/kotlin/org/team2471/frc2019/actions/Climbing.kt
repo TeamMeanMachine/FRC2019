@@ -10,13 +10,17 @@ import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.math.linearMap
 import org.team2471.frc.lib.motion.following.drive
+import org.team2471.frc.lib.motion.following.stop
+import org.team2471.frc.lib.motion_profiling.MotionCurve
 import org.team2471.frc.lib.units.Angle
 import org.team2471.frc.lib.units.degrees
 import org.team2471.frc.lib.units.inches
 import org.team2471.frc2019.*
+import java.util.*
+import kotlin.math.max
 
 
-suspend fun climb() = use(Armavator) {
+//suspend fun climb() = use(Armavator) {
    /* val heightOffset = (-2.8).inches
     val pivotToRollers = 13.inches
     val thetaOffset = 58.degrees
@@ -49,7 +53,7 @@ suspend fun climb() = use(Armavator) {
             }
         }
 
-        periodic {
+       / periodic {
             OB1.climb(Pose.LIFTED.obiAngle, -0.3 * (OB1.angle - thetaOffset).cos())
             OB1.intake(-0.7)
             Drive.drive(Vector2(0.0, 0.4 * OI.driverController.rightTrigger), OI.driveRotation * 0.4, false)
@@ -72,7 +76,7 @@ suspend fun climb() = use(Armavator) {
 //            ).degrees
         }
     }*/
-}
+//}
 //            goToPose(Pose.CLIMB_LIFT_ELEVATOR)
 //            val timer = Timer().apply { start() }
 //            periodic {
@@ -82,8 +86,8 @@ suspend fun climb() = use(Armavator) {
 //            }
 //            goToPose(Pose.LIFTED)
 
-suspend fun climb2() {
-   val body: suspend CoroutineScope.() -> Unit = {
+//suspend fun climb2() {
+//   val body: suspend CoroutineScope.() -> Unit = {
       /* goToPose(Pose.BEFORE_CLIMB)
   goToPose(Pose.CLIMB_START)
   suspendUntil { OI.startClimb }
@@ -110,5 +114,53 @@ suspend fun climb2() {
       }
   }*/
 
+//   }
+//}
+
+suspend fun climb() = use(Armavator, OB) {
+   goToPose(Pose.BEFORE_BEFORE_CLIMB)
+   goToPose(Pose.BEFORE_CLIMB)
+   suspendUntil { OI.driverController.x }
+   Armavator.isClimbing = true
+   val obCurve = MotionCurve().apply {
+      storeValue(0.0, Pose.BEFORE_CLIMB.obAngle.asDegrees)
+      storeValue(2.0, Pose.LIFTED.obAngle.asDegrees)
    }
+
+   val elevatorCurve = MotionCurve().apply{
+      storeValue(0.0, Pose.BEFORE_CLIMB.elevatorHeight.asInches)
+      storeValue(1.5, Pose.LIFTED.elevatorHeight.asInches)
+   }
+
+   val timer = Timer().apply { start() }
+   use(Drive) {
+      periodic {
+         val time = timer.get().coerceAtMost(2.0)
+         Armavator.heightSetpoint = elevatorCurve.getValue(time).inches
+         OB.angleSetpoint = obCurve.getValue(time).degrees
+
+        OB.climbDrive(1.0)
+        Drive.drive(Vector2(0.0, 0.3), 0.0, fieldCentric = false)
+         if (OI.driverController.y)
+            stop()
+      }
+      Drive.stop()
+   }
+
+   val armCurve = MotionCurve().apply {
+      storeValue(0.0, Pose.LIFTED.armAngle.asDegrees)
+      storeValue(2.0, Pose.AFTER_LIFTED.armAngle.asDegrees)
+   }
+
+   val elevatorCurve2 = MotionCurve().apply {
+      storeValue(0.0, Pose.LIFTED.elevatorHeight.asInches)
+      storeValue(2.0, Pose.AFTER_LIFTED.elevatorHeight.asInches)
+   }
+
+   val timer2 = Timer().apply { start() }
+      periodic {
+         val time = timer2.get().coerceAtMost(2.0)
+         Armavator.heightSetpoint = elevatorCurve2.getValue(time).inches
+         Armavator.angleSetpoint = armCurve.getValue(time).degrees
+      }
 }

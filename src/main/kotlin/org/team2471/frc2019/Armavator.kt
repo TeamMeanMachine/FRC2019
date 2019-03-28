@@ -49,7 +49,7 @@ object Armavator : Subsystem("Armavator") {
             motionMagic(ELEVATOR_ACCELERATION, ELEVATOR_VELOCITY)
         }
 
-        currentLimit(15, 0, 0)
+        currentLimit(25, 0, 0)
     }
 
     private val armMotors = MotorController(TalonID(ARM_MASTER), VictorID(ARM_SLAVE)).config {
@@ -67,9 +67,9 @@ object Armavator : Subsystem("Armavator") {
             p(2.0)
             d(1.0)
 
-            f(10.0)
+            f(7.0)
 
-            motionMagic(560.0, 180.0)
+            motionMagic(360.0, 120.0)
         }
         currentLimit(15, 0, 0)
     }

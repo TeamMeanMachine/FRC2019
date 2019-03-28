@@ -33,9 +33,11 @@ suspend fun goToPose(targetPose: Pose) = use(Armavator) {
     periodic {
         Armavator.heightSetpoint = targetPose.elevatorHeight
         Armavator.angleSetpoint = targetPose.armAngle
+        OB.angleSetpoint = targetPose.obAngle
 
         val armError = Armavator.angleSetpoint - Armavator.angle
         val elevatorError = Armavator.heightSetpoint - Armavator.height
+        val obError = OB.angleSetpoint - (OB.leftAngle + OB.rightAngle)/2.0
         if (armError.asDegrees.absoluteValue < 10.0 &&
             elevatorError.asInches.absoluteValue < 3.0 &&
             timer.get() > 0.3
