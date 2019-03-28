@@ -22,6 +22,10 @@ import org.team2471.frc.lib.units.Length
 import org.team2471.frc.lib.units.asRadians
 
 object Jevois : Subsystem("Jevois") {
+    val blueOutput = DigitalOutput(0)
+    val redOutput = DigitalOutput(1)
+    val greenOutput = DigitalOutput(2)
+
     private const val PING_INTERVAL = 5.0
 
     private val pingTimer = Timer().apply { start() }
