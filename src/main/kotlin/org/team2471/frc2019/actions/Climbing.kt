@@ -164,12 +164,18 @@ suspend fun climb() = use(Armavator, OB) {
             storeValue(2.0, Pose.AFTER_LIFTED.elevatorHeight.asInches)
         }
 
+        val obCurve2 = MotionCurve().apply {
+            storeValue(0.0, 0.0)
+            storeValue(1.0, 10.0)
+        }
+
         val timer2 = Timer().apply { start() }
         periodic {
             val time = timer2.get()//.coerceAtMost(2.0)
             OB.climbDrive(1.0)
             Armavator.heightSetpoint = elevatorCurve2.getValue(time).inches
             Armavator.angleSetpoint = armCurve.getValue(time).degrees
+            OB.angleSetpoint = obCurve2.getValue(time).degrees
             if(OI.driverController.b)
                 stop()
         }

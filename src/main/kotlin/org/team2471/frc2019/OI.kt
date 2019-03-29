@@ -25,7 +25,7 @@ object OI {
         get() = Vector2(driveTranslationX, driveTranslationY)
 
     val driveRotation: Double
-        get() = (driverController.rightThumbstickX.deadband(deadBandDriver)).cube() * 0.75
+        get() = (driverController.rightThumbstickX.deadband(deadBandDriver)).cube() * 0.6
 
     val operatorTranslation: Vector2
         get() = Vector2(operatorLeftXStick, operatorLeftYStick) * 0.5

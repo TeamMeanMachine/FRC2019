@@ -20,7 +20,7 @@ data class Pose(val elevatorHeight: Length, val armAngle: Angle) {
         val BEFORE_CLIMB2 = Pose((-8.5).inches, 70.degrees) //values need to be changed
 //        val CLIMB_START = Pose(1.inches, 18.degrees, 120.degrees, false, true,  true)
 //        val CLIMB_START2 = Pose(1.inches, 18.degrees, 50.degrees, false, true,  true)
-        val LIFTED = Pose((-27.5).inches, 70.degrees) //21.5
+        val LIFTED = Pose((-28.5).inches, 70.degrees) //21.5
         val AFTER_LIFTED = Pose(-8.5.inches, 0.degrees)
         val LIFTED2 = Pose((-17.5).inches, 70.degrees) //21.5 values need to be changed
         val AFTER_LIFTED2 = Pose(-8.5.inches, 0.degrees) // values need to be changed
