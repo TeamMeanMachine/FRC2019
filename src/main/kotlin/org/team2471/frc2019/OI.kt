@@ -99,7 +99,10 @@ object OI {
         operatorController::leftBumper.whenTrue{ Armavator.toggleExtention()}
         operatorController::rightBumper.whenTrue{ Armavator.togglePinching()}
         ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }
-       //+ ({operatorController.dPad == Controller.Direction.DOWN}).whenTrue{ climb2() }
+        ({ operatorController.dPad == Controller.Direction.DOWN }).whenTrue { climb2() }
+        operatorController::start.whileTrue { Drive.turnTo180() }
+
+        //+ ({operatorController.dPad == Controller.Direction.DOWN}).whenTrue{ climb2() }
 
         operatorController::back.whileTrue{ driveToTarget() }
 //        driverController.createMappings {

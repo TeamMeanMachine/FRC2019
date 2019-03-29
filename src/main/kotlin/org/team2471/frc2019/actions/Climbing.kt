@@ -183,3 +183,68 @@ suspend fun climb() = use(Armavator, OB) {
         }
     }
 }
+
+suspend fun climb2() = use(Armavator, OB) {
+    try {
+        goToPose(Pose.BEFORE_CLIMB2)
+        OB.angleSetpoint = 120.0.degrees
+        delay(2.0)
+        suspendUntil { OI.driverController.x }
+        Armavator.isClimbing = true
+        val obCurve = MotionCurve().apply {
+            storeValue(0.0, 120.0)
+            storeValue(2.0, 0.0)
+        }
+
+        val elevatorCurve = MotionCurve().apply {
+            storeValue(0.0, Pose.BEFORE_CLIMB2.elevatorHeight.asInches)
+            storeValue(1.0, Pose.LIFTED2.elevatorHeight.asInches)
+        }
+
+        val timer = Timer().apply { start() }
+        use(Drive) {
+            periodic {
+                val time = timer.get()//.coerceAtMost(2.0)
+                Armavator.heightSetpoint = elevatorCurve.getValue(time).inches
+                OB.climb(obCurve.getValue(time).degrees)
+
+                OB.climbDrive(1.0)
+                Drive.drive(Vector2(0.0, 0.45), 0.0, fieldCentric = false)
+                if (OI.driverController.x && time > obCurve.tailKey.time)
+                    stop()
+                if(OI.driverController.b)
+                    stop()
+
+            }
+            Drive.stop()
+        }
+
+        val armCurve = MotionCurve().apply {
+            storeValue(0.0, Pose.LIFTED2.armAngle.asDegrees)
+            storeValue(1.5, Pose.AFTER_LIFTED2.armAngle.asDegrees)
+        }
+
+        val elevatorCurve2 = MotionCurve().apply {
+            storeValue(0.0, Pose.LIFTED2.elevatorHeight.asInches)
+            storeValue(1.5, Pose.AFTER_LIFTED2.elevatorHeight.asInches)
+        }
+
+        val timer2 = Timer().apply { start() }
+        periodic {
+            val time = timer2.get()//.coerceAtMost(2.0)
+            OB.climbDrive(1.0)
+            Armavator.heightSetpoint = elevatorCurve2.getValue(time).inches
+            Armavator.angleSetpoint = armCurve.getValue(time).degrees
+            if(OI.driverController.b)
+                stop()
+        }
+    } finally {
+        withContext(NonCancellable) {
+            OB.angleSetpoint = 180.degrees
+            suspendUntil {
+                DriverStation.getInstance().isDisabled ||
+                        Math.abs(((OB.leftAngle + OB.rightAngle) / 2.0 - OB.angleSetpoint).asDegrees) < 5
+            }
+        }
+    }
+}

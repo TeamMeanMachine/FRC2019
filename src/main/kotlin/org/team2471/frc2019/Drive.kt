@@ -25,7 +25,9 @@ import org.team2471.frc.lib.motion.following.SwerveDrive
 import org.team2471.frc.lib.motion.following.drive
 import org.team2471.frc.lib.motion_profiling.following.SwerveParameters
 import org.team2471.frc.lib.units.*
+import kotlin.math.abs
 import kotlin.math.absoluteValue
+import kotlin.math.min
 import kotlin.math.withSign
 
 private var gyroOffset = 0.0.degrees
@@ -293,5 +295,13 @@ suspend fun Drive.driveTime(translation: Vector2, time: Time) = use(Drive) {
     periodic {
         drive(translation, 0.0, false)
         if (timer.get() > time.asSeconds) stop()
+    }
+}
+
+suspend fun Drive.turnTo180() = use(this){
+    val kTurn = 0.007
+    periodic {
+        val turnError = (180.degrees - heading).wrap()
+        Drive.drive(Vector2(0.0,0.0), turnError.asDegrees * kTurn)
     }
 }
