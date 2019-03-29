@@ -25,8 +25,10 @@ suspend fun intakeHatch() = use(Armavator) {
     Armavator.isPinching = false
     delay(0.5)
     Armavator.isExtending = false
+    Armavator.intake(-0.2)
     Drive.driveTime(Vector2(0.0, -0.4), 0.75.seconds)
     goToPose(Pose.HOME)
+    Armavator.intake(0.0)
 }
 
 suspend fun ejectPiece() = use(Armavator) {

@@ -10,6 +10,7 @@ import org.team2471.frc.lib.actuators.VictorID
 import org.team2471.frc.lib.coroutines.MeanlibDispatcher
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.Subsystem
+import org.team2471.frc.lib.math.DoubleRange
 import org.team2471.frc.lib.units.Angle
 import org.team2471.frc.lib.units.degrees
 import org.team2471.frc2019.Talons.OB_PIVOT_LEFT
@@ -25,8 +26,8 @@ object OB : Subsystem("OB") {
         feedbackCoefficient = 1/2.6
         rawOffset(750)
         pid {
-            p(8.0 / 2)
-            d(8.0 / 2)
+            p(8.0)
+            d(8.0)
         }
     }
     private val rightPivotMotor = MotorController(TalonID(OB_PIVOT_RIGHT)).config {
@@ -36,8 +37,8 @@ object OB : Subsystem("OB") {
         rawOffset(-250 )
 
         pid {
-            p(8.0 / 2)
-            d(8.0 / 2)
+            p(8.0)
+            d(8.0)
         }
     }
 
@@ -49,9 +50,11 @@ object OB : Subsystem("OB") {
     val rightAngle
         get() = rightPivotMotor.position.degrees
 
+    private val obRange: DoubleRange = -4.0..180.0
+
     var angleSetpoint: Angle = (leftAngle + rightAngle) / 2.0
         set(value) {
-            field = value
+            field = value.asDegrees.coerceIn(obRange).degrees
             leftPivotMotor.setPositionSetpoint(value.asDegrees)
             rightPivotMotor.setPositionSetpoint(value.asDegrees)
         }
@@ -68,6 +71,11 @@ object OB : Subsystem("OB") {
         }
     }
 
+    fun climb(angleSetpoint: Angle) {
+        leftPivotMotor.setPositionSetpoint(angleSetpoint.asDegrees, -0.35)
+        rightPivotMotor.setPositionSetpoint(angleSetpoint.asDegrees, -0.35)
+    }
+
     fun climbDrive(power: Double) {
         climbDriveMotors.setPercentOutput(power)
     }
@@ -77,14 +85,8 @@ object OB : Subsystem("OB") {
     }
 
     override suspend fun default() {
-//        var leftSetpoint = leftPivotMotor.position.degrees
-       // var rightSetpoint = rightPivotMotor.position.degrees
         periodic {
-//            leftSetpoint += 45.degrees * OI.obiControl * period
-//            angleSetpoint += 45.degrees * OI.obiControl * period
-//            leftPivotMotor.setPositionSetpoint(leftSetpoint.asDegrees)
-//            leftPivotMotor.setPercentOutput(OI.operatorLeftYStick)
-//            rightPivotMotor.setPercentOutput(OI.operatorRightYStick)
+            angleSetpoint += 45.degrees * OI.obiControl * period
         }
     }
 }

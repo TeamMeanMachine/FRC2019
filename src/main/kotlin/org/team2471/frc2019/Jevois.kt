@@ -27,7 +27,10 @@ object Jevois : Subsystem("Jevois") {
     val redOutput = DigitalOutput(1)
     val greenOutput = DigitalOutput(2)
 
-    private const val PING_INTERVAL = 5.0
+    val connected
+        get() = pongTimer.get() < 5.0
+
+    private const val PING_INTERVAL = 1.0
 
     private val pingTimer = Timer().apply { start() }
     private val pongTimer = Timer().apply { start() }
@@ -92,6 +95,8 @@ object Jevois : Subsystem("Jevois") {
             val dataAdapter = Moshi.Builder().build().adapter(Target::class.java)
 
             while (true) {
+                redOutput.set(!connected)
+
                 if (pingTimer.get() > PING_INTERVAL) {
                     serialPort.writeString("PING")
                     pingTimer.reset()

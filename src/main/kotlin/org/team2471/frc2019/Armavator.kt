@@ -105,7 +105,7 @@ object Armavator : Subsystem("Armavator") {
             height.asInches
         )..18.0 else Pose.LIFTED.elevatorHeight.asInches..26.0// inches
 
-    private val armRange: DoubleRange = -77.0..71.0 // degrees
+    private val armRange: DoubleRange = -77.0..76.0 // degrees
 
     val height: Length
         get() = elevatorMotors.position.inches
@@ -158,8 +158,14 @@ object Armavator : Subsystem("Armavator") {
                 angleEntry.setDouble(angle.asDegrees)
                 heightSetpointEntry.setDouble(heightSetpoint.asInches)
                 angleSetpointEntry.setDouble(angleSetpoint.asDegrees)
-                armMotors.setMotionMagicSetpoint((angleSetpoint.asDegrees - ARM_OFFSET))
-                elevatorMotors.setMotionMagicSetpoint(heightSetpoint.asInches, ELEVATOR_FEED_FORWARD)
+
+                if (DriverStation.getInstance().isEnabled) {
+                    armMotors.setMotionMagicSetpoint((angleSetpoint.asDegrees - ARM_OFFSET))
+                    elevatorMotors.setMotionMagicSetpoint(heightSetpoint.asInches, ELEVATOR_FEED_FORWARD)
+                } else {
+                    armMotors.stop()
+                    elevatorMotors.stop()
+                }
             }
         }
     }

@@ -72,7 +72,6 @@ object OI {
         driverController::rightBumper::toggleWhenTrue { intakeHatch() }
         driverController::b.whenTrue { goToPose(Pose.HOME) }
         driverController::back.whenTrue { Drive.zeroGyro() }
-        driverController::start.whenTrue{climb()}
         //  ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }
 
 //        driverController::y.whenTrue {
@@ -99,7 +98,7 @@ object OI {
         operatorController::y.whenTrue { scoreHigh() }
         operatorController::leftBumper.whenTrue{ Armavator.toggleExtention()}
         operatorController::rightBumper.whenTrue{ Armavator.togglePinching()}
-      //  ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }
+        ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }
        //+ ({operatorController.dPad == Controller.Direction.DOWN}).whenTrue{ climb2() }
 
         operatorController::back.whileTrue{ driveToTarget() }

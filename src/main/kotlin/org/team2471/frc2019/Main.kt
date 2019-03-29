@@ -60,6 +60,11 @@ object Robot: RobotProgram {
     }
 
     override suspend fun test() {
+        use(OB) {
+            periodic {
+                OB.climbDrive(1.0)
+            }
+        }
 //        use(Jevois) {
 //            Jevois.isLightEnabled = true
 //            halt()
