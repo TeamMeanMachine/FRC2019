@@ -45,8 +45,9 @@ object Robot: RobotProgram {
         Drive.zeroGyro()
 //        AutoChooser.autonomous()
         goToPose(Pose.HOME)
-        intakeHatch()
-        scoreCargoShip()
+        Armavator.isPinching = false
+//        intakeHatch()
+//        scoreCargoShip()
     }
 
     override suspend fun teleop() {

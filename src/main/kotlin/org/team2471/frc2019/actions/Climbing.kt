@@ -145,8 +145,11 @@ suspend fun climb() = use(Armavator, OB) {
 
                 OB.climbDrive(1.0)
                 Drive.drive(Vector2(0.0, 0.45), 0.0, fieldCentric = false)
-                if (OI.driverController.y)
+                if (OI.driverController.x && time > obCurve.tailKey.time)
                     stop()
+                if(OI.driverController.b)
+                    stop()
+
             }
             Drive.stop()
         }
@@ -167,6 +170,8 @@ suspend fun climb() = use(Armavator, OB) {
             OB.climbDrive(1.0)
             Armavator.heightSetpoint = elevatorCurve2.getValue(time).inches
             Armavator.angleSetpoint = armCurve.getValue(time).degrees
+            if(OI.driverController.b)
+                stop()
         }
     } finally {
         withContext(NonCancellable) {

@@ -66,7 +66,7 @@ object OB : Subsystem("OB") {
             periodic {
                 leftArmTable.setDouble(leftAngle.asDegrees)
                 rightArmTable.setDouble(rightAngle.asDegrees)
-                println("Current position: ${(leftAngle + rightAngle) / 2.0} Current setpoint: ${angleSetpoint}")
+//                println("Current position: ${(leftAngle + rightAngle) / 2.0} Current setpoint: ${angleSetpoint}")
             }
         }
     }
