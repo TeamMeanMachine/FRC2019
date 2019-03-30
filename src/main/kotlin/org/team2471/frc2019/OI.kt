@@ -22,13 +22,16 @@ object OI {
         get() = -driverController.leftThumbstickY.deadband(deadBandDriver).squareWithSign()
 
     val driveTranslation: Vector2
-        get() = Vector2(driveTranslationX, driveTranslationY)
+        get() = Vector2(driveTranslationX, driveTranslationY) //does owen want this cubed?
 
     val driveRotation: Double
         get() = (driverController.rightThumbstickX.deadband(deadBandDriver)).cube() * 0.6
 
+    val driveClimbDrive: Double
+        get() = if(Armavator.isClimbing) driverController.rightTrigger.deadband(deadBandDriver) else 0.0
+
     val operatorTranslation: Vector2
-        get() = Vector2(operatorLeftXStick, operatorLeftYStick) * 0.5
+        get() = Vector2(operatorLeftXStick, operatorLeftYStick) * 0.4
 
     val operatorRotation: Double
         get() = operatorRightXStick.squareWithSign() * 0.25
@@ -52,7 +55,7 @@ object OI {
         get() = -driverController.rightThumbstickY.deadband(deadBandOperator)
 
     val ejectPiece: Boolean
-        get() = driverController.rightTrigger > 0.5
+        get() = driverController.rightTrigger > 0.3
 
     val activate: Boolean
         get() = driverController.rightBumper

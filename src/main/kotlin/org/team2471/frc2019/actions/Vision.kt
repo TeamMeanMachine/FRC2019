@@ -22,7 +22,8 @@ suspend fun driveToTarget() = use(Drive, Jevois, name = "Drive To Target") {
     val strafeController = PDController(0.005, 0.0)
 
     periodic {
-        val target = Jevois.target
+        val data = Jevois.data
+        val target = data!!.target
         if (target == null) {
             Jevois.redOutput.set(false)
             Drive.stop()

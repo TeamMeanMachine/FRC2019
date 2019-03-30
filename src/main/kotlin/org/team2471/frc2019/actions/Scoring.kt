@@ -53,7 +53,7 @@ private suspend fun score(position: ScoringPosition) {
             }
             GamePiece.CARGO -> {
                 suspendUntil { OI.ejectPiece }
-                Armavator.intake(-1.0)
+                Armavator.intake(OI.driverController.rightTrigger * -0.8)
                 delay(0.35)
                 Armavator.intake(0.0)
             }

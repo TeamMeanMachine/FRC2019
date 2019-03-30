@@ -5,6 +5,7 @@ import edu.wpi.cscore.MjpegServer
 import edu.wpi.cscore.UsbCamera
 import edu.wpi.cscore.VideoMode
 import edu.wpi.first.wpilibj.DigitalOutput
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.SerialPort
 import edu.wpi.first.wpilibj.Timer
 import kotlinx.coroutines.GlobalScope
@@ -16,10 +17,13 @@ import org.team2471.frc.lib.coroutines.MeanlibDispatcher
 import org.team2471.frc.lib.coroutines.delay
 import org.team2471.frc.lib.framework.Subsystem
 import org.team2471.frc.lib.math.Vector2
+import org.team2471.frc.lib.motion.following.SwerveDrive
+import org.team2471.frc.lib.motion.following.lookupPose
 import org.team2471.frc.lib.units.Angle
 import org.team2471.frc.lib.units.Angle.Companion.cos
 import org.team2471.frc.lib.units.Angle.Companion.sin
 import org.team2471.frc.lib.units.Length
+import org.team2471.frc.lib.units.Time
 import org.team2471.frc.lib.units.asRadians
 
 object Jevois : Subsystem("Jevois") {
@@ -62,7 +66,7 @@ object Jevois : Subsystem("Jevois") {
             ledRingLight.setPercentOutput(if (value) 0.5 else 0.0)
         }
 
-    var target: Target? = null
+    var data: Data? = null
         private set
 
     override fun reset() {
@@ -92,13 +96,13 @@ object Jevois : Subsystem("Jevois") {
             serialPort.writeString("setpar serout USB\n")
             serialPort.writeString("streamon\n")
 
-            val dataAdapter = Moshi.Builder().build().adapter(Target::class.java)
+            val dataAdapter = Moshi.Builder().build().adapter(Data::class.java)
 
             while (true) {
                 redOutput.set(!connected)
 
                 if (pingTimer.get() > PING_INTERVAL) {
-                    serialPort.writeString("PING")
+                    serialPort.writeString("PING\n")
                     pingTimer.reset()
                 }
 
@@ -111,15 +115,19 @@ object Jevois : Subsystem("Jevois") {
 
                 when {
                     data.startsWith("PONG") -> pongTimer.reset()
-                    data.startsWith("TIME") -> serialPort.writeString("TIME ${Timer.getFPGATimestamp()}")
+                    data.startsWith("TIME") -> serialPort.writeString("TIME ${Timer.getFPGATimestamp()}\n")
                     data.startsWith("DATA") -> try {
-                        target = dataAdapter.fromJson(data.drop(5))!!
+                        this@Jevois.data = dataAdapter.fromJson(data.drop(5))!!
+                        println(this@Jevois.data!!.time.asSeconds - Timer.getFPGATimestamp())
                     } catch (_: Throwable) {
+                        println("Failed to parse $data")
                     }
                 }
             }
         }
     }
+
+    data class Data(val time: Time, val target: Target?)
 
     data class Target(val distance: Length, val angle: Angle, val skew: Angle) {
         val position: Vector2

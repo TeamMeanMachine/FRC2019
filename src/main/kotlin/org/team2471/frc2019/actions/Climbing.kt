@@ -169,15 +169,18 @@ suspend fun climb() = use(Armavator, OB) {
             storeValue(1.0, 10.0)
         }
 
-        val timer2 = Timer().apply { start() }
-        periodic {
-            val time = timer2.get()//.coerceAtMost(2.0)
-            OB.climbDrive(1.0)
-            Armavator.heightSetpoint = elevatorCurve2.getValue(time).inches
-            Armavator.angleSetpoint = armCurve.getValue(time).degrees
-            OB.angleSetpoint = obCurve2.getValue(time).degrees
-            if(OI.driverController.b)
-                stop()
+        use(Drive) {
+            val timer2 = Timer().apply { start() }
+            periodic {
+                val time = timer2.get()//.coerceAtMost(2.0)
+                OB.climbDrive(1.0)
+                Drive.drive(Vector2(0.0, OI.driveClimbDrive), 0.0, false)
+                Armavator.heightSetpoint = elevatorCurve2.getValue(time).inches
+                Armavator.angleSetpoint = armCurve.getValue(time).degrees
+                OB.angleSetpoint = obCurve2.getValue(time).degrees
+                if (OI.driverController.b)
+                    stop()
+            }
         }
     } finally {
         withContext(NonCancellable) {
@@ -235,14 +238,17 @@ suspend fun climb2() = use(Armavator, OB) {
             storeValue(1.5, Pose.AFTER_LIFTED2.elevatorHeight.asInches)
         }
 
-        val timer2 = Timer().apply { start() }
-        periodic {
-            val time = timer2.get()//.coerceAtMost(2.0)
-            OB.climbDrive(1.0)
-            Armavator.heightSetpoint = elevatorCurve2.getValue(time).inches
-            Armavator.angleSetpoint = armCurve.getValue(time).degrees
-            if(OI.driverController.b)
-                stop()
+        use(Drive) {
+            val timer2 = Timer().apply { start() }
+            periodic {
+                val time = timer2.get()//.coerceAtMost(2.0)
+                OB.climbDrive(1.0)
+                Armavator.heightSetpoint = elevatorCurve2.getValue(time).inches
+                Armavator.angleSetpoint = armCurve.getValue(time).degrees
+                Drive.drive(Vector2(0.0, OI.driveClimbDrive), 0.0, false)
+                if (OI.driverController.b)
+                    stop()
+            }
         }
     } finally {
         withContext(NonCancellable) {
