@@ -54,7 +54,7 @@ object OI {
     val rightYStick: Double
         get() = -driverController.rightThumbstickY.deadband(deadBandOperator)
 
-    val ejectPiece: Boolean
+    val usePiece: Boolean
         get() = driverController.rightTrigger > 0.3
 
     val activate: Boolean
@@ -75,6 +75,7 @@ object OI {
         driverController::rightBumper::toggleWhenTrue { intakeHatch() }
         driverController::b.whenTrue { goToPose(Pose.HOME) }
         driverController::back.whenTrue { Drive.zeroGyro() }
+        ({ driverController.leftTrigger > 0.1 }).whileTrue{ visionDrive() }
         //  ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }
 
 //        driverController::y.whenTrue {

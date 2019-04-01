@@ -45,14 +45,15 @@ private suspend fun score(position: ScoringPosition) {
 
         when (gamePiece) {
             GamePiece.HATCH_PANEL -> {
-                suspendUntil { OI.ejectPiece }
+//                suspendUntil { Math.abs(Armavator.angleSetpoint.asDegrees - Armavator.angle.asDegrees) < 2.0 }
+                suspendUntil { Limelight.area > 6.5 || OI.usePiece }
                 Armavator.isExtending = true
                 Armavator.isPinching = true
                 delay(0.5)
                 Armavator.isExtending = false
             }
             GamePiece.CARGO -> {
-                suspendUntil { OI.ejectPiece }
+                suspendUntil { OI.usePiece }
                 Armavator.intake(OI.driverController.rightTrigger * -0.8)
                 delay(0.5)
                 Armavator.intake(0.0)

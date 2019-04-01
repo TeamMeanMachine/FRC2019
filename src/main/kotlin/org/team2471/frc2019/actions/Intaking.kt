@@ -21,7 +21,8 @@ suspend fun intakeHatch() = use(Armavator) {
     Armavator.isPinching = true
     goToPose(Pose.HATCH_FEEDER_PICKUP)
     Armavator.isExtending = true
-    suspendUntil { OI.pickupFromFeederStation }
+//    suspendUntil { Math.abs(Armavator.angleSetpoint.asDegrees - Armavator.angle.asDegrees) < 2.0 }
+    suspendUntil { Limelight.area > 6.5 || OI.usePiece }
     Armavator.isPinching = false
     delay(0.5)
     Armavator.isExtending = false
