@@ -34,7 +34,7 @@ object OI {
         get() = Vector2(operatorLeftXStick, operatorLeftYStick) * 0.4
 
     val operatorRotation: Double
-        get() = operatorRightXStick.squareWithSign() * 0.25
+        get() = operatorRightXStick.squareWithSign() * 0.35
 
     val operatorLeftXStick: Double
         get() = operatorController.leftThumbstickX.deadband(deadBandOperator)
@@ -104,6 +104,8 @@ object OI {
         operatorController::rightBumper.whenTrue{ Armavator.togglePinching()}
         ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }
         ({ operatorController.dPad == Controller.Direction.DOWN }).whenTrue { climb2() }
+        ({operatorController.dPad == Controller.Direction.LEFT}).whenTrue{ Armavator.decrementOffset() }
+        ({operatorController.dPad == Controller.Direction.RIGHT}).whenTrue{ Armavator.incrementOffset() }
         operatorController::start.whileTrue { Drive.turnTo180() }
 
         //+ ({operatorController.dPad == Controller.Direction.DOWN}).whenTrue{ climb2() }

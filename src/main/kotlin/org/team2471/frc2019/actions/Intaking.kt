@@ -13,7 +13,7 @@ suspend fun intakeCargo() = use(Armavator) {
     Armavator.intake(0.5)
     goToPose(Pose.CARGO_GROUND_PICKUP)
     delay(0.2)
-    suspendUntil { println(Armavator.intakeCurrent);Armavator.intakeCurrent > 20.0 }
+    suspendUntil { println(Armavator.intakeCurrent);Armavator.intakeCurrent > 15.0 }
     goToPose(Pose.HOME)
 }
 
