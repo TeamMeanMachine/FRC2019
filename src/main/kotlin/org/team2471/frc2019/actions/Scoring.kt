@@ -46,7 +46,8 @@ private suspend fun score(position: ScoringPosition) {
         when (gamePiece) {
             GamePiece.HATCH_PANEL -> {
 //                suspendUntil { Math.abs(Armavator.angleSetpoint.asDegrees - Armavator.angle.asDegrees) < 2.0 }
-                suspendUntil { Limelight.area > 6.5 || OI.usePiece }
+                suspendUntil {
+                    Limelight.area > (if (position == ScoringPosition.ROCKET_HIGH) 10.5 else 6.5) || OI.usePiece }
                 Armavator.isExtending = true
                 Armavator.isPinching = true
                 delay(0.5)
