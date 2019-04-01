@@ -27,10 +27,6 @@ import org.team2471.frc.lib.units.Time
 import org.team2471.frc.lib.units.asRadians
 
 object Jevois : Subsystem("Jevois") {
-    val blueOutput = DigitalOutput(0)
-    val redOutput = DigitalOutput(1)
-    val greenOutput = DigitalOutput(2)
-
     val connected
         get() = pongTimer.get() < 5.0
 
@@ -38,7 +34,6 @@ object Jevois : Subsystem("Jevois") {
 
     private val pingTimer = Timer().apply { start() }
     private val pongTimer = Timer().apply { start() }
-
 
     private val serialPort = try {
         SerialPort(115200, SerialPort.Port.kUSB1).apply {
