@@ -86,7 +86,9 @@ object OB : Subsystem("OB") {
 
     override suspend fun default() {
         periodic {
-            angleSetpoint += 45.degrees * OI.obiControl * period
+            leftPivotMotor.stop()
+            rightPivotMotor.stop()
+//            angleSetpoint += 45.degrees * OI.obiControl * period
         }
     }
 }

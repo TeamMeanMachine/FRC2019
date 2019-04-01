@@ -145,13 +145,15 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     fun zeroGyro() = gyro?.reset()
 
     override suspend fun default() {
+        val limelightTable = NetworkTableInstance.getDefault().getTable("limelight")
+        val xEntry = limelightTable.getEntry("tx")
+        val angleEntry = limelightTable.getEntry("ts")
 /*
         val table = NetworkTableInstance.getDefault().getTable(name)
         val positionXEntry = table.getEntry("positionX")
         val positionYEntry = table.getEntry("positionY")
 */
         periodic {
-
             drive(
                 OI.driveTranslation,
                 OI.driveRotation,
