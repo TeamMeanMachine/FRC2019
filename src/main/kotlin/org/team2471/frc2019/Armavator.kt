@@ -107,6 +107,8 @@ object Armavator : Subsystem("Armavator") {
 
     private val armRange: DoubleRange = -77.0..76.0 // degrees
 
+    private var elevatorOffset = 0.inches
+
     val height: Length
         get() = elevatorMotors.position.inches
 
@@ -143,7 +145,7 @@ object Armavator : Subsystem("Armavator") {
             table.getEntry("Elevator Error").setDouble(elevatorMotors.closedLoopError)
             table.getEntry("Elevator Output").setDouble(elevatorMotors.output)
 
-            field = value.asInches.coerceIn(heightRange).inches
+            field = (value.asInches + elevatorOffset.asInches).coerceIn(heightRange).inches
         }
 
     init {
@@ -180,6 +182,14 @@ object Armavator : Subsystem("Armavator") {
 
     fun setArmRaw(power: Double) {
         armMotors.setPercentOutput(power)
+    }
+
+    fun incrementOffset()  {
+        elevatorOffset += 0.5.inches
+    }
+
+    fun decrementOffset()  {
+        elevatorOffset -= 0.5.inches
     }
 
     fun printDebugInfo() {

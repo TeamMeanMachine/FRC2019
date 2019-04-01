@@ -210,11 +210,17 @@ suspend fun climb2() = use(Armavator, OB) {
             storeValue(1.0, Pose.LIFTED2.elevatorHeight.asInches)
         }
 
+        val armCurve = MotionCurve().apply {
+            storeValue(0.0, Pose.BEFORE_CLIMB2.armAngle.asDegrees)
+            storeValue(2.0, Pose.LIFTED2.armAngle.asDegrees)
+        }
+
         val timer = Timer().apply { start() }
         use(Drive) {
             periodic {
                 val time = timer.get()//.coerceAtMost(2.0)
                 Armavator.heightSetpoint = elevatorCurve.getValue(time).inches
+                Armavator.angleSetpoint = armCurve.getValue(time).degrees
                 OB.climb(obCurve.getValue(time).degrees)
 
                 OB.climbDrive(1.0)
@@ -228,9 +234,9 @@ suspend fun climb2() = use(Armavator, OB) {
             Drive.stop()
         }
 
-        val armCurve = MotionCurve().apply {
+        val armCurve2 = MotionCurve().apply {
             storeValue(0.0, Pose.LIFTED2.armAngle.asDegrees)
-            storeValue(1.5, Pose.AFTER_LIFTED2.armAngle.asDegrees)
+            storeValue(1.2, Pose.AFTER_LIFTED2.armAngle.asDegrees)
         }
 
         val elevatorCurve2 = MotionCurve().apply {
@@ -244,7 +250,7 @@ suspend fun climb2() = use(Armavator, OB) {
                 val time = timer2.get()//.coerceAtMost(2.0)
                 OB.climbDrive(1.0)
                 Armavator.heightSetpoint = elevatorCurve2.getValue(time).inches
-                Armavator.angleSetpoint = armCurve.getValue(time).degrees
+                Armavator.angleSetpoint = armCurve2.getValue(time).degrees
                 Drive.drive(Vector2(0.0, OI.driveClimbDrive), 0.0, false)
                 if (OI.driverController.b)
                     stop()

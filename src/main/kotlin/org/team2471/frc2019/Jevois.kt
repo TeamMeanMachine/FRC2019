@@ -118,7 +118,6 @@ object Jevois : Subsystem("Jevois") {
                     data.startsWith("TIME") -> serialPort.writeString("TIME ${Timer.getFPGATimestamp()}\n")
                     data.startsWith("DATA") -> try {
                         this@Jevois.data = dataAdapter.fromJson(data.drop(5))!!
-                        println(this@Jevois.data!!.time.asSeconds - Timer.getFPGATimestamp())
                     } catch (_: Throwable) {
                         println("Failed to parse $data")
                     }

@@ -10,26 +10,26 @@ data class Pose(val elevatorHeight: Length, val armAngle: Angle) {
 
         //        val STARTING_POSITION = Pose(0.inches, (-74).degrees, 145.degrees, true)
         val HOME = Pose(2.inches, (-74).degrees)
-        val HATCH_LOW = Pose((-1).inches, (-57).degrees) //0, -63
+        val HATCH_LOW = Pose((-2).inches, (-57).degrees) //0, -63
         val HATCH_MED = Pose(16.inches, (-40).degrees)
         val HATCH_HIGH = Pose(2.25.inches, 48.degrees)
         val HATCH_FEEDER_PICKUP = Pose((-5).inches, (-48).degrees)
 
         val BEFORE_BEFORE_CLIMB = Pose((-8.5).inches, 45.degrees)
         val BEFORE_CLIMB = Pose((-8.5).inches, 70.degrees)
-        val BEFORE_CLIMB2 = Pose((-8.5).inches, 70.degrees) //values need to be changed
+        val BEFORE_CLIMB2 = Pose((-8.5).inches, 68.degrees) //values need to be changed
 //        val CLIMB_START = Pose(1.inches, 18.degrees, 120.degrees, false, true,  true)
 //        val CLIMB_START2 = Pose(1.inches, 18.degrees, 50.degrees, false, true,  true)
         val LIFTED = Pose((-28.5).inches, 70.degrees) //21.5
         val AFTER_LIFTED = Pose(-8.5.inches, 0.degrees)
-        val LIFTED2 = Pose((-17.5).inches, 70.degrees) //21.5 values need to be changed
+        val LIFTED2 = Pose((-17.5).inches, 64.degrees) //21.5 values need to be changed
         val AFTER_LIFTED2 = Pose(-8.5.inches, 0.degrees) // values need to be changed
 //        val LIFTED2 = Pose((-9.25).inches, 64.degrees, (-3).degrees, false, true, true)
 //        val CLIMB_LIFT_ELEVATOR = Pose(0.inches, -17.5.degrees, 30.degrees, false, true, true)
 
-        val CARGO_GROUND_PICKUP = Pose((-9.5).inches, (-50).degrees)
+        val CARGO_GROUND_PICKUP = Pose((-9.75).inches, (-55).degrees)
         val CARGO_LOW = Pose(7.inches, (-40).degrees)
-        val CARGO_MED = Pose((0).inches, (32).degrees)
+        val CARGO_MED = Pose((-2).inches, (32).degrees)
         val CARGO_HIGH = Pose(17.inches, (57).degrees)
         val CARGO_SHIP_SCORE = Pose((-9).inches, (20).degrees)
     }
