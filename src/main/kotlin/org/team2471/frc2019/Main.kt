@@ -38,15 +38,17 @@ object Robot: RobotProgram {
         Armavator.enable()
         Drive.enable()
         OB.enable()
-        Jevois.enable()
+        Limelight.enable()
+//        Jevois.enable()
     }
 
     override suspend fun autonomous() {
         Drive.zeroGyro()
 //        AutoChooser.autonomous()
         goToPose(Pose.HOME)
-        intakeHatch()
-        scoreCargoShip()
+        Armavator.isPinching = false
+//        intakeHatch()
+//        scoreCargoShip()
     }
 
     override suspend fun teleop() {
@@ -65,7 +67,7 @@ object Robot: RobotProgram {
 //            halt()
 //        }
 //        use(Drive) {
-//            periodic {
+//            pe0riodic {
 //                Drive.drive(Vector2(0.0, 0.2), 0.0)
 //            }
 //        }
@@ -87,7 +89,8 @@ object Robot: RobotProgram {
         Armavator.disable()
         Drive.disable()
         OB.disable()
-        Jevois.disable()
+        Limelight.disable()
+//        Jevois.disable()
 
 //            if (Jevois.target.isNotEmpty()) println(Jevois.target.joinToString())
 //            println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
@@ -99,7 +102,8 @@ fun main() {
 
     Drive
     Armavator
-    Jevois
+//    Jevois
+    Limelight
     OB
     OI
 

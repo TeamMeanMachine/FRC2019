@@ -25,7 +25,9 @@ import org.team2471.frc.lib.motion.following.SwerveDrive
 import org.team2471.frc.lib.motion.following.drive
 import org.team2471.frc.lib.motion_profiling.following.SwerveParameters
 import org.team2471.frc.lib.units.*
+import kotlin.math.abs
 import kotlin.math.absoluteValue
+import kotlin.math.min
 import kotlin.math.withSign
 
 private var gyroOffset = 0.0.degrees
@@ -143,13 +145,15 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     fun zeroGyro() = gyro?.reset()
 
     override suspend fun default() {
+        val limelightTable = NetworkTableInstance.getDefault().getTable("limelight")
+        val xEntry = limelightTable.getEntry("tx")
+        val angleEntry = limelightTable.getEntry("ts")
 /*
         val table = NetworkTableInstance.getDefault().getTable(name)
         val positionXEntry = table.getEntry("positionX")
         val positionYEntry = table.getEntry("positionY")
 */
         periodic {
-
             drive(
                 OI.driveTranslation,
                 OI.driveRotation,
@@ -293,5 +297,13 @@ suspend fun Drive.driveTime(translation: Vector2, time: Time) = use(Drive) {
     periodic {
         drive(translation, 0.0, false)
         if (timer.get() > time.asSeconds) stop()
+    }
+}
+
+suspend fun Drive.turnToAngle(angle: Angle) = use(this){
+    val kTurn = 0.007
+    periodic {
+        val turnError = (angle - heading).wrap()
+        Drive.drive(Vector2(0.0,0.0), turnError.asDegrees * kTurn)
     }
 }

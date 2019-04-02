@@ -2,6 +2,7 @@ package org.team2471.frc2019.actions
 
 import org.team2471.frc.lib.coroutines.delay
 import org.team2471.frc.lib.coroutines.parallel
+import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.coroutines.suspendUntil
 import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.input.Controller
@@ -45,28 +46,33 @@ private suspend fun score(position: ScoringPosition) {
 
         when (gamePiece) {
             GamePiece.HATCH_PANEL -> {
-                suspendUntil { OI.ejectPiece }
+//                suspendUntil { Math.abs(Armavator.angleSetpoint.asDegrees - Armavator.angle.asDegrees) < 2.0 }
+                suspendUntil {
+                    Limelight.area > (if (position == ScoringPosition.ROCKET_HIGH) 8.5 else 6.5) || OI.usePiece
+                }
                 Armavator.isExtending = true
                 Armavator.isPinching = true
                 delay(0.5)
                 Armavator.isExtending = false
             }
             GamePiece.CARGO -> {
-                suspendUntil { OI.ejectPiece }
-                Armavator.intake(-1.0)
-                delay(0.35)
+                suspendUntil { OI.usePiece }
+                val placePosition = Drive.position
+
+                periodic {
+                    Armavator.intake(OI.driverController.rightTrigger * -1.0)
+
+                    if (Drive.position.distance(placePosition) > 0.5) stop()
+                }
                 Armavator.intake(0.0)
+
             }
         }
 
-        parallel({
-            val placePosition = Drive.position
-            val placeHeading = Drive.heading
-            Drive.driveTime(Vector2(0.0, -0.3), 0.35.seconds)
-            suspendUntil { Drive.position.distance(placePosition) > 1.5 || abs(Drive.heading.asDegrees - placeHeading.asDegrees) > 60.0 }
-        }, {
-            Armavator.heightSetpoint = Armavator.height - 2.inches
-        })
+        val placePosition = Drive.position
+        val placeHeading = Drive.heading
+        Drive.driveTime(Vector2(0.0, -0.3), 0.35.seconds)
+        suspendUntil { Drive.position.distance(placePosition) > 1.5 || abs(Drive.heading.asDegrees - placeHeading.asDegrees) > 60.0 }
         goToPose(Pose.HOME)
     }
 }

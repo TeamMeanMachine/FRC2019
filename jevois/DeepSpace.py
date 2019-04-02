@@ -47,7 +47,7 @@ class DeepSpace:
         self.open_kernel = np.ones((7, 7), np.uint8)
         self.stretch_factor = 16.0
         self.last_ping = None
-        self.time_offset = None
+        self.time_offset = 0.0
         self.requested_time = None
 
     def processNoUSB(self, inframe):
@@ -110,9 +110,12 @@ class DeepSpace:
                 'skew': skew_angle
             })
 
-
         target = min(targets, default=None, key=lambda x: x['angle'])
-        jevois.sendSerial("DATA {}".format(json.dumps(target)))
+        output = {
+            'time': time() - self.time_offset,
+            'target': target
+        }
+        jevois.sendSerial("DATA {}".format(json.dumps(output)))
         outimg = inimg
 
         fps = self.timer.stop()
@@ -150,15 +153,19 @@ class DeepSpace:
     def parseSerial(self, data):
         if data.startswith('PING'):
             self.last_ping = time()
-            jevois.sendSerial('PONG')
             if not self.time_offset:
                 self.requested_time = time()
-                jevois.sendSerial('TIME')
+                return "PONG\nTIME"
+            else:
+                return "PONG"
         elif data.startswith('TIME') and self.requested_time:
             split = data.split(' ')
             rio_time = float(split[1])
             self.time_offset = rio_time + (time() - self.requested_time) / 2.0
             self.requested_time = None
+            return 'OK'
+        elif data.startswith('DEBUG'):
+            return self.requested_time
 
     def group_rects(self, rects):
         pairs = []

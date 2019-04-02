@@ -49,7 +49,7 @@ object Armavator : Subsystem("Armavator") {
             motionMagic(ELEVATOR_ACCELERATION, ELEVATOR_VELOCITY)
         }
 
-        currentLimit(15, 0, 0)
+        currentLimit(25, 0, 0)
     }
 
     private val armMotors = MotorController(TalonID(ARM_MASTER), VictorID(ARM_SLAVE)).config {
@@ -67,9 +67,9 @@ object Armavator : Subsystem("Armavator") {
             p(2.0)
             d(1.0)
 
-            f(10.0)
+            f(7.0)
 
-            motionMagic(560.0, 180.0)
+            motionMagic(360.0, 120.0)
         }
         currentLimit(15, 0, 0)
     }
@@ -105,7 +105,9 @@ object Armavator : Subsystem("Armavator") {
             height.asInches
         )..18.0 else Pose.LIFTED.elevatorHeight.asInches..26.0// inches
 
-    private val armRange: DoubleRange = -77.0..71.0 // degrees
+    private val armRange: DoubleRange = -77.0..76.0 // degrees
+
+    private var elevatorOffset = 0.inches
 
     val height: Length
         get() = elevatorMotors.position.inches
@@ -143,7 +145,7 @@ object Armavator : Subsystem("Armavator") {
             table.getEntry("Elevator Error").setDouble(elevatorMotors.closedLoopError)
             table.getEntry("Elevator Output").setDouble(elevatorMotors.output)
 
-            field = value.asInches.coerceIn(heightRange).inches
+            field = (value.asInches + elevatorOffset.asInches).coerceIn(heightRange).inches
         }
 
     init {
@@ -158,8 +160,14 @@ object Armavator : Subsystem("Armavator") {
                 angleEntry.setDouble(angle.asDegrees)
                 heightSetpointEntry.setDouble(heightSetpoint.asInches)
                 angleSetpointEntry.setDouble(angleSetpoint.asDegrees)
-                armMotors.setMotionMagicSetpoint((angleSetpoint.asDegrees - ARM_OFFSET))
-                elevatorMotors.setMotionMagicSetpoint(heightSetpoint.asInches, ELEVATOR_FEED_FORWARD)
+
+                if (DriverStation.getInstance().isEnabled) {
+                    armMotors.setMotionMagicSetpoint((angleSetpoint.asDegrees - ARM_OFFSET))
+                    elevatorMotors.setMotionMagicSetpoint(heightSetpoint.asInches, ELEVATOR_FEED_FORWARD)
+                } else {
+                    armMotors.stop()
+                    elevatorMotors.stop()
+                }
             }
         }
     }
@@ -174,6 +182,14 @@ object Armavator : Subsystem("Armavator") {
 
     fun setArmRaw(power: Double) {
         armMotors.setPercentOutput(power)
+    }
+
+    fun incrementOffset()  {
+        elevatorOffset += 0.5.inches
+    }
+
+    fun decrementOffset()  {
+        elevatorOffset -= 0.5.inches
     }
 
     fun printDebugInfo() {

@@ -10,10 +10,11 @@ import java.util.concurrent.DelayQueue
 
 suspend fun intakeCargo() = use(Armavator) {
     Armavator.isPinching = true // make sure there's no hatch
-    Armavator.intake(0.5)
+    Armavator.isExtending = false
+    Armavator.intake(0.8)
     goToPose(Pose.CARGO_GROUND_PICKUP)
     delay(0.2)
-    suspendUntil { println(Armavator.intakeCurrent);Armavator.intakeCurrent > 20.0 }
+    suspendUntil { println(Armavator.intakeCurrent);Armavator.intakeCurrent > 15.0 }
     goToPose(Pose.HOME)
 }
 
@@ -21,12 +22,15 @@ suspend fun intakeHatch() = use(Armavator) {
     Armavator.isPinching = true
     goToPose(Pose.HATCH_FEEDER_PICKUP)
     Armavator.isExtending = true
-    suspendUntil { OI.pickupFromFeederStation }
+//    suspendUntil { Math.abs(Armavator.angleSetpoint.asDegrees - Armavator.angle.asDegrees) < 2.0 }
+    suspendUntil { Limelight.area > 6.5 || OI.usePiece }
     Armavator.isPinching = false
     delay(0.5)
     Armavator.isExtending = false
+    Armavator.intake(-0.2)
     Drive.driveTime(Vector2(0.0, -0.4), 0.75.seconds)
     goToPose(Pose.HOME)
+    Armavator.intake(0.0)
 }
 
 suspend fun ejectPiece() = use(Armavator) {

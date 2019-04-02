@@ -6,6 +6,7 @@ import org.team2471.frc.lib.math.cube
 import org.team2471.frc.lib.math.deadband
 import org.team2471.frc.lib.math.squareWithSign
 import org.team2471.frc.lib.motion_profiling.Path2D
+import org.team2471.frc.lib.units.degrees
 import org.team2471.frc2019.actions.*
 
 private val deadBandDriver = 0.05
@@ -22,16 +23,19 @@ object OI {
         get() = -driverController.leftThumbstickY.deadband(deadBandDriver).squareWithSign()
 
     val driveTranslation: Vector2
-        get() = Vector2(driveTranslationX, driveTranslationY)
+        get() = Vector2(driveTranslationX, driveTranslationY) //does owen want this cubed?
 
     val driveRotation: Double
-        get() = (driverController.rightThumbstickX.deadband(deadBandDriver)).cube() * 0.5
+        get() = (driverController.rightThumbstickX.deadband(deadBandDriver)).cube() * 0.6
+
+    val driveClimbDrive: Double
+        get() = if(Armavator.isClimbing) driverController.rightTrigger.deadband(deadBandDriver) else 0.0
 
     val operatorTranslation: Vector2
-        get() = Vector2(operatorLeftXStick, operatorLeftYStick) * 0.5
+        get() = Vector2(operatorLeftXStick, operatorLeftYStick) * 0.4
 
     val operatorRotation: Double
-        get() = operatorRightXStick.squareWithSign() * 0.25
+        get() = operatorRightXStick.squareWithSign() * 0.35
 
     val operatorLeftXStick: Double
         get() = operatorController.leftThumbstickX.deadband(deadBandOperator)
@@ -51,8 +55,8 @@ object OI {
     val rightYStick: Double
         get() = -driverController.rightThumbstickY.deadband(deadBandOperator)
 
-    val ejectPiece: Boolean
-        get() = driverController.rightTrigger > 0.5
+    val usePiece: Boolean
+        get() = driverController.rightTrigger > 0.3
 
     val activate: Boolean
         get() = driverController.rightBumper
@@ -70,8 +74,13 @@ object OI {
         // owen mappings
         driverController::leftBumper::toggleWhenTrue { intakeCargo() }
         driverController::rightBumper::toggleWhenTrue { intakeHatch() }
-        driverController::b.whenTrue { goToPose(Pose.HOME) }
+        driverController::b.whenTrue {
+            Armavator.isExtending = false
+            goToPose(Pose.HOME)
+        }
         driverController::back.whenTrue { Drive.zeroGyro() }
+        ({ driverController.leftTrigger > 0.1 }).whileTrue{ visionDrive() }
+        //  ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }
 
 //        driverController::y.whenTrue {
 //            val position1 = Vector2(0.0, 0.0)
@@ -98,7 +107,12 @@ object OI {
         operatorController::leftBumper.whenTrue{ Armavator.toggleExtention()}
         operatorController::rightBumper.whenTrue{ Armavator.togglePinching()}
         ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }
-        ({operatorController.dPad == Controller.Direction.DOWN}).whenTrue{ climb2() }
+        ({ operatorController.dPad == Controller.Direction.DOWN }).whenTrue { climb2() }
+        ({operatorController.dPad == Controller.Direction.LEFT}).whenTrue{ Armavator.decrementOffset() }
+        ({operatorController.dPad == Controller.Direction.RIGHT}).whenTrue{ Armavator.incrementOffset() }
+        operatorController::start.whileTrue { Drive.turnToAngle(180.degrees) }
+
+        //+ ({operatorController.dPad == Controller.Direction.DOWN}).whenTrue{ climb2() }
 
         operatorController::back.whileTrue{ driveToTarget() }
 //        driverController.createMappings {

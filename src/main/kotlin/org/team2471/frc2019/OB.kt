@@ -10,6 +10,7 @@ import org.team2471.frc.lib.actuators.VictorID
 import org.team2471.frc.lib.coroutines.MeanlibDispatcher
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.Subsystem
+import org.team2471.frc.lib.math.DoubleRange
 import org.team2471.frc.lib.units.Angle
 import org.team2471.frc.lib.units.degrees
 import org.team2471.frc2019.Talons.OB_PIVOT_LEFT
@@ -21,17 +22,24 @@ object OB : Subsystem("OB") {
     private val leftPivotMotor = MotorController(TalonID(OB_PIVOT_LEFT)).config {
         encoderType(FeedbackDevice.Analog)
         encoderContinuous(false)
-        sensorPhase(true)
+        inverted(true)
         feedbackCoefficient = 1/2.6
         rawOffset(750)
+        pid {
+            p(8.0)
+            d(8.0)
+        }
     }
     private val rightPivotMotor = MotorController(TalonID(OB_PIVOT_RIGHT)).config {
         encoderType(FeedbackDevice.Analog)
         encoderContinuous(false)
-        inverted(true)
-        sensorPhase(true)
         feedbackCoefficient = 1/2.6
         rawOffset(-250 )
+
+        pid {
+            p(8.0)
+            d(8.0)
+        }
     }
 
     private val climbDriveMotors = MotorController(VictorID(OB_CLIMB_ROLLERS))
@@ -42,8 +50,11 @@ object OB : Subsystem("OB") {
     val rightAngle
         get() = rightPivotMotor.position.degrees
 
+    private val obRange: DoubleRange = -4.0..180.0
+
     var angleSetpoint: Angle = (leftAngle + rightAngle) / 2.0
         set(value) {
+            field = value.asDegrees.coerceIn(obRange).degrees
             leftPivotMotor.setPositionSetpoint(value.asDegrees)
             rightPivotMotor.setPositionSetpoint(value.asDegrees)
         }
@@ -55,9 +66,14 @@ object OB : Subsystem("OB") {
             periodic {
                 leftArmTable.setDouble(leftAngle.asDegrees)
                 rightArmTable.setDouble(rightAngle.asDegrees)
-
+//                println("Current position: ${(leftAngle + rightAngle) / 2.0} Current setpoint: ${angleSetpoint}")
             }
         }
+    }
+
+    fun climb(angleSetpoint: Angle) {
+        leftPivotMotor.setPositionSetpoint(angleSetpoint.asDegrees, -0.35)
+        rightPivotMotor.setPositionSetpoint(angleSetpoint.asDegrees, -0.35)
     }
 
     fun climbDrive(power: Double) {
@@ -66,5 +82,13 @@ object OB : Subsystem("OB") {
 
     override fun reset() {
         climbDriveMotors.stop()
+    }
+
+    override suspend fun default() {
+        periodic {
+            leftPivotMotor.stop()
+            rightPivotMotor.stop()
+//            angleSetpoint += 45.degrees * OI.obiControl * period
+        }
     }
 }
