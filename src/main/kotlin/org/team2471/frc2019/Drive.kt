@@ -300,10 +300,10 @@ suspend fun Drive.driveTime(translation: Vector2, time: Time) = use(Drive) {
     }
 }
 
-suspend fun Drive.turnTo180() = use(this){
+suspend fun Drive.turnToAngle(angle: Angle) = use(this){
     val kTurn = 0.007
     periodic {
-        val turnError = (180.degrees - heading).wrap()
+        val turnError = (angle - heading).wrap()
         Drive.drive(Vector2(0.0,0.0), turnError.asDegrees * kTurn)
     }
 }

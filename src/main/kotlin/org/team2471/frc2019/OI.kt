@@ -6,6 +6,7 @@ import org.team2471.frc.lib.math.cube
 import org.team2471.frc.lib.math.deadband
 import org.team2471.frc.lib.math.squareWithSign
 import org.team2471.frc.lib.motion_profiling.Path2D
+import org.team2471.frc.lib.units.degrees
 import org.team2471.frc2019.actions.*
 
 private val deadBandDriver = 0.05
@@ -109,7 +110,7 @@ object OI {
         ({ operatorController.dPad == Controller.Direction.DOWN }).whenTrue { climb2() }
         ({operatorController.dPad == Controller.Direction.LEFT}).whenTrue{ Armavator.decrementOffset() }
         ({operatorController.dPad == Controller.Direction.RIGHT}).whenTrue{ Armavator.incrementOffset() }
-        operatorController::start.whileTrue { Drive.turnTo180() }
+        operatorController::start.whileTrue { Drive.turnToAngle(180.degrees) }
 
         //+ ({operatorController.dPad == Controller.Direction.DOWN}).whenTrue{ climb2() }
 

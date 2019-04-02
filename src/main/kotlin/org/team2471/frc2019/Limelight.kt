@@ -11,7 +11,11 @@ import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.Subsystem
 import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.math.Vector2
+import org.team2471.frc.lib.math.linearMap
 import org.team2471.frc.lib.motion.following.drive
+import org.team2471.frc.lib.units.degrees
+import kotlin.math.absoluteValue
+import kotlin.math.sqrt
 
 object Limelight: Subsystem("Limelight") {
     private val table = NetworkTableInstance.getDefault().getTable("limelight")
@@ -55,20 +59,28 @@ object Limelight: Subsystem("Limelight") {
     }
 }
 
-private val angles = doubleArrayOf(-135.0, -90.0, -45.0, 0.0, 45.0, 90.0, 135.0)
+private val angles = doubleArrayOf(-150.0, -90.0, -30.0, 0.0, 30.0, 90.0, 150.0, 180.0)
 
 suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive"){
     Limelight.isCamEnabled = true
     val xTranslationK = 0.04
+    val distanceK = 20.0
+    val smallestAngle = angles.minBy { (Drive.heading - it.degrees).wrap().asDegrees.absoluteValue }!!
+    val kTurn = 0.0 //0.007
 
     periodic {
-        val visionVector = Vector2(Limelight.xTranslation * xTranslationK, OI.driverController.leftTrigger * 0.5)
+        val speed = sqrt(Limelight.area).linearMap(sqrt(0.4)..sqrt(8.5), 1.0..0.2)
+
+        val visionVector = Vector2(Limelight.xTranslation * xTranslationK, OI.driverController.leftTrigger * speed)
+        val turnError = (smallestAngle.degrees - Drive.heading).wrap()
+        println("Target angle: $smallestAngle, error: $turnError")
+
         Drive.drive(
             OI.driveTranslation,
             OI.driveRotation,
             SmartDashboard.getBoolean("Use Gyro", true) && !DriverStation.getInstance().isAutonomous,
             OI.operatorTranslation + visionVector,
-            OI.operatorRotation
+            OI.operatorRotation + turnError.asDegrees * kTurn
         )
     }
 }
