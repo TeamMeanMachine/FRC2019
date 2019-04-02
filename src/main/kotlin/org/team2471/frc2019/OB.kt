@@ -16,8 +16,6 @@ import org.team2471.frc2019.Talons.OB_PIVOT_LEFT
 import org.team2471.frc2019.Talons.OB_PIVOT_RIGHT
 import org.team2471.frc2019.Victors.OB_CLIMB_ROLLERS
 
-private const val PIVOT_F = 50.0
-
 object OB : Subsystem("OB") {
     private val table = NetworkTableInstance.getDefault().getTable(name)
     private val leftPivotMotor = MotorController(TalonID(OB_PIVOT_LEFT)).config {
@@ -26,11 +24,6 @@ object OB : Subsystem("OB") {
         sensorPhase(true)
         feedbackCoefficient = 1/2.6
         rawOffset(750)
-        pid {
-            p(8.0)
-            d(8.0)
-            f(PIVOT_F)
-        }
     }
     private val rightPivotMotor = MotorController(TalonID(OB_PIVOT_RIGHT)).config {
         encoderType(FeedbackDevice.Analog)
@@ -39,11 +32,6 @@ object OB : Subsystem("OB") {
         sensorPhase(true)
         feedbackCoefficient = 1/2.6
         rawOffset(-250 )
-        pid {
-            p(8.0)
-            d(8.0)
-            f(PIVOT_F)
-        }
     }
 
     private val climbDriveMotors = MotorController(VictorID(OB_CLIMB_ROLLERS))
@@ -76,10 +64,6 @@ object OB : Subsystem("OB") {
         climbDriveMotors.setPercentOutput(power)
     }
 
-    fun pivotRaw(power: Double)  {
-        rightPivotMotor.setPercentOutput(power)
-        leftPivotMotor.setPercentOutput(power)
-    }
     override fun reset() {
         climbDriveMotors.stop()
     }

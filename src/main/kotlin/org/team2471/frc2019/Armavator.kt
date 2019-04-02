@@ -3,9 +3,8 @@ package org.team2471.frc2019
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import com.ctre.phoenix.motorcontrol.can.TalonSRX
 import edu.wpi.first.networktables.NetworkTableInstance
-import edu.wpi.first.wpilibj.Solenoid
+import edu.wpi.first.wpilibj.*
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.team2471.frc.lib.actuators.MotorController
 import org.team2471.frc.lib.actuators.TalonID
@@ -234,15 +233,6 @@ suspend fun Armavator.togglePinching() = use(this) {
 
 suspend fun Armavator.toggleExtention() = use(this) {
     isExtending = !isExtending
-}
-
-suspend fun Armavator.expelHatch() = use(this) {
-    isPinching = true
-    delay(150)
-    isExtending = true
-    delay(200)
-
-
 }
 
 enum class GamePiece { HATCH_PANEL, CARGO }
