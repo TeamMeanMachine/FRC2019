@@ -99,8 +99,8 @@ object OI {
         operatorController::rightBumper.whenTrue{ Armavator.togglePinching()}
         ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }
         ({operatorController.dPad == Controller.Direction.DOWN}).whenTrue{ climb2() }
-
         operatorController::back.whileTrue{ driveToTarget() }
+        operatorController::start.whenTrue{ Armavator.expelHatch()}
 //        driverController.createMappings {
 //            leftBumperToggle { intakeCargo() }
 //

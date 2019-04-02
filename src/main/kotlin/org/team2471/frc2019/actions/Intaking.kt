@@ -10,7 +10,7 @@ import java.util.concurrent.DelayQueue
 
 suspend fun intakeCargo() = use(Armavator) {
     Armavator.isPinching = true // make sure there's no hatch
-    Armavator.intake(0.5)
+    Armavator.intake(0.8)
     goToPose(Pose.CARGO_GROUND_PICKUP)
     delay(0.2)
     suspendUntil { println(Armavator.intakeCurrent);Armavator.intakeCurrent > 20.0 }

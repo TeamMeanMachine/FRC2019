@@ -1,12 +1,11 @@
 package org.team2471.frc2019.actions
 
+import kotlinx.coroutines.delay
 import org.team2471.frc.lib.coroutines.delay
-import org.team2471.frc.lib.coroutines.parallel
 import org.team2471.frc.lib.coroutines.suspendUntil
 import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.input.Controller
 import org.team2471.frc.lib.math.Vector2
-import org.team2471.frc.lib.units.inches
 import org.team2471.frc.lib.units.seconds
 import org.team2471.frc2019.*
 import kotlin.math.abs
@@ -42,6 +41,11 @@ private suspend fun score(position: ScoringPosition) {
         }
 
         goToPose(scorePose)
+        OI.driverController.rumble(1.0)
+        OI.operatorController.rumble(1.0)
+        delay(200)
+        OI.driverController.rumble(0.0)
+        OI.operatorController.rumble(0.0)
 
         when (gamePiece) {
             GamePiece.HATCH_PANEL -> {
@@ -53,20 +57,15 @@ private suspend fun score(position: ScoringPosition) {
             }
             GamePiece.CARGO -> {
                 suspendUntil { OI.ejectPiece }
-                Armavator.intake(-1.0)
+                Armavator.intake(-0.7)
                 delay(0.35)
                 Armavator.intake(0.0)
             }
         }
-
-        parallel({
-            val placePosition = Drive.position
-            val placeHeading = Drive.heading
-            Drive.driveTime(Vector2(0.0, -0.3), 0.35.seconds)
-            suspendUntil { Drive.position.distance(placePosition) > 1.5 || abs(Drive.heading.asDegrees - placeHeading.asDegrees) > 60.0 }
-        }, {
-            Armavator.heightSetpoint = Armavator.height - 2.inches
-        })
+        val placePosition = Drive.position
+        val placeHeading = Drive.heading
+        Drive.driveTime(Vector2(0.0, -0.3), 0.35.seconds)
+        suspendUntil { Drive.position.distance(placePosition) > 1.5 || abs(Drive.heading.asDegrees - placeHeading.asDegrees) > 60.0 }
         goToPose(Pose.HOME)
     }
 }
