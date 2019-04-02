@@ -73,7 +73,10 @@ object OI {
         // owen mappings
         driverController::leftBumper::toggleWhenTrue { intakeCargo() }
         driverController::rightBumper::toggleWhenTrue { intakeHatch() }
-        driverController::b.whenTrue { goToPose(Pose.HOME) }
+        driverController::b.whenTrue {
+            Armavator.isExtending = false
+            goToPose(Pose.HOME)
+        }
         driverController::back.whenTrue { Drive.zeroGyro() }
         ({ driverController.leftTrigger > 0.1 }).whileTrue{ visionDrive() }
         //  ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }

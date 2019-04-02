@@ -25,11 +25,9 @@ suspend fun driveToTarget() = use(Drive, Jevois, name = "Drive To Target") {
         val data = Jevois.data
         val target = data!!.target
         if (target == null) {
-            Jevois.redOutput.set(false)
             Drive.stop()
             return@periodic
         }
-        Jevois.redOutput.set(true)
         val turnError = target.angle - ANGLE_OFFSET.degrees
         var turn = turnController.update(turnError.asDegrees)
         val distance = 0.2 // distanceController.update(target.distance.asInches - DISTANCE_OFFSET) + 0.05

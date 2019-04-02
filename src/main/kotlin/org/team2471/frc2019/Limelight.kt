@@ -59,7 +59,7 @@ private val angles = doubleArrayOf(-135.0, -90.0, -45.0, 0.0, 45.0, 90.0, 135.0)
 
 suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive"){
     Limelight.isCamEnabled = true
-    val xTranslationK = 0.03
+    val xTranslationK = 0.04
 
     periodic {
         val visionVector = Vector2(Limelight.xTranslation * xTranslationK, OI.driverController.leftTrigger * 0.5)
