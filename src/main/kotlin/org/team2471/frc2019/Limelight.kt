@@ -18,7 +18,7 @@ import org.team2471.frc.lib.units.degrees
 import kotlin.math.absoluteValue
 import kotlin.math.sqrt
 
-object Limelight: Subsystem("Limelight") {
+object Limelight : Subsystem("Limelight") {
     private val table = NetworkTableInstance.getDefault().getTable("limelight")
     private val xEntry = table.getEntry("tx")
     private val areaEntry = table.getEntry("ta")
@@ -65,17 +65,18 @@ object Limelight: Subsystem("Limelight") {
 
 private val angles = doubleArrayOf(-150.0, -90.0, -30.0, 0.0, 30.0, 90.0, 150.0, 180.0)
 
-suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive"){
+suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
     Limelight.isCamEnabled = true
-    val translationPDController = PDController(0.035, 0.0)
+    val translationPDController = PDController(0.033, 0.0) //0.03375
     val distanceK = 20.0
     val smallestAngle = angles.minBy { (Drive.heading - it.degrees).wrap().asDegrees.absoluteValue }!!
     val kTurn = 0.0 //0.007
 
     periodic {
-        val speed = sqrt(Limelight.area).linearMap(sqrt(0.4)..sqrt(8.5), 0.4..0.05)
+        val speed = sqrt(Limelight.area).linearMap(sqrt(0.4)..sqrt(8.5), 0.35..0.07)
 
-        val visionVector = Vector2(translationPDController.update(Limelight.xTranslation), OI.driverController.leftTrigger * speed)
+        val visionVector =
+            Vector2(translationPDController.update(Limelight.xTranslation), OI.driverController.leftTrigger * speed)
         val turnError = (smallestAngle.degrees - Drive.heading).wrap()
         println("Target angle: $smallestAngle, error: $turnError")
 
@@ -85,6 +86,28 @@ suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive"){
             SmartDashboard.getBoolean("Use Gyro", true) && !DriverStation.getInstance().isAutonomous,
             OI.operatorTranslation + visionVector,
             OI.operatorRotation + turnError.asDegrees * kTurn
+        )
+    }
+}
+
+suspend fun autonomousVisionDrive(power: Double) = use(Drive, Limelight, name = "Vision Drive") {
+    Limelight.isCamEnabled = true
+    val translationPDController = PDController(0.033, 0.0) //0.03375
+    val distanceK = 20.0
+    val smallestAngle = angles.minBy { (Drive.heading - it.degrees).wrap().asDegrees.absoluteValue }!!
+    val kTurn = 0.0 //0.007
+
+    periodic {
+        val speed = sqrt(Limelight.area).linearMap(sqrt(0.4)..sqrt(8.5), 0.35..0.07)
+
+        val visionVector = Vector2(translationPDController.update(Limelight.xTranslation), power * speed)
+        val turnError = (smallestAngle.degrees - Drive.heading).wrap()
+        println("Target angle: $smallestAngle, error: $turnError")
+
+        Drive.drive(
+            Vector2(0.0, 0.0), 0.0,
+            SmartDashboard.getBoolean("Use Gyro", true) && !DriverStation.getInstance().isAutonomous,
+            visionVector, turnError.asDegrees * kTurn
         )
     }
 }

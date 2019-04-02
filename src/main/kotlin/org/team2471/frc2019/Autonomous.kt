@@ -48,7 +48,7 @@ object AutoChooser {
 
     private val autonomousChooser = SendableChooser<suspend () -> Unit>().apply {
         setDefaultOption("None", null)
-        addOption("Oregon City", ::oregonCity)
+        addOption("Rocket Auto", ::rocketAuto)
         addOption("Tests", ::testAuto)
     }
 
@@ -103,15 +103,15 @@ object AutoChooser {
 
 }
 
-private suspend fun oregonCity() = coroutineScope {
-    val auto = autonomi["Oregon City"]
+private suspend fun rocketAuto() = coroutineScope {
+    val auto = autonomi["Rocket Auto"]
     auto.isMirrored = false
 
     parallel({
         Drive.driveAlongPath(auto["Platform to Rocket"], true, 0.0)
     }, {
         if (Limelight.hasValidTarget) {
-            visionDrive()
+            autonomousVisionDrive(0.3)
         }
     })
     //Armavator.isPinching = true

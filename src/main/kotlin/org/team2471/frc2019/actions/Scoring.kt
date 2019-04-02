@@ -48,7 +48,8 @@ private suspend fun score(position: ScoringPosition) {
             GamePiece.HATCH_PANEL -> {
 //                suspendUntil { Math.abs(Armavator.angleSetpoint.asDegrees - Armavator.angle.asDegrees) < 2.0 }
                 suspendUntil {
-                    Limelight.area > (if (position == ScoringPosition.ROCKET_HIGH) 8.5 else 6.5) || OI.usePiece
+                    Limelight.area > (if (position == ScoringPosition.ROCKET_MED) 6.25
+                     else 9.0) || OI.usePiece
                 }
                 Armavator.isExtending = true
                 Armavator.isPinching = true
@@ -56,6 +57,7 @@ private suspend fun score(position: ScoringPosition) {
                 Armavator.isExtending = false
             }
             GamePiece.CARGO -> {
+                Armavator.isCarryingBall = true
                 suspendUntil { OI.usePiece }
                 val placePosition = Drive.position
 
@@ -64,6 +66,7 @@ private suspend fun score(position: ScoringPosition) {
 
                     if (Drive.position.distance(placePosition) > 0.5) stop()
                 }
+                Armavator.isCarryingBall = false
                 Armavator.intake(0.0)
 
             }
