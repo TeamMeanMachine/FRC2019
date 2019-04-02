@@ -31,12 +31,12 @@ private var startingSide = Side.RIGHT
 object AutoChooser {
     private val cacheFile = File("/home/lvuser/autonomi.json")
 
-    val sideChooser = SendableChooser<Side>().apply {
+    private val sideChooser = SendableChooser<Side>().apply {
         setDefaultOption("Left", Side.LEFT)
         addOption("Right", Side.RIGHT)
     }
 
-    val testAutoChooser = SendableChooser<String?>().apply {
+    private val testAutoChooser = SendableChooser<String?>().apply {
         setDefaultOption("None", null)
         addOption("20 Foot Test", "20 Foot Test")
         addOption("8 Foot Straight", "8 Foot Straight")
@@ -46,7 +46,7 @@ object AutoChooser {
         addOption("Hook Path", "Hook Path")
     }
 
-    val autonomousChooser = SendableChooser<suspend () -> Unit>().apply {
+    private val autonomousChooser = SendableChooser<suspend () -> Unit>().apply {
         setDefaultOption("None", null)
         addOption("Oregon City", ::oregonCity)
         addOption("Tests", ::testAuto)
@@ -84,17 +84,12 @@ object AutoChooser {
             }, EntryListenerFlags.kImmediate or EntryListenerFlags.kNew or EntryListenerFlags.kUpdate)
     }
 
-    suspend fun oregonCity() = coroutineScope {
-        val auto = autonomi["Oregon City"]
-        auto.isMirrored = false
+    suspend fun autonomous() = use(Drive, Armavator, name = "Autonomous") {
+        val nearSide = sideChooser.selected
+        startingSide = nearSide
 
-        parallel({
-            Drive.driveAlongPath(auto["Platform to Rocket"], true, 0.0)
-        }, {
-            //animateToPose(Pose.HATCH_HIGH)
-        })
-        //Armavator.isPinching = true
-        delay(0.5)
+        val autoEntry = autonomousChooser.selected
+        autoEntry.invoke()
     }
 
     suspend fun testAuto() {
@@ -105,13 +100,20 @@ object AutoChooser {
             Drive.driveAlongPath(path, true, 0.0)
         }
     }
+
 }
 
-suspend fun AutoChooser.autonomous() = use(Drive) {
-    val nearSide = sideChooser.selected
-    startingSide = nearSide
+private suspend fun oregonCity() = coroutineScope {
+    val auto = autonomi["Oregon City"]
+    auto.isMirrored = false
 
-    val autoEntry = autonomousChooser.selected
-    autoEntry.invoke()
+    parallel({
+        Drive.driveAlongPath(auto["Platform to Rocket"], true, 0.0)
+    }, {
+        if (Limelight.hasValidTarget) {
+            visionDrive()
+        }
+    })
+    //Armavator.isPinching = true
+    delay(0.5)
 }
-
