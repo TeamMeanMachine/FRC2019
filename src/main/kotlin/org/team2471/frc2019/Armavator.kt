@@ -10,6 +10,7 @@ import org.team2471.frc.lib.actuators.MotorController
 import org.team2471.frc.lib.actuators.TalonID
 import org.team2471.frc.lib.actuators.VictorID
 import org.team2471.frc.lib.coroutines.MeanlibDispatcher
+import org.team2471.frc.lib.coroutines.halt
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.Subsystem
 import org.team2471.frc.lib.framework.use
@@ -174,8 +175,10 @@ object Armavator : Subsystem("Armavator") {
     }
 
     override suspend fun default() {
-        if (isCarryingBall) {
-            intake(0.3)
+        periodic {
+            if (isCarryingBall) {
+                intake(0.3)
+            }
         }
     }
 

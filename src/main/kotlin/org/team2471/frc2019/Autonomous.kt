@@ -3,15 +3,21 @@ package org.team2471.frc2019
 import edu.wpi.first.networktables.EntryListenerFlags
 import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlinx.coroutines.coroutineScope
+import org.team2471.frc.lib.control.PDController
 import org.team2471.frc.lib.coroutines.delay
 import org.team2471.frc.lib.coroutines.parallel
+import org.team2471.frc.lib.coroutines.suspendUntil
 import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.motion.following.driveAlongPath
+import org.team2471.frc.lib.motion.following.driveAlongPathWithStrafe
 import org.team2471.frc.lib.motion_profiling.Autonomi
 import org.team2471.frc.lib.util.measureTimeFPGA
+import org.team2471.frc2019.actions.intakeHatch
+import org.team2471.frc2019.actions.scoreHigh
 import java.io.File
 
 private lateinit var autonomi: Autonomi
@@ -106,14 +112,31 @@ object AutoChooser {
 private suspend fun rocketAuto() = coroutineScope {
     val auto = autonomi["Rocket Auto"]
     auto.isMirrored = false
+    println("DAB ON THE HATERS")
+    val translationPDController = PDController(0.025, 0.0)
+    val timer = Timer()
+    timer.start()
+    parallel({
+        Drive.driveAlongPathWithStrafe(auto["Platform to Rocket"], true, 0.0,
+            { if (Limelight.area > 3.0) 1.0 else 0.0 },
+            { translationPDController.update(Limelight.xTranslation) },
+            { Limelight.targetValid.value.boolean && Limelight.area > Limelight.HIGH_HATCH_AREA })
+        println("Drive done")
+    }, {
+        suspendUntil { timer.get() > 1.0 }
+        scoreHigh()
+    })
 
     parallel({
-        Drive.driveAlongPath(auto["Platform to Rocket"], true, 0.0)
+        Drive.driveAlongPathWithStrafe(auto["Rocket to Feeder Station"], false, 0.0,
+            { if (Limelight.area > 3.0) 1.0 else 0.0 },
+            { translationPDController.update(Limelight.xTranslation) },
+            { Limelight.targetValid.value.boolean && Limelight.area > Limelight.LOW_HATCH_AREA })
     }, {
-        if (Limelight.hasValidTarget) {
-            autonomousVisionDrive(0.3)
-        }
+        suspendUntil { timer.get() > 1.0 }
+        intakeHatch()
     })
+
     //Armavator.isPinching = true
     delay(0.5)
 }

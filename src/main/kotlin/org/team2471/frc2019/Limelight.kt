@@ -19,12 +19,15 @@ import kotlin.math.absoluteValue
 import kotlin.math.sqrt
 
 object Limelight : Subsystem("Limelight") {
+    const val HIGH_HATCH_AREA = 9.0
+    const val MED_HATCH_AREA = 6.25
+    const val LOW_HATCH_AREA =9.0
     private val table = NetworkTableInstance.getDefault().getTable("limelight")
     private val xEntry = table.getEntry("tx")
     private val areaEntry = table.getEntry("ta")
     private val camModeEntry = table.getEntry("camMode")
     private val ledModeEntry = table.getEntry("ledMode")
-    private val targetValid = table.getEntry("tv")
+    val targetValid = table.getEntry("tv")
 
     var isCamEnabled = false
         set(value) {
@@ -67,13 +70,14 @@ private val angles = doubleArrayOf(-150.0, -90.0, -30.0, 0.0, 30.0, 90.0, 150.0,
 
 suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
     Limelight.isCamEnabled = true
-    val translationPDController = PDController(0.033, 0.0) //0.03375
+    val translationPDController = PDController(0.02, 0.0) //0.03375
     val distanceK = 20.0
     val smallestAngle = angles.minBy { (Drive.heading - it.degrees).wrap().asDegrees.absoluteValue }!!
     val kTurn = 0.0 //0.007
 
     periodic {
-        val speed = sqrt(Limelight.area).linearMap(sqrt(0.4)..sqrt(8.5), 0.35..0.07)
+//        val speed = sqrt(Limelight.area).linearMap(sqrt(0.4)..sqrt(8.5), 0.3..0.07)
+        val speed = sqrt(Limelight.area).linearMap(sqrt(0.4)..sqrt(8.5), 0.3..0.07)
 
         val visionVector =
             Vector2(translationPDController.update(Limelight.xTranslation), OI.driverController.leftTrigger * speed)
@@ -86,28 +90,6 @@ suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
             SmartDashboard.getBoolean("Use Gyro", true) && !DriverStation.getInstance().isAutonomous,
             OI.operatorTranslation + visionVector,
             OI.operatorRotation + turnError.asDegrees * kTurn
-        )
-    }
-}
-
-suspend fun autonomousVisionDrive(power: Double) = use(Drive, Limelight, name = "Vision Drive") {
-    Limelight.isCamEnabled = true
-    val translationPDController = PDController(0.033, 0.0) //0.03375
-    val distanceK = 20.0
-    val smallestAngle = angles.minBy { (Drive.heading - it.degrees).wrap().asDegrees.absoluteValue }!!
-    val kTurn = 0.0 //0.007
-
-    periodic {
-        val speed = sqrt(Limelight.area).linearMap(sqrt(0.4)..sqrt(8.5), 0.35..0.07)
-
-        val visionVector = Vector2(translationPDController.update(Limelight.xTranslation), power * speed)
-        val turnError = (smallestAngle.degrees - Drive.heading).wrap()
-        println("Target angle: $smallestAngle, error: $turnError")
-
-        Drive.drive(
-            Vector2(0.0, 0.0), 0.0,
-            SmartDashboard.getBoolean("Use Gyro", true) && !DriverStation.getInstance().isAutonomous,
-            visionVector, turnError.asDegrees * kTurn
         )
     }
 }
