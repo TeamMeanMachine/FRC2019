@@ -57,7 +57,6 @@ private suspend fun score(position: ScoringPosition) {
                 Armavator.isExtending = false
             }
             GamePiece.CARGO -> {
-                Armavator.isCarryingBall = true
                 suspendUntil { OI.usePiece }
                 val placePosition = Drive.position
 
@@ -66,7 +65,6 @@ private suspend fun score(position: ScoringPosition) {
 
                     if (Drive.position.distance(placePosition) > 0.5) stop()
                 }
-                Armavator.isCarryingBall = false
                 Armavator.intake(0.0)
 
             }

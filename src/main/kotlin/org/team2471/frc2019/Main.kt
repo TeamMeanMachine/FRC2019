@@ -44,7 +44,7 @@ object Robot: RobotProgram {
 
     override suspend fun autonomous() {
         Drive.zeroGyro()
-        AutoChooser.autonomous()
+//        AutoChooser.autonomous()
         goToPose(Pose.HOME)
         Armavator.isPinching = false
 //        intakeHatch()
@@ -99,12 +99,15 @@ object Robot: RobotProgram {
 
 fun main() {
     initializeWpilib()
+
     Drive
     Armavator
 //    Jevois
     Limelight
     OB
     OI
+
     AutoChooser
+
     runRobotProgram(Robot)
 }

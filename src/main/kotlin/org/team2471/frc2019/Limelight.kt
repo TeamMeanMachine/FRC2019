@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.team2471.frc.lib.control.PDController
 import org.team2471.frc.lib.coroutines.MeanlibDispatcher
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.Subsystem
@@ -45,16 +44,13 @@ object Limelight : Subsystem("Limelight") {
     val area
         get() = areaEntry.getDouble(0.0)
 
-    var hasValidTarget = false
-        get() = targetValid.value.double == 1.0
-
     init {
         isCamEnabled = false
 //            camModeEntry.setDouble(0.0)
 //            ledModeEntry.setDouble(0.0)
         GlobalScope.launch(MeanlibDispatcher) {
             periodic {
-                if (hasValidTarget)  // target valid
+                if (targetValid.value.double == 1.0)  // target valid
                     setLEDColor(false, true, false)
                 else
                     setLEDColor(true, false, false)
@@ -69,18 +65,17 @@ object Limelight : Subsystem("Limelight") {
 
 private val angles = doubleArrayOf(-150.0, -90.0, -30.0, 0.0, 30.0, 90.0, 150.0, 180.0)
 
-suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
+suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive"){
     Limelight.isCamEnabled = true
-    val translationPDController = PDController(0.033, 0.0) //0.03375
+    val xTranslationK = 0.04
     val distanceK = 20.0
     val smallestAngle = angles.minBy { (Drive.heading - it.degrees).wrap().asDegrees.absoluteValue }!!
     val kTurn = 0.0 //0.007
 
     periodic {
-        val speed = sqrt(Limelight.area).linearMap(sqrt(0.4)..sqrt(8.5), 0.35..0.07)
+        val speed = sqrt(Limelight.area).linearMap(sqrt(0.4)..sqrt(8.5), 1.0..0.2)
 
-        val visionVector =
-            Vector2(translationPDController.update(Limelight.xTranslation), OI.driverController.leftTrigger * speed)
+        val visionVector = Vector2(Limelight.xTranslation * xTranslationK, OI.driverController.leftTrigger * speed)
         val turnError = (smallestAngle.degrees - Drive.heading).wrap()
         println("Target angle: $smallestAngle, error: $turnError")
 

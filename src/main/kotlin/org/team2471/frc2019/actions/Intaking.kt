@@ -14,16 +14,14 @@ suspend fun intakeCargo() = use(Armavator) {
     Armavator.intake(0.8)
     goToPose(Pose.CARGO_GROUND_PICKUP)
     delay(0.2)
-    suspendUntil { println(Armavator.intakeCurrent);Armavator.intakeCurrent > 20.0 } // final 15
+    suspendUntil { println(Armavator.intakeCurrent);Armavator.intakeCurrent > 15.0 }
     goToPose(Pose.HOME)
-    delay(0.4)
-    Armavator.isCarryingBall = true
 }
 
 suspend fun intakeHatch() = use(Armavator) {
     Armavator.isPinching = true
-    Armavator.isExtending = true
     goToPose(Pose.HATCH_FEEDER_PICKUP)
+    Armavator.isExtending = true
 //    suspendUntil { Math.abs(Armavator.angleSetpoint.asDegrees - Armavator.angle.asDegrees) < 2.0 }
     suspendUntil { Limelight.area > 6.5 || OI.usePiece }
     Armavator.isPinching = false
