@@ -240,7 +240,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                 inverted(isBack)
                 sensorPhase(isBack)
                 brakeMode()
-                feedbackCoefficient = 1 / (4687.5 * 15.0 / 12.0)
+                feedbackCoefficient = 1 / (4687.5 * 20.0 / 12.0)
                 currentLimit(30, 0, 0)
                 openLoopRamp(0.15)
             }
