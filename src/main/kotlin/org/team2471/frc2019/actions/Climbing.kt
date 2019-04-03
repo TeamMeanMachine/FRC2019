@@ -126,6 +126,10 @@ suspend fun climb() = use(Armavator, OB) {
         delay(2.0)
         suspendUntil { OI.driverController.x }
         Armavator.isClimbing = true
+        val armCurve = MotionCurve().apply {
+            storeValue(0.0, Pose.BEFORE_CLIMB.armAngle.asDegrees)
+            storeValue(1.5, Pose.LIFTED.armAngle.asDegrees)
+        }
         val obCurve = MotionCurve().apply {
             storeValue(0.0, 120.0)
             storeValue(2.5, 0.0)
@@ -142,6 +146,7 @@ suspend fun climb() = use(Armavator, OB) {
                 val time = timer.get()//.coerceAtMost(2.0)
                 Armavator.heightSetpoint = elevatorCurve.getValue(time).inches
                 OB.climb(obCurve.getValue(time).degrees)
+                Armavator.angleSetpoint = armCurve.getValue(time).degrees
 
                 OB.climbDrive(1.0)
                 Drive.drive(Vector2(0.0, 0.45), 0.0, fieldCentric = false)
@@ -154,7 +159,7 @@ suspend fun climb() = use(Armavator, OB) {
             Drive.stop()
         }
 
-        val armCurve = MotionCurve().apply {
+        val armCurve2 = MotionCurve().apply {
             storeValue(0.0, Pose.LIFTED.armAngle.asDegrees)
             storeValue(2.0, Pose.AFTER_LIFTED.armAngle.asDegrees)
         }
@@ -176,7 +181,7 @@ suspend fun climb() = use(Armavator, OB) {
                 OB.climbDrive(1.0)
                 Drive.drive(Vector2(0.0, OI.driveClimbDrive), 0.0, false)
                 Armavator.heightSetpoint = elevatorCurve2.getValue(time).inches
-                Armavator.angleSetpoint = armCurve.getValue(time).degrees
+                Armavator.angleSetpoint = armCurve2.getValue(time).degrees
                 OB.angleSetpoint = obCurve2.getValue(time).degrees
                 if (OI.driverController.b)
                     stop()
@@ -207,7 +212,7 @@ suspend fun climb2() = use(Armavator, OB) {
 
         val elevatorCurve = MotionCurve().apply {
             storeValue(0.0, Pose.BEFORE_CLIMB2.elevatorHeight.asInches)
-            storeValue(1.0, Pose.LIFTED2.elevatorHeight.asInches)
+            storeValue(1.5, Pose.LIFTED2.elevatorHeight.asInches)
         }
 
         val armCurve = MotionCurve().apply {

@@ -114,8 +114,7 @@ object AutoChooser {
 
 private suspend fun rocketAuto() = coroutineScope {
     val auto = autonomi["Rocket Auto"]
-    auto.isMirrored = false
-    println("DAB ON THE HATERS")
+    auto.isMirrored = startingSide == Side.LEFT
     val translationPDController = PDController(0.015, 0.0)
     parallel({
         Drive.driveAlongPathWithStrafe(auto["Platform to Rocket"], true, 0.0,
@@ -124,47 +123,47 @@ private suspend fun rocketAuto() = coroutineScope {
             { Limelight.hasValidTarget && Limelight.area > Limelight.HIGH_HATCH_AREA })
         println("Drive done")
     }, {
-        delay(1.0)
-        autoScoreHigh()
+//        delay(1.0)
+//        autoScoreHigh()
 
     })
 
-    parallel({
-        Drive.driveAlongPathWithStrafe(auto["Rocket to Feeder Station"], false, 0.0,
-            { time ->  if (auto["Rocket to Feeder Station"].easeCurve.getValue(time) > 0.5
-                && Limelight.hasValidTarget
-                && (Limelight.area > 3.0)) 1.0 else 0.0 },
-            { translationPDController.update(Limelight.xTranslation) },
-            { Limelight.hasValidTarget && Limelight.area > Limelight.LOW_HATCH_AREA })
-    }, {
-        delay(1.5)
-        autoIntakeHatch()
-    })
-
-    parallel({
-        Drive.driveAlongPathWithStrafe(auto["Feeder Station to Back Rocket"], false, 0.0,
-            { time ->  if (auto["Feeder Station to Back Rocket"].easeCurve.getValue(time) > 0.8
-                && Limelight.hasValidTarget
-                && (Limelight.area > 3.0)) 1.0 else 0.0 },
-            { translationPDController.update(Limelight.xTranslation) },
-            { Limelight.hasValidTarget && Limelight.area > Limelight.HIGH_HATCH_AREA })
-    }, {
-        delay(3.0)
-        autoScoreHigh()
-    })
-
-    parallel({
-        Drive.driveAlongPathWithStrafe(auto["Back Rocket to Cargoship"], false, 0.0,
-            { time ->  if (auto["Back Rocket to Cargoship"].easeCurve.getValue(time) > 0.8
-                && Limelight.hasValidTarget
-                && (Limelight.area > 3.0)) 1.0 else 0.0 },
-            { translationPDController.update(Limelight.xTranslation) },
-            { Limelight.hasValidTarget && Limelight.area > Limelight.LOW_HATCH_AREA })
-    }, {
-        delay(1.0)
-        Armavator.intake(0.6)
-        goToPose(Pose.HATCH_LOW)
-    })
+//    parallel({
+//        Drive.driveAlongPathWithStrafe(auto["Rocket to Feeder Station"], false, 0.0,
+//            { time ->  if (auto["Rocket to Feeder Station"].easeCurve.getValue(time) > 0.5
+//                && Limelight.hasValidTarget
+//                && (Limelight.area > 3.0)) 1.0 else 0.0 },
+//            { translationPDController.update(Limelight.xTranslation) },
+//            { Limelight.hasValidTarget && Limelight.area > Limelight.LOW_HATCH_AREA })
+//    }, {
+//        delay(1.5)
+//        autoIntakeHatch()
+//    })
+//
+//    parallel({
+//        Drive.driveAlongPathWithStrafe(auto["Feeder Station to Back Rocket"], false, 0.0,
+//            { time ->  if (auto["Feeder Station to Back Rocket"].easeCurve.getValue(time) > 0.8
+//                && Limelight.hasValidTarget
+//                && (Limelight.area > 3.0)) 1.0 else 0.0 },
+//            { translationPDController.update(Limelight.xTranslation) },
+//            { Limelight.hasValidTarget && Limelight.area > Limelight.HIGH_HATCH_AREA })
+//    }, {
+//        delay(3.0)
+//        autoScoreHigh()
+//    })
+//
+//    parallel({
+//        Drive.driveAlongPathWithStrafe(auto["Back Rocket to Cargoship"], false, 0.0,
+//            { time ->  if (auto["Back Rocket to Cargoship"].easeCurve.getValue(time) > 0.8
+//                && Limelight.hasValidTarget
+//                && (Limelight.area > 3.0)) 1.0 else 0.0 },
+//            { translationPDController.update(Limelight.xTranslation) },
+//            { Limelight.hasValidTarget && Limelight.area > Limelight.LOW_HATCH_AREA })
+//    }, {
+//        delay(1.0)
+//        Armavator.intake(0.6)
+//        goToPose(Pose.HATCH_LOW)
+//    })
     //Armavator.isPinching = true
     delay(Double.POSITIVE_INFINITY)
 }
