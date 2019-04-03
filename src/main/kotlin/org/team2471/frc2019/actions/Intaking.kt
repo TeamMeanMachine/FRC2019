@@ -35,6 +35,20 @@ suspend fun intakeHatch() = use(Armavator) {
     Armavator.intake(0.0)
 }
 
+suspend fun autoIntakeHatch() = use(Armavator) {
+    Armavator.isPinching = true
+    Armavator.isExtending = true
+    goToPose(Pose.HATCH_FEEDER_PICKUP)
+//    suspendUntil { Math.abs(Armavator.angleSetpoint.asDegrees - Armavator.angle.asDegrees) < 2.0 }
+    suspendUntil { Limelight.area > 6.5 || OI.usePiece }
+    Armavator.isPinching = false
+    delay(0.5)
+    Armavator.isExtending = false
+//    Armavator.intake(-0.2)
+//    goToPose(Pose.HOME)
+//    Armavator.intake(0.0)
+}
+
 suspend fun ejectPiece() = use(Armavator) {
     Armavator.isPinching = true
     Armavator.intake(-0.5)

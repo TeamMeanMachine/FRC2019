@@ -27,7 +27,7 @@ object Limelight : Subsystem("Limelight") {
     private val areaEntry = table.getEntry("ta")
     private val camModeEntry = table.getEntry("camMode")
     private val ledModeEntry = table.getEntry("ledMode")
-    val targetValid = table.getEntry("tv")
+    private val targetValidEntry = table.getEntry("tv")
 
     var isCamEnabled = false
         set(value) {
@@ -45,7 +45,7 @@ object Limelight : Subsystem("Limelight") {
         get() = areaEntry.getDouble(0.0)
 
     var hasValidTarget = false
-        get() = targetValid.value.double == 1.0
+        get() = targetValidEntry.getDouble(0.0) == 1.0
 
     init {
         isCamEnabled = false
@@ -68,18 +68,18 @@ object Limelight : Subsystem("Limelight") {
 
 private val angles = doubleArrayOf(-150.0, -90.0, -30.0, 0.0, 30.0, 90.0, 150.0, 180.0)
 
-suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
+
+suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive"){
     Limelight.isCamEnabled = true
-    val translationPDController = PDController(0.02, 0.0) //0.03375
+    val translationPDController = PDController(0.035, 0.0)
     val distanceK = 20.0
     val smallestAngle = angles.minBy { (Drive.heading - it.degrees).wrap().asDegrees.absoluteValue }!!
     val kTurn = 0.0 //0.007
 
     periodic {
-//        val speed = sqrt(Limelight.area).linearMap(sqrt(0.4)..sqrt(8.5), 0.3..0.07)
-        val speed = sqrt(Limelight.area).linearMap(sqrt(0.4)..sqrt(8.5), 0.3..0.07)
+        val speed = sqrt(Limelight.area).linearMap(sqrt(0.4)..sqrt(8.5), 0.4..0.05)
 
-        val visionVector =
+        val visionVector = Vector2(translationPDController.update(Limelight.xTranslation), OI.driverController.leftTrigger * speed)
             Vector2(translationPDController.update(Limelight.xTranslation), OI.driverController.leftTrigger * speed)
         val turnError = (smallestAngle.degrees - Drive.heading).wrap()
         println("Target angle: $smallestAngle, error: $turnError")

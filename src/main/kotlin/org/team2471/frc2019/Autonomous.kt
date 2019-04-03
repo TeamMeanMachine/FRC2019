@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlinx.coroutines.coroutineScope
 import org.team2471.frc.lib.control.PDController
 import org.team2471.frc.lib.coroutines.delay
+import org.team2471.frc.lib.coroutines.halt
 import org.team2471.frc.lib.coroutines.parallel
 import org.team2471.frc.lib.coroutines.suspendUntil
 import org.team2471.frc.lib.framework.use
@@ -16,6 +17,8 @@ import org.team2471.frc.lib.motion.following.driveAlongPath
 import org.team2471.frc.lib.motion.following.driveAlongPathWithStrafe
 import org.team2471.frc.lib.motion_profiling.Autonomi
 import org.team2471.frc.lib.util.measureTimeFPGA
+import org.team2471.frc2019.actions.autoIntakeHatch
+import org.team2471.frc2019.actions.autoScoreHigh
 import org.team2471.frc2019.actions.intakeHatch
 import org.team2471.frc2019.actions.scoreHigh
 import java.io.File
@@ -113,30 +116,55 @@ private suspend fun rocketAuto() = coroutineScope {
     val auto = autonomi["Rocket Auto"]
     auto.isMirrored = false
     println("DAB ON THE HATERS")
-    val translationPDController = PDController(0.025, 0.0)
-    val timer = Timer()
-    timer.start()
+    val translationPDController = PDController(0.015, 0.0)
     parallel({
         Drive.driveAlongPathWithStrafe(auto["Platform to Rocket"], true, 0.0,
             { if (Limelight.area > 3.0) 1.0 else 0.0 },
             { translationPDController.update(Limelight.xTranslation) },
-            { Limelight.targetValid.value.boolean && Limelight.area > Limelight.HIGH_HATCH_AREA })
+            { Limelight.hasValidTarget && Limelight.area > Limelight.HIGH_HATCH_AREA })
         println("Drive done")
     }, {
-        suspendUntil { timer.get() > 1.0 }
-        scoreHigh()
+        delay(1.0)
+        autoScoreHigh()
+
     })
 
     parallel({
         Drive.driveAlongPathWithStrafe(auto["Rocket to Feeder Station"], false, 0.0,
-            { if (Limelight.area > 3.0) 1.0 else 0.0 },
+            { time ->  if (auto["Rocket to Feeder Station"].easeCurve.getValue(time) > 0.5
+                && Limelight.hasValidTarget
+                && (Limelight.area > 3.0)) 1.0 else 0.0 },
             { translationPDController.update(Limelight.xTranslation) },
-            { Limelight.targetValid.value.boolean && Limelight.area > Limelight.LOW_HATCH_AREA })
+            { Limelight.hasValidTarget && Limelight.area > Limelight.LOW_HATCH_AREA })
     }, {
-        suspendUntil { timer.get() > 1.0 }
-        intakeHatch()
+        delay(1.5)
+        autoIntakeHatch()
     })
 
+    parallel({
+        Drive.driveAlongPathWithStrafe(auto["Feeder Station to Back Rocket"], false, 0.0,
+            { time ->  if (auto["Feeder Station to Back Rocket"].easeCurve.getValue(time) > 0.8
+                && Limelight.hasValidTarget
+                && (Limelight.area > 3.0)) 1.0 else 0.0 },
+            { translationPDController.update(Limelight.xTranslation) },
+            { Limelight.hasValidTarget && Limelight.area > Limelight.HIGH_HATCH_AREA })
+    }, {
+        delay(3.0)
+        autoScoreHigh()
+    })
+
+    parallel({
+        Drive.driveAlongPathWithStrafe(auto["Back Rocket to Cargoship"], false, 0.0,
+            { time ->  if (auto["Back Rocket to Cargoship"].easeCurve.getValue(time) > 0.8
+                && Limelight.hasValidTarget
+                && (Limelight.area > 3.0)) 1.0 else 0.0 },
+            { translationPDController.update(Limelight.xTranslation) },
+            { Limelight.hasValidTarget && Limelight.area > Limelight.LOW_HATCH_AREA })
+    }, {
+        delay(1.0)
+        Armavator.intake(0.6)
+        goToPose(Pose.HATCH_LOW)
+    })
     //Armavator.isPinching = true
-    delay(0.5)
+    delay(Double.POSITIVE_INFINITY)
 }
