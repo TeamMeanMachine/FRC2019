@@ -6,12 +6,15 @@ import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlinx.coroutines.coroutineScope
+import org.team2471.frc.lib.control.PDController
 import org.team2471.frc.lib.coroutines.delay
 import org.team2471.frc.lib.coroutines.parallel
 import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.motion.following.driveAlongPath
+import org.team2471.frc.lib.motion.following.driveAlongPathWithStrafe
 import org.team2471.frc.lib.motion_profiling.Autonomi
 import org.team2471.frc.lib.util.measureTimeFPGA
+import sun.security.util.Length
 import java.io.File
 
 private lateinit var autonomi: Autonomi
@@ -106,14 +109,12 @@ object AutoChooser {
 private suspend fun rocketAuto() = coroutineScope {
     val auto = autonomi["Rocket Auto"]
     auto.isMirrored = false
+    val translationPDController = PDController(0.033, 0.0) //0.03375
+    Drive.driveAlongPathWithStrafe(auto["Platform to Rocket"], true, 0.0,
+        { if (Limelight.area < 3.0) 1.0 else 0.0 },
+        { translationPDController.update(Limelight.xTranslation) },
+        { Limelight.area < Limelight.HIGH_HATCH_AREA })
 
-    parallel({
-        Drive.driveAlongPath(auto["Platform to Rocket"], true, 0.0)
-    }, {
-        if (Limelight.hasValidTarget) {
-            autonomousVisionDrive(0.3)
-        }
-    })
     //Armavator.isPinching = true
     delay(0.5)
 }
