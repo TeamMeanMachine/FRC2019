@@ -51,7 +51,7 @@ object AutoChooser {
 
     val autonomousChooser = SendableChooser<suspend () -> Unit>().apply {
         setDefaultOption("None", null)
-        addOption("Oregon City", ::oregonCity)
+        addOption("Rocket Auto", ::rocketAuto)
         addOption("Tests", ::testAuto)
     }
 
@@ -114,12 +114,21 @@ private suspend fun rocketAuto() = coroutineScope {
     val auto = autonomi["Rocket Auto"]
     auto.isMirrored = false
     val translationPDController = PDController(0.033, 0.0) //0.03375
+    println("Went through Rocket Auto")
     Drive.driveAlongPathWithStrafe(auto["Platform to Rocket"], true, 0.0,
         { if (Limelight.area < 3.0) 1.0 else 0.0 },
         { translationPDController.update(Limelight.xTranslation) },
-        { Limelight.area < Limelight.HIGH_HATCH_AREA })
+        { Limelight.targetValid.value.boolean && Limelight.area > Limelight.HIGH_HATCH_AREA })
 
     //Armavator.isPinching = true
     delay(0.5)
+}
+
+suspend fun AutoChooser.autonomous() = use(Drive) {
+    val nearSide = sideChooser.selected
+    startingSide = nearSide
+
+    val autoEntry = autonomousChooser.selected
+    autoEntry.invoke()
 }
 

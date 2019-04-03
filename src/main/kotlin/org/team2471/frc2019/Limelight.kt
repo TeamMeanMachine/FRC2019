@@ -27,7 +27,7 @@ object Limelight : Subsystem("Limelight") {
     private val areaEntry = table.getEntry("ta")
     private val camModeEntry = table.getEntry("camMode")
     private val ledModeEntry = table.getEntry("ledMode")
-    private val targetValid = table.getEntry("tv")
+    val targetValid = table.getEntry("tv")
 
     var isCamEnabled = false
         set(value) {
