@@ -116,7 +116,7 @@ private val angles = doubleArrayOf(-150.0, -90.0, -30.0, 0.0, 30.0, 90.0, 150.0,
 
 suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
     Limelight.isCamEnabled = true
-    val translationPDController = PDController(0.035, 0.0)
+    val translationPDController = PDController(0.033, 0.0)
     val distanceK = 20.0
     val smallestAngle = angles.minBy { (Drive.heading - it.degrees).wrap().asDegrees.absoluteValue }!!
     val kTurn = 0.0 //0.007
@@ -134,7 +134,7 @@ suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
             OI.driveTranslation,
             OI.driveRotation,
             SmartDashboard.getBoolean("Use Gyro", true) && !DriverStation.getInstance().isAutonomous,
-            OI.operatorTranslation + visionVector,
+            (OI.operatorTranslation + visionVector),
             OI.operatorRotation + turnError.asDegrees * kTurn
         )
     }

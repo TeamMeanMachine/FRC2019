@@ -146,11 +146,11 @@ private suspend fun rocketAuto() = coroutineScope {
         Drive.driveAlongPathWithStrafe(auto["Feeder Station to Back Rocket"], false, 0.0,
             { time ->  if (auto["Feeder Station to Back Rocket"].easeCurve.getValue(time) > 0.8
                 && Limelight.hasValidTarget
-                && (Limelight.area > 3.0)) 1.0 else 0.0 },
+                && (Limelight.area > 3.0)) 1.0 else 0.0},
             { translationPDController.update(Limelight.xTranslation) },
             { Limelight.hasValidTarget && Limelight.isAtTarget(ScoringPosition.ROCKET_HIGH) && timer.get() > 3.25})
     }, {
-        delay(2.5)
+        delay(2.15)
         goToPose(Pose.HATCH_HIGH)
     })
 

@@ -62,13 +62,13 @@ private suspend fun score(position: ScoringPosition, isAuto: Boolean) {
                 Armavator.isCarryingBall = true
                 suspendUntil { OI.usePiece }
                 val placePosition = Drive.position
+                Armavator.isCarryingBall = false
 
                 periodic {
                     Armavator.intake(OI.driverController.rightTrigger * -1.0)
 
                     if (Drive.position.distance(placePosition) > 0.5) stop()
                 }
-                Armavator.isCarryingBall = false
                 Armavator.intake(0.0)
 
             }

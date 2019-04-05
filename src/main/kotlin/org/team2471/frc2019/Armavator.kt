@@ -177,7 +177,7 @@ object Armavator : Subsystem("Armavator") {
     override suspend fun default() {
         periodic {
             if (isCarryingBall) {
-                intake(0.3)
+                intake(0.15)
             }
         }
     }
@@ -213,7 +213,6 @@ object Armavator : Subsystem("Armavator") {
 
     override fun reset() {
         isClimbing = false
-        isCarryingBall = false
         intake(0.0)
     }
 }
