@@ -130,8 +130,8 @@ private suspend fun rocketAuto() = coroutineScope {
 
     timer.reset()
     parallel({
-        Drive.driveAlongPathWithStrafe(auto["Rocket to Feeder Station"], false, 0.0,
-            { time ->  if (auto["Rocket to Feeder Station"].easeCurve.getValue(time) > 0.5
+        Drive.driveAlongPathWithStrafe(auto["Rocket to Feeder Station 2"], false, 0.0,
+            { time ->  if (auto["Rocket to Feeder Station 2"].easeCurve.getValue(time) > 0.5
                 && Limelight.hasValidTarget
                 && (Limelight.area > 3.0)) 1.0 else 0.0 },
             { translationPDController.update(Limelight.xTranslation) },
