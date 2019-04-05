@@ -10,10 +10,10 @@ data class Pose(val elevatorHeight: Length, val armAngle: Angle) {
 
         //        val STARTING_POSITION = Pose(0.inches, (-74).degrees, 145.degrees, true)
         val HOME = Pose(2.inches, (-74).degrees)
-        val HATCH_LOW = Pose((-9).inches, (-46).degrees) //0, -63
-        val HATCH_MED = Pose((-10).inches, 25.degrees)
-        val HATCH_HIGH = Pose(5.inches, 48.degrees)
-        val HATCH_FEEDER_PICKUP = Pose((-5).inches, (-48).degrees)
+        val HATCH_LOW = Pose((-9).inches, (-51).degrees) //0, -63
+        val HATCH_MED = Pose((-10).inches, 10.degrees) //15
+        val HATCH_HIGH = Pose(1.inches, 48.degrees) //5
+        val HATCH_FEEDER_PICKUP = Pose((-7).inches, (-48).degrees)
 
         val BEFORE_BEFORE_CLIMB = Pose((-8.5).inches, 45.degrees)
         val BEFORE_CLIMB = Pose((-8.5).inches, 20.degrees)
@@ -29,8 +29,8 @@ data class Pose(val elevatorHeight: Length, val armAngle: Angle) {
 
         val CARGO_GROUND_PICKUP = Pose((-9.5).inches, (-56.5).degrees)
         val CARGO_LOW = Pose(7.inches, (-40).degrees)
-        val CARGO_MED = Pose((0).inches, (32).degrees)
-        val CARGO_HIGH = Pose(17.inches, (57).degrees)
+        val CARGO_MED = Pose((-3).inches, (32).degrees)
+        val CARGO_HIGH = Pose(14.inches, (57).degrees)
         val CARGO_SHIP_SCORE = Pose((-9).inches, (20).degrees)
     }
 }

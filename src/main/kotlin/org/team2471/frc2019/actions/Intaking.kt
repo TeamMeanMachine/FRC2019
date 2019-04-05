@@ -25,9 +25,9 @@ suspend fun intakeHatch() = use(Armavator) {
     Armavator.isExtending = true
     goToPose(Pose.HATCH_FEEDER_PICKUP)
 //    suspendUntil { Math.abs(Armavator.angleSetpoint.asDegrees - Armavator.angle.asDegrees) < 2.0 }
-    suspendUntil { Limelight.area > 6.5 || OI.usePiece }
+    suspendUntil { Limelight.isAtTarget() || OI.usePiece }
     Armavator.isPinching = false
-    delay(0.5)
+    delay(0.75)
     Armavator.isExtending = false
     Armavator.intake(-0.2)
     Drive.driveTime(Vector2(0.0, -0.4), 0.75.seconds)
@@ -40,7 +40,7 @@ suspend fun autoIntakeHatch() = use(Armavator) {
     Armavator.isExtending = true
     goToPose(Pose.HATCH_FEEDER_PICKUP)
 //    suspendUntil { Math.abs(Armavator.angleSetpoint.asDegrees - Armavator.angle.asDegrees) < 2.0 }
-    suspendUntil { Limelight.area > 6.5 || OI.usePiece }
+    suspendUntil { Limelight.isAtTarget() || OI.usePiece }
     Armavator.isPinching = false
     delay(0.5)
     Armavator.isExtending = false

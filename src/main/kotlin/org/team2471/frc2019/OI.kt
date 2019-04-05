@@ -80,6 +80,7 @@ object OI {
         }
         driverController::back.whenTrue { Drive.zeroGyro() }
         ({ driverController.leftTrigger > 0.1 }).whileTrue{ visionDrive() }
+        driverController::start.whenTrue { panic() }
         //  ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }
 
 //        driverController::y.whenTrue {

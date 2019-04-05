@@ -48,10 +48,10 @@ private suspend fun score(position: ScoringPosition, isAuto: Boolean) {
                 suspendUntil {
                     //This is the best line of code I have ever written.
                     //-Justine
-                    ((Limelight.area > ((if (position == ScoringPosition.ROCKET_MED) 6.25 else 8.5))
-                            && OI.driverController.leftTrigger > 0.2) || OI.usePiece) || (isAuto && (Limelight.area
-                            > ((if (position == ScoringPosition.ROCKET_MED) 6.25 else 8.3))))
+//                    ((Limelight.isAtTarget(position) && OI.driverController.leftTrigger > 0.2) || OI.usePiece) ||
+//                            (isAuto && (Limelight.area > ((if (position == ScoringPosition.ROCKET_MED) Limelight.MED_HATCH_AREA else 8.3))))
                     //don't think about it too hard
+                    OI.driverController.rightTrigger > 0.2 /*|| (OI.driverController.leftTrigger > 0.2 && Limelight.isAtTarget(position)) */
                 }
                 Armavator.isExtending = true
                 Armavator.isPinching = true
@@ -84,66 +84,16 @@ private suspend fun score(position: ScoringPosition, isAuto: Boolean) {
     }
 }
 
-private suspend fun autoScore(position: ScoringPosition) {
+suspend fun placeHatch() {
 //    val gamePiece = Armavator.gamePiece ?: return
-    val gamePiece = when (OI.operatorController.dPad) {
-        Controller.Direction.LEFT -> GamePiece.CARGO
-        Controller.Direction.RIGHT -> GamePiece.HATCH_PANEL
-        else -> if (Armavator.isCarryingHatch) GamePiece.HATCH_PANEL else GamePiece.CARGO
-    }
-
     use(Armavator, name = "Score") {
-        val scorePose = when (gamePiece) {
-            GamePiece.HATCH_PANEL -> when (position) {
-                ScoringPosition.ROCKET_LOW -> Pose.HATCH_LOW
-                ScoringPosition.ROCKET_MED -> Pose.HATCH_MED
-                ScoringPosition.ROCKET_HIGH -> Pose.HATCH_HIGH
-                ScoringPosition.CARGO_SHIP -> Pose.HATCH_LOW
-            }
-            GamePiece.CARGO -> when (position) {
-                ScoringPosition.ROCKET_LOW -> Pose.CARGO_LOW
-                ScoringPosition.ROCKET_MED -> Pose.CARGO_MED
-                ScoringPosition.ROCKET_HIGH -> Pose.CARGO_HIGH
-                ScoringPosition.CARGO_SHIP -> Pose.CARGO_SHIP_SCORE
-            }
-        }
+        Armavator.isExtending = true
+        Armavator.isPinching = true
+        delay(0.5)
+        Armavator.isExtending = false
 
-        goToPose(scorePose)
-
-        when (gamePiece) {
-            GamePiece.HATCH_PANEL -> {
-//                suspendUntil { Math.abs(Armavator.angleSetpoint.asDegrees - Armavator.angle.asDegrees) < 2.0 }
-                suspendUntil {
-                    /*Limelight.area > (if (position == ScoringPosition.ROCKET_MED) 6.25
-                     else 9.0) ||*/ OI.usePiece
-                }
-                Armavator.isExtending = true
-                Armavator.isPinching = true
-                delay(0.5)
-                Armavator.isExtending = false
-            }
-            GamePiece.CARGO -> {
-                Armavator.isCarryingBall = true
-                suspendUntil { OI.usePiece }
-                val placePosition = Drive.position
-
-                periodic {
-                    Armavator.intake(OI.driverController.rightTrigger * -1.0)
-
-                    if (Drive.position.distance(placePosition) > 0.5) stop()
-                }
-                Armavator.isCarryingBall = false
-                Armavator.intake(0.0)
-
-            }
-        }
-
-        val placePosition = Drive.position
-        val placeHeading = Drive.heading
-        suspendUntil { Drive.position.distance(placePosition) > 1.5 || abs(Drive.heading.asDegrees - placeHeading.asDegrees) > 60.0 }
-        goToPose(Pose.HOME)
     }
 }
 
 
-private enum class ScoringPosition { ROCKET_LOW, ROCKET_MED, ROCKET_HIGH, CARGO_SHIP }
+enum class ScoringPosition { ROCKET_LOW, ROCKET_MED, ROCKET_HIGH, CARGO_SHIP }

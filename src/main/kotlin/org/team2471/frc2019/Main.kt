@@ -32,6 +32,7 @@ object Robot: RobotProgram {
     }
 
     override suspend fun enable() {
+        Limelight.ledEnabled = true
         Armavator.heightSetpoint = Armavator.height
         Armavator.angleSetpoint = Armavator.angle
         if (Armavator.height.asInches < 0.0) Armavator.reset()
@@ -86,6 +87,7 @@ object Robot: RobotProgram {
     }
 
     override suspend fun disable() {
+//        Limelight.ledEnabled = false
         Armavator.disable()
         Drive.disable()
         OB.disable()
