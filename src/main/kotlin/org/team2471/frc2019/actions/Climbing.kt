@@ -141,12 +141,34 @@ suspend fun climb() = use(Armavator, OB) {
         }
 
         val timer = Timer().apply { start() }
+        val gyroAngle = Drive.heading
+        var leftIncrease = 0.0.degrees
+        var rightIncrease = 0.0.degrees
         use(Drive) {
             periodic {
                 val time = timer.get()//.coerceAtMost(2.0)
                 Armavator.heightSetpoint = elevatorCurve.getValue(time).inches
-                OB.climb(obCurve.getValue(time).degrees)
                 Armavator.angleSetpoint = armCurve.getValue(time).degrees
+                OB.climbLeft(obCurve.getValue(time).degrees + leftIncrease)
+                OB.climbRight(obCurve.getValue(time).degrees + rightIncrease)
+
+                if (obCurve.getValue(time).degrees < 2.0.degrees) {
+                    val error = (gyroAngle - Drive.heading).wrap()
+                    if (Math.abs(error.asDegrees) > 2.0){
+                        if (error > 0.0.degrees) {
+                            leftIncrease = 2.0.degrees
+
+                        } else {
+                            rightIncrease = 2.0.degrees
+                        }
+                    } else {
+                        leftIncrease = 0.0.degrees
+                        rightIncrease = 0.0.degrees
+                    }
+
+                }
+
+
 
                 OB.climbDrive(1.0)
                 Drive.drive(Vector2(0.0, 0.45), 0.0, fieldCentric = false)
@@ -179,7 +201,10 @@ suspend fun climb() = use(Armavator, OB) {
             periodic {
                 val time = timer2.get()//.coerceAtMost(2.0)
                 OB.climbDrive(1.0)
-                Drive.drive(Vector2(0.0, OI.driveClimbDrive), 0.0, false)
+                Drive.drive(OI.driveTranslation.apply {
+                    x /= 2
+                    y = y.coerceAtMost(0.0)
+                }, 0.0)
                 Armavator.heightSetpoint = elevatorCurve2.getValue(time).inches
                 Armavator.angleSetpoint = armCurve2.getValue(time).degrees
                 OB.angleSetpoint = obCurve2.getValue(time).degrees
@@ -256,7 +281,10 @@ suspend fun climb2() = use(Armavator, OB) {
                 OB.climbDrive(1.0)
                 Armavator.heightSetpoint = elevatorCurve2.getValue(time).inches
                 Armavator.angleSetpoint = armCurve2.getValue(time).degrees
-                Drive.drive(Vector2(0.0, OI.driveClimbDrive), 0.0, false)
+                Drive.drive(OI.driveTranslation.apply {
+                    x /= 2
+                    y = y.coerceAtMost(0.0)
+                }, OI.driveRotation * 0.75)
                 if (OI.driverController.b)
                     stop()
             }
