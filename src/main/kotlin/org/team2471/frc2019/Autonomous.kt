@@ -150,7 +150,7 @@ private suspend fun rocketAuto() = coroutineScope {
             { translationPDController.update(Limelight.xTranslation) },
             { Limelight.hasValidTarget && Limelight.isAtTarget(ScoringPosition.ROCKET_HIGH) && timer.get() > 3.25})
     }, {
-        delay(2.15)
+        delay(2.5)
         goToPose(Pose.HATCH_HIGH)
     })
 
