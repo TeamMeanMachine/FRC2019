@@ -76,6 +76,14 @@ object OB : Subsystem("OB") {
         rightPivotMotor.setPositionSetpoint(angleSetpoint.asDegrees, -0.35)
     }
 
+    fun climbLeft(angleSetpoint: Angle) {
+        leftPivotMotor.setPositionSetpoint(angleSetpoint.asDegrees, -0.35)
+    }
+
+    fun climbRight(angleSetpoint: Angle) {
+        rightPivotMotor.setPositionSetpoint(angleSetpoint.asDegrees, -0.35)
+    }
+
     fun climbDrive(power: Double) {
         climbDriveMotors.setPercentOutput(power)
     }

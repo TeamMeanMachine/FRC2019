@@ -106,7 +106,9 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 
             val headingEntry = table.getEntry("Heading")
 
-            /*
+            val xEntry = table.getEntry("X")
+            val yEntry = table.getEntry("Y")
+
             val flAngleEntry = table.getEntry("Front Left Angle")
             val frAngleEntry = table.getEntry("Front Right Angle")
             val blAngleEntry = table.getEntry("Back Left Angle")
@@ -121,22 +123,25 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             val blErrorEntry = table.getEntry("Back Left Error")
             val brErrorEntry = table.getEntry("Back Right Error")
 
-        */
             periodic {
-                /* flAngleEntry.setDouble(frontLeftModule.angle.asDegrees)
-                   frAngleEntry.setDouble(frontRightModule.angle.asDegrees)
-                   blAngleEntry.setDouble(backLeftModule.angle.asDegrees)
-                   brAngleEntry.setDouble(backRightModule.angle.asDegrees)
-                   flSPEntry.setDouble(frontLeftModule.setPoint.asDegrees)
-                   frSPEntry.setDouble(frontRightModule.setPoint.asDegrees)
-                   blSPEntry.setDouble(backLeftModule.setPoint.asDegrees)
-                   brSPEntry.setDouble(backRightModule.setPoint.asDegrees)
+                flAngleEntry.setDouble(modules[0].angle.asDegrees)
+                   frAngleEntry.setDouble(modules[1].angle.asDegrees)
+                   blAngleEntry.setDouble(modules[2].angle.asDegrees)
+                   brAngleEntry.setDouble(modules[3].angle.asDegrees)
+                   flSPEntry.setDouble(modules[0].speed)
+                   frSPEntry.setDouble(modules[1].speed)
+                   blSPEntry.setDouble(modules[2].speed)
+                   brSPEntry.setDouble(modules[3].speed)
 
-                   flErrorEntry.setDouble(frontLeftModule.error.asDegrees)
-                   frErrorEntry.setDouble(frontRightModule.error.asDegrees)
-                   blErrorEntry.setDouble(backLeftModule.error.asDegrees)
-                   brErrorEntry.setDouble(backRightModule.error.asDegrees)*/
+//                   flErrorEntry.setDouble(frontLeftModule.error.asDegrees)
+//                   frErrorEntry.setDouble(frontRightModule.error.asDegrees)
+//                   blErrorEntry.setDouble(backLeftModule.error.asDegrees)
+//                   brErrorEntry.setDouble(backRightModule.error.asDegrees)
 
+                val (x, y) = position
+
+                xEntry.setDouble(x)
+                yEntry.setDouble(y)
                 headingEntry.setDouble(heading.asDegrees)
             }
         }
@@ -148,11 +153,10 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         val limelightTable = NetworkTableInstance.getDefault().getTable("limelight")
         val xEntry = limelightTable.getEntry("tx")
         val angleEntry = limelightTable.getEntry("ts")
-/*
         val table = NetworkTableInstance.getDefault().getTable(name)
         val positionXEntry = table.getEntry("positionX")
         val positionYEntry = table.getEntry("positionY")
-*/
+
         periodic {
             drive(
                 OI.driveTranslation,
@@ -238,33 +242,33 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             }
             driveMotor.config {
                 inverted(isBack)
-                sensorPhase(isBack)
+//                sensorPhase(isBack)
                 brakeMode()
                 feedbackCoefficient = 1 / (4687.5 * 20.0 / 12.0)
                 currentLimit(30, 0, 0)
                 openLoopRamp(0.15)
             }
-            GlobalScope.launch(MeanlibDispatcher) {
-                val table = NetworkTableInstance.getDefault().getTable(name)
-                val flAngleEntry = table.getEntry("Front Left Angle")
-                val frAngleEntry = table.getEntry("Front Right Angle")
-                val blAngleEntry = table.getEntry("Back Left Angle")
-                val brAngleEntry = table.getEntry("Back Right Angle")
-//                val flSPEntry = table.getEntry("Front Left SP")
-//                val frSPEntry = table.getEntry("Front Right SP")
-//                val blSPEntry = table.getEntry("Back Left SP")
-//                val brSPEntry = table.getEntry("Back Right SP")
-                periodic {
-                    flAngleEntry.setDouble(modules[0].angle.asDegrees)
-                    frAngleEntry.setDouble(modules[1].angle.asDegrees)
-                    blAngleEntry.setDouble(modules[2].angle.asDegrees)
-                    brAngleEntry.setDouble(modules[3].angle.asDegrees)
+//            GlobalScope.launch(MeanlibDispatcher) {
+//                val table = NetworkTableInstance.getDefault().getTable(name)
+//                val flAngleEntry = table.getEntry("Front Left Angle")
+//                val frAngleEntry = table.getEntry("Front Right Angle")
+//                val blAngleEntry = table.getEntry("Back Left Angle")
+//                val brAngleEntry = table.getEntry("Back Right Angle")
+//                val flSPEntry = table.getEntry("Front Left Speed")
+//                val frSPEntry = table.getEntry("Front Right Speed)
+//                val blSPEntry = table.getEntry("Back Left Speed")
+//                val brSPEntry = table.getEntry("Back Right Speed")
+//                periodic {
+//                    flAngleEntry.setDouble(modules[0].angle.asDegrees)
+//                    frAngleEntry.setDouble(modules[1].angle.asDegrees)
+//                    blAngleEntry.setDouble(modules[2].angle.asDegrees)
+//                    brAngleEntry.setDouble(modules[3].angle.asDegrees)
 //                    flSPEntry.setDouble(modules[0].setPoint.asDegrees)
 //                    frSPEntry.setDouble(modules[1].setPoint.asDegrees)
 //                    blSPEntry.setDouble(modules[2].setPoint.asDegrees)
 //                    brSPEntry.setDouble(modules[3].setPoint.asDegrees)
-                }
-            }
+//                }
+//            }
         }
 
         override fun driveWithDistance(angle: Angle, distance: Length) {
