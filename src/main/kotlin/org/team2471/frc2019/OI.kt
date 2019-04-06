@@ -1,5 +1,8 @@
 package org.team2471.frc2019
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.team2471.frc.lib.coroutines.MeanlibDispatcher
 import org.team2471.frc.lib.input.*
 import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.math.cube
@@ -107,8 +110,12 @@ object OI {
         operatorController::y.whenTrue { scoreHigh() }
         operatorController::leftBumper.whenTrue{ Armavator.toggleExtention()}
         operatorController::rightBumper.whenTrue{ Armavator.togglePinching()}
-        ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }
-        ({ operatorController.dPad == Controller.Direction.DOWN }).whenTrue { climb2() }
+        ({ operatorController.dPad == Controller.Direction.UP }).whenTrue {
+            GlobalScope.launch(MeanlibDispatcher) { climb() }
+        }
+        ({ operatorController.dPad == Controller.Direction.DOWN }).whenTrue {
+            GlobalScope.launch(MeanlibDispatcher) { climb2() }
+        }
         ({operatorController.dPad == Controller.Direction.LEFT}).whenTrue{ Armavator.decrementOffset() }
         ({operatorController.dPad == Controller.Direction.RIGHT}).whenTrue{ Armavator.incrementOffset() }
         operatorController::start.whileTrue { Drive.turnToAngle(180.degrees) }
