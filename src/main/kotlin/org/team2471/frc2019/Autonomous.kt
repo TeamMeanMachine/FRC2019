@@ -118,9 +118,9 @@ private suspend fun cargoShipAuto() = coroutineScope {
     timer.start()
     parallel({
         Drive.driveAlongPathWithStrafe(auto["Platform to Cargo Ship"], true, 0.0,
-            { if (Limelight.area > 3.0) 1.0 else 0.0 },
+            { time -> if (Limelight.area > 3.0 && time > 4.0) 1.0 else 0.0 },
             { translationPDController.update(Limelight.xTranslation) },
-            { Limelight.hasValidTarget && Limelight.isAtTarget(ScoringPosition.CARGO_SHIP) })
+            { Limelight.hasValidTarget && Limelight.isAtTarget(ScoringPosition.CARGO_SHIP) && timer.get() > 4.0})
         println("Drive done")
     }, {
         delay(1.0)
@@ -139,7 +139,7 @@ private suspend fun cargoShipAuto() = coroutineScope {
                 ) 1.0 else 0.0
             },
             { translationPDController.update(Limelight.xTranslation) },
-            { Limelight.hasValidTarget && Limelight.isAtTarget() && timer.get() > 3.0 })
+            { Limelight.hasValidTarget && Limelight.isAtTarget() && timer.get() > 4.0 })
     }, {
         delay(1.5)
         autoIntakeHatch()
@@ -177,11 +177,11 @@ private suspend fun rocketAuto() = coroutineScope {
         Drive.driveAlongPathWithStrafe(auto["Platform to Rocket"], true, 0.0,
             { if (Limelight.area > 3.0) 1.0 else 0.0 },
             { translationPDController.update(Limelight.xTranslation) },
-            { Limelight.hasValidTarget && Limelight.isAtTarget(ScoringPosition.ROCKET_HIGH) })
+            { Limelight.hasValidTarget && Limelight.isAtTarget(ScoringPosition.ROCKET_LOW) })
         println("Drive done")
     }, {
         delay(1.0)
-        goToPose(Pose.HATCH_HIGH)
+        goToPose(Pose.HATCH_LOW)
     })
     placeHatch()
 
@@ -206,10 +206,10 @@ private suspend fun rocketAuto() = coroutineScope {
                 && Limelight.hasValidTarget
                 && (Limelight.area > 3.0)) 1.0 else 0.0},
             { translationPDController.update(Limelight.xTranslation) },
-            { Limelight.hasValidTarget && Limelight.isAtTarget(ScoringPosition.ROCKET_HIGH) && timer.get() > 3.25})
+            { Limelight.hasValidTarget && Limelight.isAtTarget(ScoringPosition.ROCKET_LOW) && timer.get() > 3.25})
     }, {
         delay(2.5)
-        goToPose(Pose.HATCH_HIGH)
+        goToPose(Pose.HATCH_LOW)
     })
 
     placeHatch()
