@@ -9,15 +9,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlinx.coroutines.coroutineScope
 import org.team2471.frc.lib.control.PDController
 import org.team2471.frc.lib.coroutines.delay
-import org.team2471.frc.lib.coroutines.halt
 import org.team2471.frc.lib.coroutines.parallel
-import org.team2471.frc.lib.coroutines.suspendUntil
 import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.motion.following.driveAlongPath
 import org.team2471.frc.lib.motion.following.driveAlongPathWithStrafe
 import org.team2471.frc.lib.motion_profiling.Autonomi
 import org.team2471.frc.lib.util.measureTimeFPGA
-import org.team2471.frc2019.actions.*
+import org.team2471.frc2019.actions.ScoringPosition
+import org.team2471.frc2019.actions.autoIntakeHatch
+import org.team2471.frc2019.actions.placeHatch
 import java.io.File
 
 private lateinit var autonomi: Autonomi
@@ -55,6 +55,7 @@ object AutoChooser {
     private val autonomousChooser = SendableChooser<suspend () -> Unit>().apply {
         setDefaultOption("None", null)
         addOption("Rocket Auto", ::rocketAuto)
+        addOption("Cargo Auto", ::cargoShipAuto)
         addOption("Tests", ::testAuto)
     }
 
@@ -108,6 +109,63 @@ object AutoChooser {
     }
 
 }
+
+private suspend fun cargoShipAuto() = coroutineScope {
+    val auto = autonomi["Cargo Auto"]
+    auto.isMirrored = startingSide == Side.LEFT
+    val translationPDController = PDController(0.015, 0.0)
+    val timer = Timer()
+    timer.start()
+    parallel({
+        Drive.driveAlongPathWithStrafe(auto["Platform to Cargo Ship"], true, 0.0,
+            { if (Limelight.area > 3.0) 1.0 else 0.0 },
+            { translationPDController.update(Limelight.xTranslation) },
+            { Limelight.hasValidTarget && Limelight.isAtTarget(ScoringPosition.CARGO_SHIP) })
+        println("Drive done")
+    }, {
+        delay(1.0)
+        goToPose(Pose.HATCH_LOW)
+    })
+    placeHatch()
+
+
+    timer.reset()
+    parallel({
+        Drive.driveAlongPathWithStrafe(auto["Cargo Ship to Feeder Station"], false, 0.0,
+            { time ->
+                if (auto["Cargo Ship to Feeder Station"].easeCurve.getValue(time) > 0.5
+                    && Limelight.hasValidTarget
+                    && (Limelight.area > 3.0)
+                ) 1.0 else 0.0
+            },
+            { translationPDController.update(Limelight.xTranslation) },
+            { Limelight.hasValidTarget && Limelight.isAtTarget() && timer.get() > 3.0 })
+    }, {
+        delay(1.5)
+        autoIntakeHatch()
+    })
+
+    timer.reset()
+    parallel({
+        Drive.driveAlongPathWithStrafe(auto["Feeder Station to Cargo Ship"], false, 0.0,
+            { time ->
+                if (auto["Feeder Station to Cargo Ship"].easeCurve.getValue(time) > 0.8
+                    && Limelight.hasValidTarget
+                    && (Limelight.area > 3.0)
+                ) 1.0 else 0.0
+            },
+            { translationPDController.update(Limelight.xTranslation) },
+            { Limelight.hasValidTarget && Limelight.isAtTarget(ScoringPosition.CARGO_SHIP) && timer.get() > 3.25 })
+    }, {
+        delay(2.5)
+        goToPose(Pose.HATCH_LOW)
+    })
+
+    placeHatch()
+
+    delay(Double.POSITIVE_INFINITY)
+}
+
 
 private suspend fun rocketAuto() = coroutineScope {
     val auto = autonomi["Rocket Auto"]
