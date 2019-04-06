@@ -19,7 +19,6 @@ import org.team2471.frc2019.*
 private var isClimbing = false
 
 suspend fun climb() {
-    println("Climbing: $isClimbing")
     if (isClimbing) return
     isClimbing = true
     use(Armavator, OB) {
@@ -117,7 +116,6 @@ suspend fun climb() {
 
             }
         } finally {
-            println("HAB1 null")
             isClimbing = false
             withContext(NonCancellable) {
                 OB.angleSetpoint = 180.degrees
@@ -131,7 +129,6 @@ suspend fun climb() {
 }
 
     suspend fun climb2() {
-        println("Climbing: $isClimbing")
         if (isClimbing) return
         isClimbing = true
         use(Armavator, OB) {
@@ -201,7 +198,6 @@ suspend fun climb() {
                     }
                 }
             } finally {
-                println("HAB 2 null")
                 isClimbing = false
                 withContext(NonCancellable) {
                     OB.angleSetpoint = 180.degrees
