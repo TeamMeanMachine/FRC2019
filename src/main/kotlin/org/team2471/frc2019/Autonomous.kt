@@ -118,7 +118,7 @@ private suspend fun cargoShipAuto() = coroutineScope {
     timer.start()
     parallel({
         Drive.driveAlongPathWithStrafe(auto["Platform to Cargo Ship"], true, 0.0,
-            { time -> if (Limelight.area > 3.0 && time > 4.0) 1.0 else 0.0 },
+            { time -> if (Limelight.area > 3.0 && time > 3.4) 1.0 else 0.0 },
             { translationPDController.update(Limelight.xTranslation) },
             { Limelight.hasValidTarget && Limelight.isAtTarget(ScoringPosition.CARGO_SHIP) && timer.get() > 4.0})
         println("Drive done")
