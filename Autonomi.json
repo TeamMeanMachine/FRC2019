@@ -3290,7 +3290,7 @@
 								"m_nextSlopeMethod": "SLOPE_SMOOTH",
 								"m_nextTangent": {
 									"x": 0.25,
-									"y": 16.363636363636363
+									"y": 13.636363636363637
 								},
 								"m_prevAngleAndMagnitude": {
 									"x": 0.0,
@@ -3299,7 +3299,7 @@
 								"m_prevSlopeMethod": "SLOPE_SMOOTH",
 								"m_prevTangent": {
 									"x": 2.5,
-									"y": 163.63636363636363
+									"y": 136.36363636363637
 								},
 								"m_timeAndValue": {
 									"x": 2.5,
@@ -3322,7 +3322,7 @@
 							},
 							"m_timeAndValue": {
 								"x": 0.0,
-								"y": 0.0
+								"y": 30.0
 							}
 						},
 						"m_maxValue": 1.7976931348623157E308,
@@ -3424,13 +3424,13 @@
 									"y": 0.041379310344827676
 								},
 								"m_timeAndValue": {
-									"x": 5.0,
+									"x": 6.0,
 									"y": 1.0
 								}
 							},
 							"m_nextSlopeMethod": "SLOPE_FLAT",
 							"m_nextTangent": {
-								"x": 5.0,
+								"x": 6.0,
 								"y": 0.0
 							},
 							"m_prevAngleAndMagnitude": {
@@ -3573,32 +3573,32 @@
 								},
 								"m_nextPoint": {
 									"m_nextAngleAndMagnitude": {
-										"x": -296.3661660834149,
+										"x": 62.53064940472967,
 										"y": 1.9
 									},
 									"m_nextSlopeMethod": "SLOPE_SMOOTH",
 									"m_nextTangent": {
-										"x": -9.04115485474082,
-										"y": 1.7763568394002505E-15
+										"x": -9.233112390391137,
+										"y": 0.16436038894889826
 									},
 									"m_position": {
-										"x": 2.9723374090049295,
-										"y": 25.17120404868356
+										"x": 2.869250562449845,
+										"y": 25.347334740055025
 									},
 									"m_prevAngleAndMagnitude": {
-										"x": -296.3661660834149,
-										"y": 3.197536312958928
+										"x": 62.53064940472967,
+										"y": 3.9032516915058095
 									},
 									"m_prevSlopeMethod": "SLOPE_SMOOTH",
 									"m_prevTangent": {
-										"x": -15.21548471532562,
-										"y": 1.7763568394002505E-15
+										"x": -18.967979766135503,
+										"y": 0.3376526137796523
 									}
 								},
 								"m_nextSlopeMethod": "SLOPE_SMOOTH",
 								"m_nextTangent": {
-									"x": 5.566689713974558,
-									"y": 22.369845702453286
+									"x": 5.577360686118281,
+									"y": 22.875117989201826
 								},
 								"m_position": {
 									"x": 7.198898117763384,
@@ -3610,8 +3610,8 @@
 								},
 								"m_prevSlopeMethod": "SLOPE_SMOOTH",
 								"m_prevTangent": {
-									"x": 2.9378842281816704,
-									"y": 11.805942176211513
+									"x": 2.8818633295612144,
+									"y": 11.819741881952362
 								}
 							},
 							"m_nextSlopeMethod": "SLOPE_SMOOTH",
