@@ -84,6 +84,38 @@ object Robot: RobotProgram {
 //
 //        OB1.animateToAngle(90.0.degrees)
 //        OB1.animateToAngle(0.degrees)
+
+//        use(Armavator) {
+//            val timer = Timer()
+//            timer.start()
+//            Armavator.elevatorMotors.setPercentOutput(-1.0)
+//            periodic {
+//                if (Armavator.height < -(18.0).inches)
+//                    stop()
+//            }
+//            Armavator.elevatorMotors.setPercentOutput(1.0)
+//            periodic {
+//                if (Armavator.height > 0.0.inches)
+//                    stop()
+//            }
+//            println("Elevator=${timer.get()}")
+//        }
+//
+//        use(OB) {
+//            val timer = Timer()
+//            timer.start()
+//            OB.leftPivotMotor.setPercentOutput(-1.0)
+//            periodic {
+//                if (OB.leftAngle<2.0.degrees)
+//                    stop()
+//            }
+//            OB.leftPivotMotor.setPercentOutput(1.0)
+//            periodic {
+//                if (OB.leftAngle>180.0.degrees)
+//                    stop()
+//            }
+//            println("OB=${timer.get()}")
+//        }
     }
 
     override suspend fun disable() {
@@ -92,6 +124,10 @@ object Robot: RobotProgram {
         Drive.disable()
         OB.disable()
         Limelight.disable()
+
+//        periodic {
+//            println(Drive.gyro!!.getNavX().pitch)
+//        }
 //        Jevois.disable()
 
 //            if (Jevois.target.isNotEmpty()) println(Jevois.target.joinToString())

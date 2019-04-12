@@ -19,7 +19,7 @@ import org.team2471.frc2019.Victors.OB_CLIMB_ROLLERS
 
 object OB : Subsystem("OB") {
     private val table = NetworkTableInstance.getDefault().getTable(name)
-    private val leftPivotMotor = MotorController(TalonID(OB_PIVOT_LEFT)).config {
+    val leftPivotMotor = MotorController(TalonID(OB_PIVOT_LEFT)).config {
         encoderType(FeedbackDevice.Analog)
         encoderContinuous(false)
         inverted(true)

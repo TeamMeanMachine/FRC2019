@@ -70,7 +70,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     //    private val gyro: SpinMaster16448? = SpinMaster16448()
 //  private val gyro: Gyro? = null
 //    private val gyro: Gyro? = ADISWrapper()
-    private val gyro: NavxWrapper? = NavxWrapper()
+    val gyro: NavxWrapper? = NavxWrapper()
 
     override var heading: Angle
         get() = gyroOffset - ((gyro?.angle ?: 0.0).degrees.wrap())

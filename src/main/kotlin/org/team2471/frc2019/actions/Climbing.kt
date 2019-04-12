@@ -44,24 +44,35 @@ suspend fun climb() {
 
             val timer = Timer().apply { start() }
             val gyroAngle = Drive.heading
+            val startingPitch = Drive.gyro!!.getNavX().pitch
             var leftIncrease = 0.0.degrees
             var rightIncrease = 0.0.degrees
             use(Drive) {
                 periodic {
                     val time = timer.get()//.coerceAtMost(2.0)
-                    Armavator.heightSetpoint = elevatorCurve.getValue(time).inches
+                    val pitchError = startingPitch - Drive.gyro!!.getNavX().pitch
+                    val elevatorOffset = pitchError * 2.0
+                    println("Elevator Offset=${elevatorOffset} Elevator Output=${Armavator.elevatorMotors.output}")
+//                    var elevatorSetpoint = (elevatorCurve.getValue(time) + elevatorOffset).coerceIn(Armavator.heightRange).inches
+//                    val positionError = elevatorSetpoint - Armavator.height
+//                    val kPHeight = 0.15
+//                    Armavator.elevatorMotors.setPercentOutput(positionError.asInches * kPHeight - 0.1)
+
+                    Armavator.heightSetpoint = elevatorCurve.getValue(time).inches + elevatorOffset.inches
                     Armavator.angleSetpoint = armCurve.getValue(time).degrees
                     OB.climbLeft(obCurve.getValue(time).degrees + leftIncrease)
                     OB.climbRight(obCurve.getValue(time).degrees + rightIncrease)
+                  //  println("Elevator Output${Armavator.elevatorMotors.output}")
+                  //  println("OB Output${OB.leftPivotMotor.output}")
 
-                    if (obCurve.getValue(time).degrees < 2.0.degrees) {
+                    if (obCurve.getValue(time).degrees < 5.0.degrees) {
                         val error = (gyroAngle - Drive.heading).wrap()
-                        if (Math.abs(error.asDegrees) > 2.0) {
+                        if (Math.abs(error.asDegrees) > 5.0) {
                             if (error > 0.0.degrees) {
-                                leftIncrease = 2.0.degrees
+                                rightIncrease = 5.0.degrees
 
                             } else {
-                                rightIncrease = 2.0.degrees
+                                leftIncrease = 5.0.degrees
                             }
                         } else {
                             leftIncrease = 0.0.degrees
@@ -81,6 +92,7 @@ suspend fun climb() {
 
                 }
                 Drive.stop()
+                Armavator.elevatorMotors.setPercentOutput(0.0)
             }
 
             val armCurve2 = MotionCurve().apply {

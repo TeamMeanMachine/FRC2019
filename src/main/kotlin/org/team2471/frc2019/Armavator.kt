@@ -37,8 +37,8 @@ object Armavator : Subsystem("Armavator") {
 
     private const val ELEVATOR_VELOCITY = 50.0
     private const val ELEVATOR_ACCELERATION = 120.0
-    private const val ELEVATOR_CLIMB_VELOCITY = 10.0
-    private const val ELEVATOR_CLIMB_ACCELERATION = 10.0
+    private const val ELEVATOR_CLIMB_VELOCITY = 50.0
+    private const val ELEVATOR_CLIMB_ACCELERATION = 120.0
 
     val elevatorMotors = MotorController(TalonID(ELEVATOR_MASTER), VictorID(ELEVATOR_SLAVE)).config {
         encoderType(FeedbackDevice.Analog)
@@ -50,7 +50,7 @@ object Armavator : Subsystem("Armavator") {
             motionMagic(ELEVATOR_ACCELERATION, ELEVATOR_VELOCITY)
         }
 
-        currentLimit(25, 0, 0)
+        currentLimit(40, 0, 0)
     }
 
     private val armMotors = MotorController(TalonID(ARM_MASTER), VictorID(ARM_SLAVE)).config {
@@ -100,7 +100,9 @@ object Armavator : Subsystem("Armavator") {
             field = value
         }
 
-    private val heightRange: DoubleRange
+    var isLifting = false
+
+    val heightRange: DoubleRange
         get() = if (!isClimbing) min(
             Pose.CARGO_GROUND_PICKUP.elevatorHeight.asInches,
             height.asInches
