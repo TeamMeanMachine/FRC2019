@@ -14,9 +14,12 @@ import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.math.linearMap
 import org.team2471.frc.lib.motion.following.drive
-import org.team2471.frc.lib.units.degrees
+import org.team2471.frc.lib.units.*
+import org.team2471.frc2019.Drive.gyro
 import org.team2471.frc2019.actions.ScoringPosition
 import kotlin.math.absoluteValue
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.math.sqrt
 
 object Limelight : Subsystem("Limelight") {
@@ -50,11 +53,19 @@ object Limelight : Subsystem("Limelight") {
         setDefaultDouble(7.3)
     }
 
+    val distance
+        get() = ((66.7 * 1/Math.sqrt(Limelight.area) + 7.03) / 12.0).feet
+
+    val targetAngle
+            get() = gyro!!.angle.degrees + xTranslation.degrees //verify that this changes? or is reasonablej
+
+    val targetPoint
+        get() = Vector2(distance.asFeet * sin(targetAngle.asRadians), distance.asFeet * cos(targetAngle.asRadians)) + Drive.position
     var isCamEnabled = false
         set(value) {
             field = value
 //            camModeEntry.setDouble(if (field) 0.0 else 1.0)
-//            ledModeEntry.setDouble(if (field) 0.0 else 1.0)
+//            ledModeEntry.setDouble(if (field) 0.0 else 1 .0)
             camModeEntry.setDouble(0.0)
 //            ledModeEntry.setDouble(0.0)
         }
@@ -124,7 +135,7 @@ suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
             Vector2(translationPDController.update(Limelight.xTranslation), OI.driverController.leftTrigger * speed)
         Vector2(translationPDController.update(Limelight.xTranslation), OI.driverController.leftTrigger * speed)
         val turnError = (smallestAngle.degrees - Drive.heading).wrap()
-        println("Target angle: $smallestAngle, error: $turnError")
+        //println("Target angle: $smallestAngle, error: $turnError")
 
         Drive.drive(
             OI.driveTranslation,

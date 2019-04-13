@@ -8,12 +8,13 @@ import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.math.cube
 import org.team2471.frc.lib.math.deadband
 import org.team2471.frc.lib.math.squareWithSign
+import org.team2471.frc.lib.motion.following.resetOdometry
 import org.team2471.frc.lib.motion_profiling.Path2D
 import org.team2471.frc.lib.units.degrees
 import org.team2471.frc2019.actions.*
 
-private val deadBandDriver = 0.05
-private val deadBandOperator = 0.150
+private val deadBandDriver = 0.1
+private val deadBandOperator = 0.15
 
 object OI {
     val driverController = XboxController(0)
@@ -80,7 +81,7 @@ object OI {
             Armavator.isExtending = false
             goToPose(Pose.HOME)
         }
-        driverController::back.whenTrue { Drive.zeroGyro() }
+        driverController::back.whenTrue { Drive.zeroGyro(); Drive.resetOdometry() }
         ({ driverController.leftTrigger > 0.1 }).whileTrue{ visionDrive() }
         driverController::start.whenTrue { panic() }
         //  ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }
