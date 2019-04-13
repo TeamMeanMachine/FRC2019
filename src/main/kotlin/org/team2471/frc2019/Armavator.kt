@@ -34,6 +34,7 @@ object Armavator : Subsystem("Armavator") {
     private const val ELEVATOR_FEED_FORWARD = 0.0
     const val ELEVATOR_HEIGHT = 21.5 //inches
     const val ARM_LENGTH = 28.0 //inches
+    const val HOLDING_INTAKE_POWER = 0.15
 
     private const val ELEVATOR_VELOCITY = 50.0
     private const val ELEVATOR_ACCELERATION = 120.0
@@ -177,7 +178,7 @@ object Armavator : Subsystem("Armavator") {
     override suspend fun default() {
         periodic {
             if (isCarryingBall) {
-                intake(0.15)
+                intake(HOLDING_INTAKE_POWER)
             }
         }
     }

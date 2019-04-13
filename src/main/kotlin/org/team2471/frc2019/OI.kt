@@ -76,7 +76,6 @@ object OI {
     init {
         // owen mappings
         driverController::leftBumper::toggleWhenTrue { intakeCargo() }
-        driverController::rightBumper::toggleWhenTrue { intakeHatch() }
         driverController::b.whenTrue {
             Armavator.isExtending = false
             goToPose(Pose.HOME)
@@ -108,8 +107,7 @@ object OI {
         operatorController::b.whenTrue { scoreMed() }
         operatorController::x.whenTrue { scoreCargoShip() }
         operatorController::y.whenTrue { scoreHigh() }
-        operatorController::leftBumper.whenTrue{ Armavator.toggleExtention()}
-        operatorController::rightBumper.whenTrue{ Armavator.togglePinching()}
+        operatorController::rightBumper::toggleWhenTrue { intakeHatch() }
         ({ operatorController.dPad == Controller.Direction.UP }).whenTrue {
             GlobalScope.launch(MeanlibDispatcher) { climb() }
         }

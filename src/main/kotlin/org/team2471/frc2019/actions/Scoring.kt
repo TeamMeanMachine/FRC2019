@@ -40,6 +40,8 @@ private suspend fun score(position: ScoringPosition, isAuto: Boolean) {
             }
         }
 
+        if (gamePiece == GamePiece.CARGO) Armavator.intake(Armavator.HOLDING_INTAKE_POWER)
+
         goToPose(scorePose)
 
         when (gamePiece) {

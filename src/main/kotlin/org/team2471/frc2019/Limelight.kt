@@ -82,12 +82,8 @@ object Limelight : Subsystem("Limelight") {
             periodic {
                 if (hasValidTarget) { // target valid
                     setLEDColor(false, true, false)
-//                    OI.driverController.rumble = 0.25
-                    OI.operatorController.rumble = if (DriverStation.getInstance().isEnabled) 0.25 else 0.0
                 } else {
                     setLEDColor(true, false, false)
-//                    OI.driverController.rumble = 0.0
-                    OI.operatorController.rumble = 0.0
                 }
             }
         }
