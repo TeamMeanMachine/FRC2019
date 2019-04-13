@@ -54,12 +54,16 @@ object Robot: RobotProgram {
 
     override suspend fun teleop() {
         periodic {
+//            println(Limelight.distance)
+            println(Limelight.targetPoint)
+        }
+//        periodic {
    //         println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
 //            println(Pose.current.clawHeight<Pose.SAFETY_POSE.clawHeight)
     //        println("BL: = ${Drive.backLeftModule.currDistance}, BR: = ${Drive.backRightModule.currDistance}, FL: = ${Drive.frontLeftModule.currDistance}, FR: = ${Drive.frontRightModule.currDistance},")
 
 
-        }
+//        }
     }
 
     override suspend fun test() {
@@ -124,6 +128,7 @@ object Robot: RobotProgram {
         Drive.disable()
         OB.disable()
         Limelight.disable()
+
 
 //        periodic {
 //            println(Drive.gyro!!.getNavX().pitch)

@@ -67,11 +67,11 @@ object Armavator : Subsystem("Armavator") {
 
         pid {
             p(2.0)
-            d(1.0)
+            d(1.5)
 
-            f(7.0)
+            f(6.5)
 
-            motionMagic(360.0, 120.0)
+            motionMagic(480.0, 160.0)
         }
         currentLimit(15, 0, 0)
     }

@@ -51,8 +51,8 @@ suspend fun climb() {
                 periodic {
                     val time = timer.get()//.coerceAtMost(2.0)
                     val pitchError = startingPitch - Drive.gyro!!.getNavX().pitch
-                    val elevatorOffset = pitchError * 2.0
-                    println("Elevator Offset=${elevatorOffset} Elevator Output=${Armavator.elevatorMotors.output}")
+                    val elevatorOffset = pitchError * 1.5
+//                    println("Elevator Offset=${elevatorOffset} Elevator Output=${Armavator.elevatorMotors.output}")
 //                    var elevatorSetpoint = (elevatorCurve.getValue(time) + elevatorOffset).coerceIn(Armavator.heightRange).inches
 //                    val positionError = elevatorSetpoint - Armavator.height
 //                    val kPHeight = 0.15
@@ -132,6 +132,7 @@ suspend fun climb() {
             withContext(NonCancellable) {
                 OB.angleSetpoint = 180.degrees
                 suspendUntil {
+                    println("Got to finally")
                     DriverStation.getInstance().isDisabled ||
                             Math.abs(((OB.leftAngle + OB.rightAngle) / 2.0 - OB.angleSetpoint).asDegrees) < 5
                 }
@@ -166,10 +167,13 @@ suspend fun climb() {
                 }
 
                 val timer = Timer().apply { start() }
+                val startingPitch = Drive.gyro!!.getNavX().pitch
                 use(Drive) {
                     periodic {
                         val time = timer.get()//.coerceAtMost(2.0)
-                        Armavator.heightSetpoint = elevatorCurve.getValue(time).inches
+                        val pitchError = startingPitch - Drive.gyro!!.getNavX().pitch
+                        val elevatorOffset = pitchError * 1.5
+                        Armavator.heightSetpoint = elevatorCurve.getValue(time).inches + elevatorOffset.inches
                         Armavator.angleSetpoint = armCurve.getValue(time).degrees
                         OB.climb(obCurve.getValue(time).degrees)
 
