@@ -52,18 +52,11 @@ suspend fun climb() {
                     val time = timer.get()//.coerceAtMost(2.0)
                     val pitchError = startingPitch - Drive.gyro!!.getNavX().pitch
                     val elevatorOffset = pitchError * 1.5
-//                    println("Elevator Offset=${elevatorOffset} Elevator Output=${Armavator.elevatorMotors.output}")
-//                    var elevatorSetpoint = (elevatorCurve.getValue(time) + elevatorOffset).coerceIn(Armavator.heightRange).inches
-//                    val positionError = elevatorSetpoint - Armavator.height
-//                    val kPHeight = 0.15
-//                    Armavator.elevatorMotors.setPercentOutput(positionError.asInches * kPHeight - 0.1)
 
                     Armavator.heightSetpoint = elevatorCurve.getValue(time).inches + elevatorOffset.inches
                     Armavator.angleSetpoint = armCurve.getValue(time).degrees
                     OB.climbLeft(obCurve.getValue(time).degrees + leftIncrease)
                     OB.climbRight(obCurve.getValue(time).degrees + rightIncrease)
-                  //  println("Elevator Output${Armavator.elevatorMotors.output}")
-                  //  println("OB Output${OB.leftPivotMotor.output}")
 
                     if (obCurve.getValue(time).degrees < 5.0.degrees) {
                         val error = (gyroAngle - Drive.heading).wrap()

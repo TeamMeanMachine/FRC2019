@@ -123,6 +123,7 @@ object Limelight : Subsystem("Limelight") {
 //            camModeEntry.setDouble(0.0)
 //            ledModeEntry.setDouble(0.0)
         GlobalScope.launch(MeanlibDispatcher) {
+
             periodic {
                 if (hasValidTarget) { // target valid
                     setLEDColor(false, true, false)
@@ -191,6 +192,7 @@ suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
     val kTurn = 0.0 //0.007
     val timer = Timer()
     var prevTargetHeading = Limelight.targetAngle
+    var prevTargetPoint = Limelight.targetPoint
     var prevTime = 0.0
     timer.start()
     val rotationPDController = PDController(rotationPEntry.getDouble(0.016), rotationDEntry.getDouble(0.0))
@@ -199,13 +201,14 @@ suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
         val dt = t - prevTime
 
         // position error
-        val positionError = Limelight.targetPoint - Drive.position
+        val targetPoint = Limelight.targetPoint * 0.5 + prevTargetPoint * 0.5
+        val positionError = targetPoint - Drive.position
         //println("pathPosition=$pathPosition position=$position positionError=$positionError")
 
-        val translationControlField = positionError * 0.075 * OI.driverController.leftTrigger
+        val translationControlField = positionError * 0.06 * OI.driverController.leftTrigger
 
         val robotHeading = heading
-        val targetHeading = if (Limelight.hasValidTarget) Limelight.targetAngle else prevTargetHeading
+        val targetHeading = if (Limelight.hasValidTarget) positionError.angle.radians else prevTargetHeading
         val headingError = (targetHeading - robotHeading).wrap()
         prevTargetHeading = targetHeading
 

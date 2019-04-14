@@ -9,15 +9,13 @@ import edu.wpi.first.wpilibj.SPI
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.interfaces.Gyro
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.team2471.frc.lib.actuators.MotorController
 import org.team2471.frc.lib.actuators.TalonID
 import org.team2471.frc.lib.control.PDController
-import org.team2471.frc.lib.coroutines.MeanlibDispatcher
-import org.team2471.frc.lib.coroutines.delay
-import org.team2471.frc.lib.coroutines.periodic
-import org.team2471.frc.lib.coroutines.suspendUntil
+import org.team2471.frc.lib.coroutines.*
 import org.team2471.frc.lib.framework.Subsystem
 import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.math.Vector2
@@ -184,8 +182,8 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             private const val ANGLE_MAX = 983
             private const val ANGLE_MIN = 47
 
-            private const val P = 0.0075 //0.010
-            private const val D = 0.00075
+            private val P = 0.0075 //0.010
+            private val D = 0.00075
         }
 
         override val angle: Angle
@@ -193,6 +191,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 
         val driveCurrent: Double
             get() = driveMotor.current
+
         private val pdController = PDController(P, D)
 
         override val speed: Double
@@ -210,10 +209,12 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         override var angleSetpoint = 0.degrees
             set(value) {
                 field = value
-                val current = this.angle
-                val error = (field - current).wrap()
-                val turnPower = pdController.update(error.asDegrees)
-                turnMotor.setPercentOutput(turnPower)
+//
+//                val current = this.angle
+//                val error = (field - current).wrap()
+//                val turnPower = pdController.update(error.asDegrees)
+//                turnMotor.setPercentOutput(turnPower)
+
 //            println(
 //                "Angle: %.3f\tTarget: %.3f\tError: %.3f\tPower: %.3f".format(
 //                    current.asDegrees,
@@ -248,6 +249,26 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                 currentLimit(30, 0, 0)
                 openLoopRamp(0.15)
             }
+
+            GlobalScope.launch {
+                val table = NetworkTableInstance.getDefault().getTable(name)
+                val pSwerveEntry = table.getEntry("Swerve P").apply {
+                    setPersistent()
+                    setDefaultDouble(0.0075)
+                }
+                val dSwerveEntry = table.getEntry("Swerve D").apply {
+                    setPersistent()
+                    setDefaultDouble(0.00075)
+                }
+//                val pdController2 = PDController(pSwerveEntry.getDouble(0.0075),
+//                    dSwerveEntry.getDouble(0.00075))
+                periodic(period = 0.005) {
+                    val error = (angleSetpoint - angle).wrap()
+                    val turnPower = pdController.update(error.asDegrees)
+                    turnMotor.setPercentOutput(turnPower)
+                }
+            }
+
 //            GlobalScope.launch(MeanlibDispatcher) {
 //                val table = NetworkTableInstance.getDefault().getTable(name)
 //                val flAngleEntry = table.getEntry("Front Left Angle")
