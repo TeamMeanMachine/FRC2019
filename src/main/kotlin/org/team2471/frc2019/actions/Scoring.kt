@@ -48,11 +48,6 @@ private suspend fun score(position: ScoringPosition, isAuto: Boolean) {
             GamePiece.HATCH_PANEL -> {
 //                suspendUntil { Math.abs(Armavator.angleSetpoint.asDegrees - Armavator.angle.asDegrees) < 2.0 }
                 suspendUntil {
-                    //This is the best line of code I have ever written.
-                    //-Justine
-//                    ((Limelight.isAtTarget(position) && OI.driverController.leftTrigger > 0.2) || OI.usePiece) ||
-//                            (isAuto && (Limelight.area > ((if (position == ScoringPosition.ROCKET_MED) Limelight.MED_HATCH_AREA else 8.3))))
-                    //don't think about it too hard
                     OI.driverController.rightTrigger > 0.2 /*|| (OI.driverController.leftTrigger > 0.2 && Limelight.isAtTarget(position)) */
                 }
                 Armavator.isExtending = true

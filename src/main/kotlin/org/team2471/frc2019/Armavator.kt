@@ -59,7 +59,7 @@ object Armavator : Subsystem("Armavator") {
         encoderContinuous(false)
         inverted(true)
         sensorPhase(true)
-        brakeMode()
+        coastMode()
         feedbackCoefficient = 0.2586
         (ctreController as TalonSRX)
             .sensorCollection

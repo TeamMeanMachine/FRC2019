@@ -14,13 +14,16 @@ import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.motion.following.driveAlongPath
 import org.team2471.frc.lib.motion.following.driveAlongPathWithStrafe
 import org.team2471.frc.lib.motion_profiling.Autonomi
+import org.team2471.frc.lib.units.feet
 import org.team2471.frc.lib.util.measureTimeFPGA
 import org.team2471.frc2019.actions.ScoringPosition
 import org.team2471.frc2019.actions.autoIntakeHatch
 import org.team2471.frc2019.actions.placeHatch
+import org.team2471.frc2019.actions.scoreAtTarget
 import java.io.File
 
 private lateinit var autonomi: Autonomi
+
 
 enum class Side {
     LEFT,
@@ -170,30 +173,20 @@ private suspend fun cargoShipAuto() = coroutineScope {
 private suspend fun rocketAuto() = coroutineScope {
     val auto = autonomi["Rocket Auto"]
     auto.isMirrored = startingSide == Side.LEFT
-    val translationPDController = PDController(0.015, 0.0)
     val timer = Timer()
     timer.start()
     parallel({
-        Drive.driveAlongPathWithStrafe(auto["Platform to Rocket"], true, 0.0,
-            { if (Limelight.area > 3.0) 1.0 else 0.0 },
-            { translationPDController.update(Limelight.xTranslation) },
-            { Limelight.hasValidTarget && Limelight.isAtTarget(ScoringPosition.ROCKET_LOW) })
-        println("Drive done")
+        scoreAtTarget(auto["Platform to Rocket"], 2.7, Limelight.AUTO_HATCH_LOW_HIGH.feet, true )
     }, {
         delay(1.0)
-        goToPose(Pose.HATCH_LOW)
+        goToPose(Pose.HATCH_HIGH)
     })
     placeHatch()
 
 
     timer.reset()
     parallel({
-        Drive.driveAlongPathWithStrafe(auto["Rocket to Feeder Station 2"], false, 0.0,
-            { time ->  if (auto["Rocket to Feeder Station 2"].easeCurve.getValue(time) > 0.5
-                && Limelight.hasValidTarget
-                && (Limelight.area > 3.0)) 1.0 else 0.0 },
-            { translationPDController.update(Limelight.xTranslation) },
-            { Limelight.hasValidTarget && Limelight.isAtTarget() && timer.get() > 3.0})
+        scoreAtTarget(auto["Rocket to Feeder Station 2"], 2.7, Limelight.AUTO_HATCH_PICKUP.feet)
     }, {
         delay(1.5)
         autoIntakeHatch()
@@ -201,33 +194,47 @@ private suspend fun rocketAuto() = coroutineScope {
 
     timer.reset()
     parallel({
-        Drive.driveAlongPathWithStrafe(auto["Feeder Station to Back Rocket"], false, 0.0,
-            { time ->  if (auto["Feeder Station to Back Rocket"].easeCurve.getValue(time) > 0.8
-                && Limelight.hasValidTarget
-                && (Limelight.area > 3.0)) 1.0 else 0.0},
-            { translationPDController.update(Limelight.xTranslation) },
-            { Limelight.hasValidTarget && Limelight.isAtTarget(ScoringPosition.ROCKET_LOW) && timer.get() > 3.25})
+        scoreAtTarget(auto["Feeder Station to Back Rocket"], 3.8, Limelight.AUTO_HATCH_LOW_HIGH.feet)
     }, {
         delay(2.5)
-        goToPose(Pose.HATCH_LOW)
+        goToPose(Pose.HATCH_HIGH)
     })
 
     placeHatch()
 
     timer.reset()
     parallel({
-        Drive.driveAlongPathWithStrafe(auto["Back Rocket to Cargoship"], false, 0.0,
-            { time ->  if (auto["Back Rocket to Cargoship"].easeCurve.getValue(time) > 0.8
-                && Limelight.hasValidTarget
-                && (Limelight.area > 3.0)) 1.0 else 0.0 },
-            { translationPDController.update(Limelight.xTranslation) },
-            { Limelight.hasValidTarget && Limelight.isAtTarget() && timer.get() > 3.0})
+        scoreAtTarget(auto["Back Rocket to Cargoship"], 3.6, Limelight.AUTO_HATCH_LOW_HIGH.feet)
     }, {
         delay(1.0)
         Armavator.intake(0.6)
-        goToPose(Pose.HATCH_LOW)
+        goToPose(Pose.CARGO_GROUND_PICKUP)
         delay(-0.0)
     })
     Armavator.isPinching = true
     delay(Double.POSITIVE_INFINITY)
+}
+
+private suspend fun autoCycleToBackRocket(position: ScoringPosition) = coroutineScope {
+    parallel({
+        scoreAtTarget(autonomi["Rocket Auto"]["Feeder Station to Back Rocket"], 3.8, Limelight.AUTO_HATCH_LOW_HIGH.feet)
+    }, {
+        delay(2.5)
+        goToPose(when (position) {
+            ScoringPosition.ROCKET_LOW -> Pose.HATCH_LOW
+            ScoringPosition.ROCKET_MED -> Pose.HATCH_MED
+            ScoringPosition.ROCKET_HIGH -> Pose.HATCH_HIGH
+            ScoringPosition.CARGO_SHIP -> throw IllegalAccessException("I can only do hatches")
+        })
+    })
+    placeHatch()
+
+//    parallel({
+//        scoreAtTarget(autonomi["Rocket Auto"]["Back Rocket to Cargoship"], 3.6, AUTO_HATCH_LOW_HIGH.feet)
+//    }, {
+//        delay(1.0)
+//        Armavator.intake(0.6)
+//        goToPose(Pose.CARGO_GROUND_PICKUP)
+//        delay(-0.0)
+//    })
 }

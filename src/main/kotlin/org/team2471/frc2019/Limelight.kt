@@ -18,6 +18,10 @@ import org.team2471.frc.lib.motion.following.drive
 import org.team2471.frc.lib.units.*
 import org.team2471.frc2019.Drive.gyro
 import org.team2471.frc2019.Drive.heading
+import org.team2471.frc2019.Limelight.rotationD
+import org.team2471.frc2019.Limelight.rotationDEntry
+import org.team2471.frc2019.Limelight.rotationP
+import org.team2471.frc2019.Limelight.rotationPEntry
 import org.team2471.frc2019.actions.ScoringPosition
 import kotlin.math.absoluteValue
 import kotlin.math.cos
@@ -32,6 +36,23 @@ object Limelight : Subsystem("Limelight") {
     private val camModeEntry = table.getEntry("camMode")
     private val ledModeEntry = table.getEntry("ledMode")
     private val targetValidEntry = table.getEntry("tv")
+    const val AUTO_HATCH_LOW_HIGH = 2.4
+    const val AUTO_HATCH_MED = 2.8
+    const val AUTO_CARGO_MED_SHIP = 2.5
+    const val AUTO_CARGO_HIGH = 2.1
+    const val AUTO_HATCH_PICKUP = 2.9
+
+
+    private val tempPIDTable = NetworkTableInstance.getDefault().getTable("fklsdajklfjsadlk;")
+
+    val rotationPEntry = tempPIDTable.getEntry("Rotation P").apply {
+        setPersistent()
+        setDefaultDouble(0.016)
+    }
+    val rotationDEntry = tempPIDTable.getEntry("Rotation D").apply {
+        setPersistent()
+        setDefaultDouble(0.0)
+    }
 
     private val useAutoPlaceEntry = table.getEntry("Use Auto Place").apply {
         setPersistent()
@@ -60,7 +81,7 @@ object Limelight : Subsystem("Limelight") {
 
     val targetAngle: Angle
             get() {
-                println("gyro angle=${-gyro!!.angle.degrees} Limelight angle=${xTranslation.degrees}")
+//                println("gyro angle=${-gyro!!.angle.degrees} Limelight angle=${xTranslation.degrees}")
                 return -gyro!!.angle.degrees + xTranslation.degrees
             } //verify that this changes? or is reasonablej
 
@@ -88,6 +109,12 @@ object Limelight : Subsystem("Limelight") {
     val area
         get() = areaEntry.getDouble(0.0)
 
+    val rotationP
+        get() = rotationPEntry.getDouble(0.016)
+
+    val rotationD
+        get() = rotationDEntry.getDouble(0.0)
+
     var hasValidTarget = false
         get() = targetValidEntry.getDouble(0.0) == 1.0
 
@@ -106,8 +133,13 @@ object Limelight : Subsystem("Limelight") {
         }
     }
 
+//    fun isAtTarget(): Boolean {
+//        return area > feederHatchEntry.value.double
+//    }
+
     fun isAtTarget(): Boolean {
-        return area > feederHatchEntry.value.double
+        return Drive.position.distance(Limelight.targetPoint) < AUTO_HATCH_PICKUP
+
     }
 
     fun isAtTarget(position: ScoringPosition): Boolean {
@@ -161,6 +193,7 @@ suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
     var prevTargetHeading = Limelight.targetAngle
     var prevTime = 0.0
     timer.start()
+    val rotationPDController = PDController(rotationPEntry.getDouble(0.016), rotationDEntry.getDouble(0.0))
     periodic {
         val t = timer.get()
         val dt = t - prevTime
@@ -174,13 +207,14 @@ suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
         val robotHeading = heading
         val targetHeading = if (Limelight.hasValidTarget) Limelight.targetAngle else prevTargetHeading
         val headingError = (targetHeading - robotHeading).wrap()
+        prevTargetHeading = targetHeading
 
-        val turnControl = headingError.asDegrees * 0.016
+        val turnControl = rotationPDController.update(headingError.asDegrees )
 
         // send it
 
 
-        println(targetHeading)
+//        println(targetHeading)
 
         Drive.drive(
             OI.driveTranslation + translationControlField,
@@ -191,6 +225,34 @@ suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
         )
     }
 }
+
+
+suspend fun autoVisionDrive() = use(Drive, Limelight, name = "Vision Drive") {
+
+    Limelight.isCamEnabled = true
+    var prevTargetHeading = Limelight.targetAngle
+    var prevTargetPoint = Limelight.targetPoint
+
+    val rotationPDController = PDController(rotationPEntry.getDouble(0.016), rotationDEntry.getDouble(0.0))
+
+    periodic {
+        // position error
+        val targetPoint = Limelight.targetPoint * 0.5 + prevTargetPoint * 0.5
+        val positionError = targetPoint - Drive.position
+        val translationControlField = positionError * 0.075
+        val robotHeading = heading
+        val targetHeading = if (Limelight.hasValidTarget) positionError.angle.radians else prevTargetHeading
+        val headingError = (targetHeading - robotHeading).wrap()
+        val turnControl = rotationPDController.update(headingError.asDegrees )
+
+        prevTargetPoint = targetPoint
+        // send it
+        Drive.drive(
+            translationControlField,
+            turnControl, true)
+    }
+}
+
 
 val blueOutput = DigitalOutput(0)
 val redOutput = DigitalOutput(1)
