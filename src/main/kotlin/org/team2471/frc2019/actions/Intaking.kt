@@ -18,7 +18,7 @@ suspend fun intakeCargo() = use(Armavator) {
     suspendUntil { println(Armavator.intakeCurrent);Armavator.intakeCurrent > 13.0 } //practice 20
     Armavator.intake(0.25)
     goToPose(Pose.HOME)
-    delay(0.2)
+    delay(0.3)
     Armavator.isCarryingBall = true
 
 }

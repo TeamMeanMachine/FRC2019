@@ -53,10 +53,11 @@ object Robot: RobotProgram {
     }
 
     override suspend fun teleop() {
-        periodic {
-//            println(Limelight.distance)
-            println(Limelight.targetPoint)
-        }
+      //  periodic {
+////            println(Limelight.distance)
+//            println(Limelight)
+         //   println(Limelight.targetAngle)
+      //  }
 //        periodic {
    //         println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
 //            println(Pose.current.clawHeight<Pose.SAFETY_POSE.clawHeight)

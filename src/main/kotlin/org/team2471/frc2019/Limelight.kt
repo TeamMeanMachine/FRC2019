@@ -3,6 +3,7 @@ package org.team2471.frc2019
 import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.wpilibj.DigitalOutput
 import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -16,6 +17,7 @@ import org.team2471.frc.lib.math.linearMap
 import org.team2471.frc.lib.motion.following.drive
 import org.team2471.frc.lib.units.*
 import org.team2471.frc2019.Drive.gyro
+import org.team2471.frc2019.Drive.heading
 import org.team2471.frc2019.actions.ScoringPosition
 import kotlin.math.absoluteValue
 import kotlin.math.cos
@@ -56,11 +58,15 @@ object Limelight : Subsystem("Limelight") {
     val distance
         get() = ((66.7 * 1/Math.sqrt(Limelight.area) + 7.03) / 12.0).feet
 
-    val targetAngle
-            get() = gyro!!.angle.degrees + xTranslation.degrees //verify that this changes? or is reasonablej
+    val targetAngle: Angle
+            get() {
+                println("gyro angle=${-gyro!!.angle.degrees} Limelight angle=${xTranslation.degrees}")
+                return -gyro!!.angle.degrees + xTranslation.degrees
+            } //verify that this changes? or is reasonablej
 
     val targetPoint
         get() = Vector2(distance.asFeet * sin(targetAngle.asRadians), distance.asFeet * cos(targetAngle.asRadians)) + Drive.position
+
     var isCamEnabled = false
         set(value) {
             field = value
@@ -121,7 +127,7 @@ object Limelight : Subsystem("Limelight") {
 private val angles = doubleArrayOf(-150.0, -90.0, -30.0, 0.0, 30.0, 90.0, 150.0, 180.0)
 
 
-suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
+suspend fun oldVisionDrive() = use(Drive, Limelight, name = "Vision Drive") {
     Limelight.isCamEnabled = true
     val translationPDController = PDController(0.033, 0.0)
     val distanceK = 20.0
@@ -143,6 +149,45 @@ suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
             SmartDashboard.getBoolean("Use Gyro", true) && !DriverStation.getInstance().isAutonomous,
             (OI.operatorTranslation + visionVector),
             OI.operatorRotation + turnError.asDegrees * kTurn
+        )
+    }
+}
+
+suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
+    Limelight.isCamEnabled = true
+    val smallestAngle = angles.minBy { (Drive.heading - it.degrees).wrap().asDegrees.absoluteValue }!!
+    val kTurn = 0.0 //0.007
+    val timer = Timer()
+    var prevTargetHeading = Limelight.targetAngle
+    var prevTime = 0.0
+    timer.start()
+    periodic {
+        val t = timer.get()
+        val dt = t - prevTime
+
+        // position error
+        val positionError = Limelight.targetPoint - Drive.position
+        //println("pathPosition=$pathPosition position=$position positionError=$positionError")
+
+        val translationControlField = positionError * 0.075 * OI.driverController.leftTrigger
+
+        val robotHeading = heading
+        val targetHeading = if (Limelight.hasValidTarget) Limelight.targetAngle else prevTargetHeading
+        val headingError = (targetHeading - robotHeading).wrap()
+
+        val turnControl = headingError.asDegrees * 0.016
+
+        // send it
+
+
+        println(targetHeading)
+
+        Drive.drive(
+            OI.driveTranslation + translationControlField,
+            OI.driveRotation,
+            SmartDashboard.getBoolean("Use Gyro", true) && !DriverStation.getInstance().isAutonomous,
+            (OI.operatorTranslation),
+            OI.operatorRotation + turnControl
         )
     }
 }
