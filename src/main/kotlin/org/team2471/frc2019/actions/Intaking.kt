@@ -9,7 +9,7 @@ import org.team2471.frc2019.*
 import java.util.concurrent.DelayQueue
 
 suspend fun intakeCargo() = use(Armavator) {
-    OI.operatorController.rumble = 50.0
+    OI.operatorController.rumble = 0.5
     Armavator.isPinching = true // make sure there's no hatch
     Armavator.isExtending = false
     Armavator.intake(0.6
@@ -27,7 +27,7 @@ suspend fun intakeCargo() = use(Armavator) {
 }
 
 suspend fun intakeHatch() = use(Armavator) {
-    OI.driverController.rumble = 50.0
+    OI.driverController.rumble = 0.5
     Armavator.isPinching = true
     Armavator.isExtending = true
     goToPose(Pose.HATCH_FEEDER_PICKUP)

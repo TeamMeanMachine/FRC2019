@@ -16,6 +16,7 @@ import org.team2471.frc.lib.motion.following.drive
 import org.team2471.frc.lib.units.degrees
 import org.team2471.frc.lib.units.inches
 import org.team2471.frc.lib.units.seconds
+import org.team2471.frc.lib.util.measureTimeFPGA
 import org.team2471.frc2019.actions.intakeHatch
 import org.team2471.frc2019.actions.scoreCargoShip
 import org.team2471.frc2019.actions.scoreLow
@@ -24,14 +25,21 @@ import kotlin.concurrent.thread
 
 val PDP = PowerDistributionPanel()
 
-object Robot: RobotProgram {
+object Robot : RobotProgram {
 
     init {
         Drive.zeroGyro()
         Drive.heading = 0.0.degrees
+
+        // i heard the first string + double concatenations were expensive...
+        repeat(25) {
+            println("RANDOM NUMBER: ${Math.random()}")
+        }
+        println("TAKE ME HOOOOOME COUNTRY ROOOOOOOOADS TOOO THE PLAAAAAAACE WHERE I BELOOOOOOOOONG")
     }
 
     override suspend fun enable() {
+        println("WEST VIRGINIA")
         Limelight.ledEnabled = true
         Armavator.heightSetpoint = Armavator.height
         Armavator.angleSetpoint = Armavator.angle
@@ -54,18 +62,18 @@ object Robot: RobotProgram {
 
     override suspend fun teleop() {
 //        periodic {
-  //           println("Distance: ${Drive.position.distance(Limelight.targetPoint)}")
+        //           println("Distance: ${Drive.position.distance(Limelight.targetPoint)}")
 //            println("P${Limelight.rotationPEntry} D${Limelight.rotationDEntry}")
 
 //        }
 ////            println(Limelight.distance)
 //            println(Limelight)
-         //   println(Limelight.targetAngle)
-      //  }
+        //   println(Limelight.targetAngle)
+        //  }
 //        periodic {
-   //         println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
+        //         println("Arm: ${Armavator.angle}, Elevator: ${Armavator.height}, OB1: ${OB1.angle}")
 //            println(Pose.current.clawHeight<Pose.SAFETY_POSE.clawHeight)
-    //        println("BL: = ${Drive.backLeftModule.currDistance}, BR: = ${Drive.backRightModule.currDistance}, FL: = ${Drive.frontLeftModule.currDistance}, FR: = ${Drive.frontRightModule.currDistance},")
+        //        println("BL: = ${Drive.backLeftModule.currDistance}, BR: = ${Drive.backRightModule.currDistance}, FL: = ${Drive.frontLeftModule.currDistance}, FR: = ${Drive.frontRightModule.currDistance},")
 
 
 //        }
