@@ -182,8 +182,7 @@ object Armavator : Subsystem("Armavator") {
             if (isCarryingBall) {
                 intake(HOLDING_INTAKE_POWER)
             }
-            if (OI.operatorController.rightTrigger > 0.2) intake(-0.7)
-        }
+            intake(if (OI.driverController.rightTrigger > 0.2) -0.7 else 0.0) }
     }
 
     fun intake(power: Double) {

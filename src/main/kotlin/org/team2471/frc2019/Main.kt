@@ -53,11 +53,11 @@ object Robot: RobotProgram {
     }
 
     override suspend fun teleop() {
-        periodic {
+//        periodic {
   //           println("Distance: ${Drive.position.distance(Limelight.targetPoint)}")
-            println("P${Limelight.rotationPEntry} D${Limelight.rotationDEntry}")
+//            println("P${Limelight.rotationPEntry} D${Limelight.rotationDEntry}")
 
-        }
+//        }
 ////            println(Limelight.distance)
 //            println(Limelight)
          //   println(Limelight.targetAngle)

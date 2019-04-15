@@ -45,11 +45,12 @@ object Limelight : Subsystem("Limelight") {
 
     private val tempPIDTable = NetworkTableInstance.getDefault().getTable("fklsdajklfjsadlk;")
 
-    val rotationPEntry = tempPIDTable.getEntry("Rotation P").apply {
+    private val rotationPEntry = tempPIDTable.getEntry("Rotation P").apply {
         setPersistent()
         setDefaultDouble(0.016)
     }
-    val rotationDEntry = tempPIDTable.getEntry("Rotation D").apply {
+
+    private val rotationDEntry = tempPIDTable.getEntry("Rotation D").apply {
         setPersistent()
         setDefaultDouble(0.0)
     }
@@ -110,7 +111,7 @@ object Limelight : Subsystem("Limelight") {
         get() = areaEntry.getDouble(0.0)
 
     val rotationP
-        get() = rotationPEntry.getDouble(0.016)
+        get() = rotationPEntry.getDouble(0.01)
 
     val rotationD
         get() = rotationDEntry.getDouble(0.0)
@@ -195,7 +196,7 @@ suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
     var prevTargetPoint = Limelight.targetPoint
     var prevTime = 0.0
     timer.start()
-    val rotationPDController = PDController(rotationPEntry.getDouble(0.016), rotationDEntry.getDouble(0.0))
+    val rotationPDController = PDController(rotationP, rotationD)
     periodic {
         val t = timer.get()
         val dt = t - prevTime
@@ -236,7 +237,7 @@ suspend fun autoVisionDrive() = use(Drive, Limelight, name = "Vision Drive") {
     var prevTargetHeading = Limelight.targetAngle
     var prevTargetPoint = Limelight.targetPoint
 
-    val rotationPDController = PDController(rotationPEntry.getDouble(0.016), rotationDEntry.getDouble(0.0))
+    val rotationPDController = PDController(rotationP, rotationD)
 
     periodic {
         // position error

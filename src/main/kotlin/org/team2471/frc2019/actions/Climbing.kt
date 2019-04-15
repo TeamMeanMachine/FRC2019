@@ -125,7 +125,6 @@ suspend fun climb() {
             withContext(NonCancellable) {
                 OB.angleSetpoint = 180.degrees
                 suspendUntil {
-                    println("Got to finally")
                     DriverStation.getInstance().isDisabled ||
                             Math.abs(((OB.leftAngle + OB.rightAngle) / 2.0 - OB.angleSetpoint).asDegrees) < 5
                 }
@@ -140,12 +139,12 @@ suspend fun climb() {
         use(Armavator, OB) {
             try {
                 goToPose(Pose.BEFORE_CLIMB2)
-                OB.angleSetpoint = 120.0.degrees
+                OB.angleSetpoint = 50.0.degrees
                 delay(2.0)
                 suspendUntil { OI.driverController.x }
                 Armavator.isClimbing = true
                 val obCurve = MotionCurve().apply {
-                    storeValue(0.0, 120.0)
+                    storeValue(0.0, 50.0)
                     storeValue(2.0, 0.0)
                 }
 
@@ -154,21 +153,36 @@ suspend fun climb() {
                     storeValue(1.5, Pose.LIFTED2.elevatorHeight.asInches)
                 }
 
-                val armCurve = MotionCurve().apply {
-                    storeValue(0.0, Pose.BEFORE_CLIMB2.armAngle.asDegrees)
-                    storeValue(2.0, Pose.LIFTED2.armAngle.asDegrees)
-                }
-
                 val timer = Timer().apply { start() }
-                val startingPitch = Drive.gyro!!.getNavX().pitch
+                val gyroAngle = Drive.heading
+                var leftIncrease = 0.0.degrees
+                var rightIncrease = 0.0.degrees
+//                val startingPitch = Drive.gyro!!.getNavX().pitch
                 use(Drive) {
                     periodic {
                         val time = timer.get()//.coerceAtMost(2.0)
-                        val pitchError = startingPitch - Drive.gyro!!.getNavX().pitch
-                        val elevatorOffset = pitchError * 1.5
-                        Armavator.heightSetpoint = elevatorCurve.getValue(time).inches + elevatorOffset.inches
-                        Armavator.angleSetpoint = armCurve.getValue(time).degrees
+//                        val pitchError = startingPitch - Drive.gyro!!.getNavX().pitch
+ //                       val elevatorOffset = pitchError * 1.5
+                        Armavator.heightSetpoint = elevatorCurve.getValue(time).inches// + elevatorOffset.inches
                         OB.climb(obCurve.getValue(time).degrees)
+                        OB.climbLeft(obCurve.getValue(time).degrees + leftIncrease)
+                        OB.climbRight(obCurve.getValue(time).degrees + rightIncrease)
+
+                        if (obCurve.getValue(time).degrees < 5.0.degrees) {
+                            val error = (gyroAngle - Drive.heading).wrap()
+                            if (Math.abs(error.asDegrees) > 5.0) {
+                                if (error > 0.0.degrees) {
+                                    rightIncrease = 5.0.degrees
+
+                                } else {
+                                    leftIncrease = 5.0.degrees
+                                }
+                            } else {
+                                leftIncrease = 0.0.degrees
+                                rightIncrease = 0.0.degrees
+                            }
+
+                        }
 
                         OB.climbDrive(1.0)
                         Drive.drive(Vector2(0.0, 0.45), 0.0, fieldCentric = false)

@@ -64,10 +64,9 @@ private suspend fun score(position: ScoringPosition, isAuto: Boolean) {
                 periodic {
                     Armavator.intake(OI.driverController.rightTrigger * if (position == ScoringPosition.CARGO_SHIP) -0.6 else -1.0)
 
-                    if (Drive.position.distance(placePosition) > 0.5) stop()
+                    if (Drive.position.distance(placePosition) > 1.5) stop()
                 }
                 Armavator.intake(0.0)
-
             }
         }
 
