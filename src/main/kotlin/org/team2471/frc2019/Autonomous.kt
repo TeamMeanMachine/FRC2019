@@ -123,7 +123,7 @@ private suspend fun cargoShipAuto() = coroutineScope {
     placeHatch()
 
     parallel({
-        scoreAtTarget(auto["Cargo Ship to Feeder Station"],3.0, Limelight.AUTO_HATCH_PICKUP.feet )
+        scoreAtTarget(auto["Cargo Ship to Feeder Station"],2.5, Limelight.AUTO_HATCH_PICKUP.feet )
     }, {
         delay(2.2)
         autoIntakeHatch()
@@ -151,7 +151,7 @@ private suspend fun cargoShipAutoFront() = coroutineScope {
     placeHatch()
 
     parallel({
-        scoreAtTarget(auto["Front Cargo Ship to Feeder Station"],3.0, Limelight.AUTO_HATCH_PICKUP.feet )
+        scoreAtTarget(auto["Front Cargo Ship to Feeder Station"],4.0, Limelight.AUTO_HATCH_PICKUP.feet )
     }, {
         delay(2.2)
         autoIntakeHatch()
