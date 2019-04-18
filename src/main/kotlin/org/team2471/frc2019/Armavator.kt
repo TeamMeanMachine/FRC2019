@@ -34,7 +34,7 @@ object Armavator : Subsystem("Armavator") {
     private const val ELEVATOR_FEED_FORWARD = 0.0
     const val ELEVATOR_HEIGHT = 21.5 //inches
     const val ARM_LENGTH = 28.0 //inches
-    const val HOLDING_INTAKE_POWER = 0.15
+    const val HOLDING_INTAKE_POWER = 0.12
 
     private const val ELEVATOR_VELOCITY = 50.0
     private const val ELEVATOR_ACCELERATION = 120.0
@@ -66,12 +66,12 @@ object Armavator : Subsystem("Armavator") {
             .setAnalogPosition((ARM_OFFSET / feedbackCoefficient).toInt(), 20)
 
         pid {
-            p(2.0)
-            d(1.5)
+            p(2.2)
+            d(2.3)
 
             f(6.5)
 
-            motionMagic(480.0, 160.0)
+            motionMagic(360.0, 160.0)
         }
         currentLimit(15, 0, 0)
     }

@@ -3,6 +3,7 @@
 package org.team2471.frc2019
 
 import edu.wpi.first.wpilibj.*
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import org.team2471.frc.lib.coroutines.delay
 import org.team2471.frc.lib.coroutines.halt
@@ -49,6 +50,7 @@ object Robot : RobotProgram {
         OB.enable()
         Limelight.enable()
 //        Jevois.enable()
+        Shuffleboard.startRecording()
     }
 
     override suspend fun autonomous() {
@@ -141,6 +143,8 @@ object Robot : RobotProgram {
         Drive.disable()
         OB.disable()
         Limelight.disable()
+
+        Shuffleboard.stopRecording()
 
 
 //        periodic {

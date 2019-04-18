@@ -119,6 +119,10 @@ object OI {
         ({operatorController.dPad == Controller.Direction.LEFT}).whenTrue{ Armavator.decrementOffset() }
         ({operatorController.dPad == Controller.Direction.RIGHT}).whenTrue{ Armavator.incrementOffset() }
         operatorController::start.whileTrue { Drive.turnToAngle(180.degrees) }
+        operatorController::leftBumper.toggleWhenTrue {
+            Armavator.isExtending = false
+            goToPose(Pose.HOME)
+        }
 
         //+ ({operatorController.dPad == Controller.Direction.DOWN}).whenTrue{ climb2() }
 

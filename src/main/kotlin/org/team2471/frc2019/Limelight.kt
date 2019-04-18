@@ -47,12 +47,12 @@ object Limelight : Subsystem("Limelight") {
 
     private val rotationPEntry = tempPIDTable.getEntry("Rotation P").apply {
         setPersistent()
-        setDefaultDouble(0.016)
+        setDefaultDouble(0.012)
     }
 
     private val rotationDEntry = tempPIDTable.getEntry("Rotation D").apply {
         setPersistent()
-        setDefaultDouble(0.0)
+        setDefaultDouble(0.1)
     }
 
     private val useAutoPlaceEntry = table.getEntry("Use Auto Place").apply {
@@ -204,9 +204,12 @@ suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
         // position error
         val targetPoint = Limelight.targetPoint * 0.5 + prevTargetPoint * 0.5
         val positionError = targetPoint - Drive.position
+        prevTargetPoint = targetPoint
         //println("pathPosition=$pathPosition position=$position positionError=$positionError")
 
         val translationControlField = positionError * 0.06 * OI.driverController.leftTrigger
+
+//        if(translationControlField.length > )
 
         val robotHeading = heading
         val targetHeading = if (Limelight.hasValidTarget) positionError.angle.radians else prevTargetHeading
@@ -237,7 +240,7 @@ suspend fun autoVisionDrive() = use(Drive, Limelight, name = "Vision Drive") {
     var prevTargetHeading = Limelight.targetAngle
     var prevTargetPoint = Limelight.targetPoint
 
-    val rotationPDController = PDController(0.01, 0.0)
+    val rotationPDController = PDController(0.012, 0.1)
 
     periodic {
         // position error
