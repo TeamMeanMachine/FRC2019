@@ -243,10 +243,11 @@ suspend fun autoVisionDrive() = use(Drive, Limelight, name = "Vision Drive") {
     val rotationPDController = PDController(0.012, 0.1)
 
     periodic {
+        if (!Limelight.hasValidTarget) return@periodic // continue
         // position error
         val targetPoint = Limelight.targetPoint * 0.5 + prevTargetPoint * 0.5
         val positionError = targetPoint - Drive.position
-        val translationControlField = positionError * 0.05
+        val translationControlField = positionError * 0.06
         val robotHeading = heading
         val targetHeading = if (Limelight.hasValidTarget) positionError.angle.radians else prevTargetHeading
         val headingError = (targetHeading - robotHeading).wrap()

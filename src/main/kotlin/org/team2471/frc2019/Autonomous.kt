@@ -143,7 +143,7 @@ private suspend fun cargoShipAutoFront() = coroutineScope {
     val auto = autonomi["Cargo Auto"]
     auto.isMirrored = startingSide == Side.LEFT
     parallel({
-        scoreAtTarget(auto["Platform to Front Cargo Ship"], 1.7, Limelight.AUTO_CARGO_MED_SHIP.feet, true )
+        scoreAtTarget(auto["Platform to Front Cargo Ship"], 1.5, Limelight.AUTO_CARGO_MED_SHIP.feet, true )
     }, {
         delay(1.0)
         goToPose(Pose.HATCH_LOW)
@@ -151,14 +151,14 @@ private suspend fun cargoShipAutoFront() = coroutineScope {
     placeHatch()
 
     parallel({
-        scoreAtTarget(auto["Front Cargo Ship to Feeder Station"],4.0, Limelight.AUTO_HATCH_PICKUP.feet )
+        scoreAtTarget(auto["Front Cargo Ship to Feeder Station"],3.75, Limelight.AUTO_HATCH_PICKUP.feet )
     }, {
         delay(2.2)
         autoIntakeHatch()
     })
 
     parallel({
-        scoreAtTarget(auto["Feeder Station to Cargo Ship"],3.2, Limelight.AUTO_CARGO_MED_SHIP.feet )
+        scoreAtTarget(auto["Feeder Station to Cargo Ship"],3.2, Limelight.AUTO_CARGO_MED_SHIP.feet, true )
     }, {
         delay(2.5)
         goToPose(Pose.HATCH_LOW)

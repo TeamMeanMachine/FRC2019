@@ -15,6 +15,7 @@ import org.team2471.frc.lib.motion_profiling.MotionCurve
 import org.team2471.frc.lib.units.degrees
 import org.team2471.frc.lib.units.inches
 import org.team2471.frc2019.*
+import javax.jws.soap.SOAPBinding
 
 private var isClimbing = false
 
@@ -133,102 +134,104 @@ suspend fun climb() {
     }
 }
 
-    suspend fun climb2() {
-        if (isClimbing) return
-        isClimbing = true
-        use(Armavator, OB) {
-            try {
-                goToPose(Pose.BEFORE_CLIMB2)
-                OB.angleSetpoint = 50.0.degrees
-                delay(2.0)
-                suspendUntil { OI.driverController.x }
-                Armavator.isClimbing = true
-                val obCurve = MotionCurve().apply {
-                    storeValue(0.0, 50.0)
-                    storeValue(2.0, 0.0)
-                }
+suspend fun climb2() {
+    if (isClimbing) return
+    isClimbing = true
+    use(Armavator, OB) {
+        try {
+            goToPose(Pose.BEFORE_CLIMB2)
+            OB.angleSetpoint = 50.0.degrees
+            delay(2.0)
+            suspendUntil { OI.driverController.x }
+            Armavator.isClimbing = true
+            val obCurve = MotionCurve().apply {
+                storeValue(0.0, 50.0)
+                storeValue(2.0, 0.0)
+            }
 
-                val elevatorCurve = MotionCurve().apply {
-                    storeValue(0.0, Pose.BEFORE_CLIMB2.elevatorHeight.asInches)
-                    storeValue(1.5, Pose.LIFTED2.elevatorHeight.asInches)
-                }
+            val elevatorCurve = MotionCurve().apply {
+                storeValue(0.0, Pose.BEFORE_CLIMB2.elevatorHeight.asInches)
+                storeValue(1.5, Pose.LIFTED2.elevatorHeight.asInches)
+            }
 
-                val timer = Timer().apply { start() }
-                val gyroAngle = Drive.heading
-                var leftIncrease = 0.0.degrees
-                var rightIncrease = 0.0.degrees
+            val timer = Timer().apply { start() }
+            val gyroAngle = Drive.heading
+            var leftIncrease = 0.0.degrees
+            var rightIncrease = 0.0.degrees
 //                val startingPitch = Drive.gyro!!.getNavX().pitch
-                use(Drive) {
-                    periodic {
-                        val time = timer.get()//.coerceAtMost(2.0)
+            use(Drive) {
+                periodic {
+                    val time = timer.get()//.coerceAtMost(2.0)
 //                        val pitchError = startingPitch - Drive.gyro!!.getNavX().pitch
- //                       val elevatorOffset = pitchError * 1.5
-                        Armavator.heightSetpoint = elevatorCurve.getValue(time).inches// + elevatorOffset.inches
-                        OB.climb(obCurve.getValue(time).degrees)
-                        OB.climbLeft(obCurve.getValue(time).degrees + leftIncrease)
-                        OB.climbRight(obCurve.getValue(time).degrees + rightIncrease)
+                    //                       val elevatorOffset = pitchError * 1.5
+                    Armavator.heightSetpoint = elevatorCurve.getValue(time).inches// + elevatorOffset.inches
+                    OB.climb(obCurve.getValue(time).degrees)
+                    OB.climbLeft(obCurve.getValue(time).degrees + leftIncrease)
+                    OB.climbRight(obCurve.getValue(time).degrees + rightIncrease)
 
-                        if (obCurve.getValue(time).degrees < 5.0.degrees) {
-                            val error = (gyroAngle - Drive.heading).wrap()
-                            if (Math.abs(error.asDegrees) > 5.0) {
-                                if (error > 0.0.degrees) {
-                                    rightIncrease = 5.0.degrees
+                    if (obCurve.getValue(time).degrees < 5.0.degrees) {
+                        val error = (gyroAngle - Drive.heading).wrap()
+                        if (Math.abs(error.asDegrees) > 5.0) {
+                            if (error > 0.0.degrees) {
+                                rightIncrease = 5.0.degrees
 
-                                } else {
-                                    leftIncrease = 5.0.degrees
-                                }
                             } else {
-                                leftIncrease = 0.0.degrees
-                                rightIncrease = 0.0.degrees
+                                leftIncrease = 5.0.degrees
                             }
-
+                        } else {
+                            leftIncrease = 0.0.degrees
+                            rightIncrease = 0.0.degrees
                         }
 
-                        OB.climbDrive(1.0)
-                        Drive.drive(Vector2(0.0, 0.45), 0.0, fieldCentric = false)
-                        if (OI.driverController.x && time > obCurve.tailKey.time)
-                            stop()
-                        if (OI.driverController.b)
-                            stop()
-
                     }
-                    Drive.stop()
-                }
 
-                val armCurve2 = MotionCurve().apply {
-                    storeValue(0.0, Pose.LIFTED2.armAngle.asDegrees)
-                    storeValue(1.2, Pose.AFTER_LIFTED2.armAngle.asDegrees)
-                }
+                    OB.climbDrive(1.0)
+                    Drive.drive(Vector2(0.0, 0.45), 0.0, fieldCentric = false)
+                    if (OI.driverController.x && time > obCurve.tailKey.time)
+                        stop()
+                    if (OI.driverController.b)
+                        stop()
 
-                val elevatorCurve2 = MotionCurve().apply {
-                    storeValue(0.0, Pose.LIFTED2.elevatorHeight.asInches)
-                    storeValue(1.5, Pose.AFTER_LIFTED2.elevatorHeight.asInches)
                 }
+                Drive.stop()
+            }
 
-                use(Drive) {
-                    val timer2 = Timer().apply { start() }
-                    periodic {
-                        val time = timer2.get()//.coerceAtMost(2.0)
-                        OB.climbDrive(1.0)
-                        Armavator.heightSetpoint = elevatorCurve2.getValue(time).inches
-                        Armavator.angleSetpoint = armCurve2.getValue(time).degrees
-                        Drive.drive(OI.driveTranslation.apply {
-                            x /= 2
-                            y = y.coerceAtMost(0.0)
-                        }, OI.driveRotation * 0.75)
-                        if (OI.driverController.b)
-                            stop()
-                    }
+            val armCurve2 = MotionCurve().apply {
+                storeValue(0.0, Pose.LIFTED2.armAngle.asDegrees)
+                storeValue(1.2, Pose.AFTER_LIFTED2.armAngle.asDegrees)
+            }
+
+            val elevatorCurve2 = MotionCurve().apply {
+                storeValue(0.0, Pose.LIFTED2.elevatorHeight.asInches)
+                storeValue(1.5, Pose.AFTER_LIFTED2.elevatorHeight.asInches)
+            }
+
+            use(Drive) {
+                val timer2 = Timer().apply { start() }
+                periodic {
+                    val time = timer2.get()//.coerceAtMost(2.0)
+                    OB.climbDrive(1.0)
+                    Armavator.heightSetpoint = elevatorCurve2.getValue(time).inches
+                    Armavator.angleSetpoint = armCurve2.getValue(time).degrees
+                    Drive.drive(OI.driveTranslation.apply {
+                        x /= 2
+                        y = y.coerceAtMost(0.0)
+                    }, OI.driveRotation * 0.75)
+                    if (OI.driverController.b)
+                        stop()
                 }
-            } finally {
-                isClimbing = false
-                withContext(NonCancellable) {
-                    OB.angleSetpoint = 180.degrees
-                    suspendUntil {
-                        DriverStation.getInstance().isDisabled ||
-                                Math.abs(((OB.leftAngle + OB.rightAngle) / 2.0 - OB.angleSetpoint).asDegrees) < 5
-                    }
+            }
+        } finally {
+            isClimbing = false
+            withContext(NonCancellable) {
+                OB.angleSetpoint = 180.degrees
+                suspendUntil {
+                    DriverStation.getInstance().isDisabled ||
+                            Math.abs(((OB.leftAngle + OB.rightAngle) / 2.0 - OB.angleSetpoint).asDegrees) < 5
                 }
             }
         }
     }
+}
+
+suspend fun climb2910() = use(Armavator) { goToPose(Pose.JITB_CLIMB) }

@@ -13,8 +13,7 @@ suspend fun intakeCargo() = use(Armavator) {
         OI.operatorController.rumble = 0.25
         Armavator.isPinching = true // make sure there's no hatch
         Armavator.isExtending = false
-        Armavator.intake(0.6
-        )
+        Armavator.intake(0.75)
         goToPose(Pose.CARGO_GROUND_PICKUP)
         delay(0.2)
         suspendUntil { println(Armavator.intakeCurrent);Armavator.intakeCurrent > 13.0 } //practice 20
