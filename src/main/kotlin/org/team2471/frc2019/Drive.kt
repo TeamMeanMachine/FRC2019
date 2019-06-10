@@ -66,9 +66,9 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     )
 
     //    private val gyro: SpinMaster16448? = SpinMaster16448()
-//  private val gyro: Gyro? = null
+  val gyro: Gyro? = null
 //    private val gyro: Gyro? = ADISWrapper()
-    val gyro: NavxWrapper? = NavxWrapper()
+//    val gyro: NavxWrapper? = NavxWrapper()
 
     override var heading: Angle
         get() = gyroOffset - ((gyro?.angle ?: 0.0).degrees.wrap())
@@ -97,7 +97,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     init {
         SmartDashboard.setPersistent("Use Gyro")
 
-        SmartDashboard.putData("Gyro", gyro!!.getNavX())
+        //SmartDashboard.putData("Gyro", gyro!!.getNavX())
 
         GlobalScope.launch(MeanlibDispatcher) {
             val table = NetworkTableInstance.getDefault().getTable(name)
@@ -156,10 +156,11 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         val positionYEntry = table.getEntry("positionY")
 
         periodic {
+
             drive(
                 OI.driveTranslation,
                 OI.driveRotation,
-                SmartDashboard.getBoolean("Use Gyro", true) && !DriverStation.getInstance().isAutonomous,
+                if (Drive.gyro!=null) SmartDashboard.getBoolean("Use Gyro", true) && !DriverStation.getInstance().isAutonomous else false,
                 OI.operatorTranslation,
                 OI.operatorRotation
             )

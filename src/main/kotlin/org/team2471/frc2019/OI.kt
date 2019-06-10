@@ -84,7 +84,7 @@ object OI {
         driverController::back.whenTrue { Drive.zeroGyro(); Drive.resetOdometry() }
         ({ driverController.leftTrigger > 0.1 }).whileTrue{ visionDrive() }
         driverController::start.whenTrue { panic() }
-        driverController::y.whenTrue { }
+        driverController::y.whenTrue { climb2910() }
 
         //  ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }
 

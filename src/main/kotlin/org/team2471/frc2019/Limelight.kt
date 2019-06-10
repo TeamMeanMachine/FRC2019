@@ -40,7 +40,7 @@ object Limelight : Subsystem("Limelight") {
     const val AUTO_HATCH_MED = 2.8
     const val AUTO_CARGO_MED_SHIP = 2.5
     const val AUTO_CARGO_HIGH = 2.1
-    const val AUTO_HATCH_PICKUP = 2.9
+    const val AUTO_HATCH_PICKUP = 3.2
 
 
     private val tempPIDTable = NetworkTableInstance.getDefault().getTable("fklsdajklfjsadlk;")

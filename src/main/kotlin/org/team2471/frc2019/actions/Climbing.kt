@@ -45,13 +45,13 @@ suspend fun climb() {
 
             val timer = Timer().apply { start() }
             val gyroAngle = Drive.heading
-            val startingPitch = Drive.gyro!!.getNavX().pitch
+            val startingPitch = 0.0 //Drive.gyro!!.getNavX().pitch
             var leftIncrease = 0.0.degrees
             var rightIncrease = 0.0.degrees
             use(Drive) {
                 periodic {
                     val time = timer.get()//.coerceAtMost(2.0)
-                    val pitchError = startingPitch - Drive.gyro!!.getNavX().pitch
+                    val pitchError = startingPitch - 0.0 //Drive.gyro!!.getNavX().pitch
                     val elevatorOffset = pitchError * 1.5
 
                     Armavator.heightSetpoint = elevatorCurve.getValue(time).inches + elevatorOffset.inches

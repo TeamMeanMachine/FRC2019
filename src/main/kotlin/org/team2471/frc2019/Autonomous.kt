@@ -180,7 +180,7 @@ private suspend fun rocketAuto() = coroutineScope {
         scoreAtTarget(auto["Platform to Rocket"], 2.7, Limelight.AUTO_HATCH_LOW_HIGH.feet, true )
     }, {
         delay(1.0)
-        goToPose(Pose.HATCH_HIGH)
+        goToPose(Pose.HATCH_LOW)
     })
     placeHatch()
 
@@ -198,7 +198,7 @@ private suspend fun rocketAuto() = coroutineScope {
         scoreAtTarget(auto["Feeder Station to Back Rocket"], 3.8, Limelight.AUTO_HATCH_LOW_HIGH.feet)
     }, {
         delay(2.5)
-        goToPose(Pose.HATCH_HIGH)
+        goToPose(Pose.HATCH_LOW)
     })
 
     placeHatch()

@@ -35,7 +35,7 @@ suspend fun intakeHatch() = use(Armavator) {
     Armavator.isExtending = true
     goToPose(Pose.HATCH_FEEDER_PICKUP)
 //    suspendUntil { Math.abs(Armavator.angleSetpoint.asDegrees - Armavator.angle.asDegrees) < 2.0 }
-    suspendUntil { Limelight.isAtTarget() || OI.usePiece }
+    suspendUntil { OI.usePiece }
     Armavator.isPinching = false
     delay(0.75)
     Armavator.isExtending = false
