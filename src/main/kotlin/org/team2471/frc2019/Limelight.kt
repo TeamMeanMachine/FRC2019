@@ -188,16 +188,21 @@ suspend fun oldVisionDrive() = use(Drive, Limelight, name = "Vision Drive") {
 }
 
 suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
+ //   println("Entered Vision drive")
     Limelight.isCamEnabled = true
     val smallestAngle = angles.minBy { (Drive.heading - it.degrees).wrap().asDegrees.absoluteValue }!!
     val kTurn = 0.0 //0.007
     val timer = Timer()
-    var prevTargetHeading = Limelight.targetAngle
+    println("1")
+    var prevTargetHeading = Limelight.targetAngle //Prints 1 but not 2. Something is wrong with this line.
+    println("2")
     var prevTargetPoint = Limelight.targetPoint
     var prevTime = 0.0
     timer.start()
     val rotationPDController = PDController(rotationP, rotationD)
+ //   println("Entered Vision drive")
     periodic {
+        println("periodic")
         val t = timer.get()
         val dt = t - prevTime
 
@@ -220,16 +225,18 @@ suspend fun visionDrive() = use(Drive, Limelight, name = "Vision Drive") {
 
         // send it
 
-
 //        println(targetHeading)
-
+        println("ENTTTTERING DRive")
         Drive.drive(
+
+            //(Vector2(0.0,0.0)),
             OI.driveTranslation + translationControlField,
             OI.driveRotation,
             SmartDashboard.getBoolean("Use Gyro", true) && !DriverStation.getInstance().isAutonomous,
             (OI.operatorTranslation),
             OI.operatorRotation + turnControl
         )
+        println("exit Drive")
     }
 }
 
