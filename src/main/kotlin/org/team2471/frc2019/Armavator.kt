@@ -30,7 +30,7 @@ import kotlin.math.min
 
 
 object Armavator : Subsystem("Armavator") {
-    private const val ARM_OFFSET = -119.22
+    private const val ARM_OFFSET = -135.22 //-119.32 before but the encoder slipped at OMSI and we can't turn it back
     private const val ELEVATOR_FEED_FORWARD = 0.0
     const val ELEVATOR_HEIGHT = 21.5 //inches
     const val ARM_LENGTH = 28.0 //inches
