@@ -189,7 +189,7 @@ private suspend fun rocketAuto() = coroutineScope {
     parallel({
         scoreAtTarget(auto["Rocket to Feeder Station 2"], 2.7, Limelight.AUTO_HATCH_PICKUP.feet)
     }, {
-        delay(1.5)
+        delay(1.7)
         autoIntakeHatch()
     })
 
