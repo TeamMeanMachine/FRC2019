@@ -72,7 +72,7 @@ object Robot: RobotProgram {
 //            }
 //        }
 
-//        Drive.steeringTests()
+        Drive.steeringTests()
 
 //        val startingHeight = Armavator.height
 //        val startingAngle = Armavator.angle

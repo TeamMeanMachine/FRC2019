@@ -12,29 +12,21 @@ import org.team2471.frc.lib.units.seconds
 import org.team2471.frc2019.Drive
 
 suspend fun Drive.steeringTests() = use(this) {
-    // front left
-  /*  Drive.modules[0].steerToAngle(90.degrees)
-    Drive.frontLeftModule.steerToAngle(180.degrees)
-    Drive.frontLeftModule.steerToAngle(270.degrees)
-    Drive.frontLeftModule.steerToAngle(360.degrees)
 
-    // front right
-    Drive.frontRightModule.steerToAngle(90.degrees)
-    Drive.frontRightModule.steerToAngle(180.degrees)
-    Drive.frontRightModule.steerToAngle(270.degrees)
-    Drive.frontRightModule.steerToAngle(360.degrees)
+    for (i in 0..3) {
+        for (j in 1..4) {
+            Drive.modules[i].angleSetpoint = (j*90).degrees
+            delay(0.75)
+        }
+    }
 
-    // back left
-    Drive.backLeftModule.steerToAngle(90.degrees)
-    Drive.backLeftModule.steerToAngle(180.degrees)
-    Drive.backLeftModule.steerToAngle(270.degrees)
-    Drive.backLeftModule.steerToAngle(360.degrees)
+//        for (i in 0..3) {
+//        for (j in 1..4) {
+//            Drive.modules[i].angleSetpoint = (j * 90.0).degrees
+//            delay(0.75)
+//        }
+//    }
 
-    // back right
-    Drive.backRightModule.steerToAngle(90.degrees)
-    Drive.backRightModule.steerToAngle(180.degrees)
-    Drive.backRightModule.steerToAngle(270.degrees)
-    Drive.backRightModule.steerToAngle(360.degrees)*/
 }
 
 suspend fun Drive.driveTests() = use(this) {
