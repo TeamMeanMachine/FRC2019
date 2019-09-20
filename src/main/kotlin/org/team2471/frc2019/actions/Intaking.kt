@@ -9,28 +9,54 @@ import org.team2471.frc2019.*
 import java.util.concurrent.DelayQueue
 
 suspend fun intakeCargo() = use(Armavator) {
-    Armavator.isPinching = true // make sure there's no hatch
-    Armavator.isExtending = false
-    Armavator.intake(0.8)
-    goToPose(Pose.CARGO_GROUND_PICKUP)
-    delay(0.2)
-    suspendUntil { println(Armavator.intakeCurrent);Armavator.intakeCurrent > 15.0 }
-    goToPose(Pose.HOME)
+    try{
+        OI.operatorController.rumble = 0.25
+        Armavator.isPinching = true // make sure there's no hatch
+        Armavator.isExtending = false
+        Armavator.intake(0.75)
+        goToPose(Pose.CARGO_GROUND_PICKUP)
+        delay(0.2)
+        suspendUntil { println(Armavator.intakeCurrent);Armavator.intakeCurrent > 13.0 } //practice 20
+        Armavator.intake(0.25)
+        goToPose(Pose.HOME)
+        delay(0.3)
+        Armavator.isCarryingBall = true
+        OI.operatorController.rumble = 0.0
+    } finally {
+        OI.operatorController.rumble = 0.0
+    }
+
+
+
 }
 
 suspend fun intakeHatch() = use(Armavator) {
     Armavator.isPinching = true
-    goToPose(Pose.HATCH_FEEDER_PICKUP)
     Armavator.isExtending = true
+    goToPose(Pose.HATCH_FEEDER_PICKUP)
 //    suspendUntil { Math.abs(Armavator.angleSetpoint.asDegrees - Armavator.angle.asDegrees) < 2.0 }
-    suspendUntil { Limelight.area > 6.5 || OI.usePiece }
+    suspendUntil { Limelight.isAtTarget() || OI.usePiece }
     Armavator.isPinching = false
-    delay(0.5)
+    delay(0.75)
     Armavator.isExtending = false
     Armavator.intake(-0.2)
     Drive.driveTime(Vector2(0.0, -0.4), 0.75.seconds)
     goToPose(Pose.HOME)
     Armavator.intake(0.0)
+}
+
+suspend fun autoIntakeHatch() = use(Armavator) {
+    Armavator.isPinching = true
+    Armavator.isExtending = true
+    goToPose(Pose.HATCH_FEEDER_PICKUP)
+//    suspendUntil { Math.abs(Armavator.angleSetpoint.asDegrees - Armavator.angle.asDegrees) < 2.0 }
+    suspendUntil { Limelight.isAtTarget() || OI.usePiece }
+    Armavator.isPinching = false
+    delay(0.5)
+    Armavator.isExtending = false
+//    Armavator.intake(-0.2)
+//    goToPose(Pose.HOME)
+//    Armavator.intake(0.0)
 }
 
 suspend fun ejectPiece() = use(Armavator) {

@@ -10,6 +10,7 @@ import org.team2471.frc.lib.actuators.MotorController
 import org.team2471.frc.lib.actuators.TalonID
 import org.team2471.frc.lib.actuators.VictorID
 import org.team2471.frc.lib.coroutines.MeanlibDispatcher
+import org.team2471.frc.lib.coroutines.halt
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.Subsystem
 import org.team2471.frc.lib.framework.use
@@ -33,11 +34,12 @@ object Armavator : Subsystem("Armavator") {
     private const val ELEVATOR_FEED_FORWARD = 0.0
     const val ELEVATOR_HEIGHT = 21.5 //inches
     const val ARM_LENGTH = 28.0 //inches
+    const val HOLDING_INTAKE_POWER = 0.12
 
     private const val ELEVATOR_VELOCITY = 50.0
     private const val ELEVATOR_ACCELERATION = 120.0
-    private const val ELEVATOR_CLIMB_VELOCITY = 10.0
-    private const val ELEVATOR_CLIMB_ACCELERATION = 10.0
+    private const val ELEVATOR_CLIMB_VELOCITY = 50.0
+    private const val ELEVATOR_CLIMB_ACCELERATION = 120.0
 
     val elevatorMotors = MotorController(TalonID(ELEVATOR_MASTER), VictorID(ELEVATOR_SLAVE)).config {
         encoderType(FeedbackDevice.Analog)
@@ -49,7 +51,7 @@ object Armavator : Subsystem("Armavator") {
             motionMagic(ELEVATOR_ACCELERATION, ELEVATOR_VELOCITY)
         }
 
-        currentLimit(25, 0, 0)
+        currentLimit(40, 0, 0)
     }
 
     private val armMotors = MotorController(TalonID(ARM_MASTER), VictorID(ARM_SLAVE)).config {
@@ -57,19 +59,19 @@ object Armavator : Subsystem("Armavator") {
         encoderContinuous(false)
         inverted(true)
         sensorPhase(true)
-        brakeMode()
+        coastMode()
         feedbackCoefficient = 0.2586
         (ctreController as TalonSRX)
             .sensorCollection
             .setAnalogPosition((ARM_OFFSET / feedbackCoefficient).toInt(), 20)
 
         pid {
-            p(2.0)
-            d(1.0)
+            p(2.2)
+            d(2.3)
 
-            f(7.0)
+            f(6.5)
 
-            motionMagic(360.0, 120.0)
+            motionMagic(360.0, 160.0)
         }
         currentLimit(15, 0, 0)
     }
@@ -99,7 +101,9 @@ object Armavator : Subsystem("Armavator") {
             field = value
         }
 
-    private val heightRange: DoubleRange
+    var isLifting = false
+
+    val heightRange: DoubleRange
         get() = if (!isClimbing) min(
             Pose.CARGO_GROUND_PICKUP.elevatorHeight.asInches,
             height.asInches
@@ -170,6 +174,14 @@ object Armavator : Subsystem("Armavator") {
                 }
             }
         }
+    }
+
+    override suspend fun default() {
+        periodic {
+            if (isCarryingBall) {
+                intake(HOLDING_INTAKE_POWER)
+            }
+            intake(if (OI.driverController.rightTrigger > 0.2) -0.7 else 0.0) }
     }
 
     fun intake(power: Double) {

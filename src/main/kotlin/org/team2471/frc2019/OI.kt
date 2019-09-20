@@ -1,16 +1,20 @@
 package org.team2471.frc2019
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.team2471.frc.lib.coroutines.MeanlibDispatcher
 import org.team2471.frc.lib.input.*
 import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.math.cube
 import org.team2471.frc.lib.math.deadband
 import org.team2471.frc.lib.math.squareWithSign
+import org.team2471.frc.lib.motion.following.resetOdometry
 import org.team2471.frc.lib.motion_profiling.Path2D
 import org.team2471.frc.lib.units.degrees
 import org.team2471.frc2019.actions.*
 
-private val deadBandDriver = 0.05
-private val deadBandOperator = 0.150
+private val deadBandDriver = 0.1
+private val deadBandOperator = 0.15
 
 object OI {
     val driverController = XboxController(0)
@@ -73,13 +77,15 @@ object OI {
     init {
         // owen mappings
         driverController::leftBumper::toggleWhenTrue { intakeCargo() }
-        driverController::rightBumper::toggleWhenTrue { intakeHatch() }
         driverController::b.whenTrue {
             Armavator.isExtending = false
             goToPose(Pose.HOME)
         }
-        driverController::back.whenTrue { Drive.zeroGyro() }
+        driverController::back.whenTrue { Drive.zeroGyro(); Drive.resetOdometry() }
         ({ driverController.leftTrigger > 0.1 }).whileTrue{ visionDrive() }
+        driverController::start.whenTrue { panic() }
+        driverController::y.whenTrue { }
+
         //  ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }
 
 //        driverController::y.whenTrue {
@@ -104,17 +110,23 @@ object OI {
         operatorController::b.whenTrue { scoreMed() }
         operatorController::x.whenTrue { scoreCargoShip() }
         operatorController::y.whenTrue { scoreHigh() }
-        operatorController::leftBumper.whenTrue{ Armavator.toggleExtention()}
-        operatorController::rightBumper.whenTrue{ Armavator.togglePinching()}
-        ({ operatorController.dPad == Controller.Direction.UP }).whenTrue { climb() }
-        ({ operatorController.dPad == Controller.Direction.DOWN }).whenTrue { climb2() }
+        operatorController::rightBumper::toggleWhenTrue { intakeHatch() }
+        ({ operatorController.dPad == Controller.Direction.UP }).whenTrue {
+            GlobalScope.launch(MeanlibDispatcher) { climb() }
+        }
+        ({ operatorController.dPad == Controller.Direction.DOWN }).whenTrue {
+            GlobalScope.launch(MeanlibDispatcher) { climb2() }
+        }
         ({operatorController.dPad == Controller.Direction.LEFT}).whenTrue{ Armavator.decrementOffset() }
         ({operatorController.dPad == Controller.Direction.RIGHT}).whenTrue{ Armavator.incrementOffset() }
         operatorController::start.whileTrue { Drive.turnToAngle(180.degrees) }
+        operatorController::leftBumper.toggleWhenTrue {
+            Armavator.isExtending = false
+            goToPose(Pose.HOME)
+        }
 
         //+ ({operatorController.dPad == Controller.Direction.DOWN}).whenTrue{ climb2() }
 
-        operatorController::back.whileTrue{ driveToTarget() }
 //        driverController.createMappings {
 //            leftBumperToggle { intakeCargo() }
 //

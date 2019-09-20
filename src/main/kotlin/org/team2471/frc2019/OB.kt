@@ -19,7 +19,7 @@ import org.team2471.frc2019.Victors.OB_CLIMB_ROLLERS
 
 object OB : Subsystem("OB") {
     private val table = NetworkTableInstance.getDefault().getTable(name)
-    private val leftPivotMotor = MotorController(TalonID(OB_PIVOT_LEFT)).config {
+    val leftPivotMotor = MotorController(TalonID(OB_PIVOT_LEFT)).config {
         encoderType(FeedbackDevice.Analog)
         encoderContinuous(false)
         inverted(true)
@@ -73,6 +73,14 @@ object OB : Subsystem("OB") {
 
     fun climb(angleSetpoint: Angle) {
         leftPivotMotor.setPositionSetpoint(angleSetpoint.asDegrees, -0.35)
+        rightPivotMotor.setPositionSetpoint(angleSetpoint.asDegrees, -0.35)
+    }
+
+    fun climbLeft(angleSetpoint: Angle) {
+        leftPivotMotor.setPositionSetpoint(angleSetpoint.asDegrees, -0.35)
+    }
+
+    fun climbRight(angleSetpoint: Angle) {
         rightPivotMotor.setPositionSetpoint(angleSetpoint.asDegrees, -0.35)
     }
 
