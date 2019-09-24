@@ -125,8 +125,6 @@ object Armavator : Subsystem("Armavator") {
     val isCarryingHatch: Boolean
         get() = !isPinching
 
-    var isCarryingBall = false
-
     var isExtending: Boolean
         get() = extensionSolenoid.get()
         set(value) {
@@ -166,6 +164,7 @@ object Armavator : Subsystem("Armavator") {
                 angleEntry.setDouble(angle.asDegrees)
                 heightSetpointEntry.setDouble(heightSetpoint.asInches)
                 angleSetpointEntry.setDouble(angleSetpoint.asDegrees)
+
                 if (DriverStation.getInstance().isEnabled) {
                     armMotors.setMotionMagicSetpoint((angleSetpoint.asDegrees - ARM_OFFSET))
                     elevatorMotors.setMotionMagicSetpoint(heightSetpoint.asInches, ELEVATOR_FEED_FORWARD)
