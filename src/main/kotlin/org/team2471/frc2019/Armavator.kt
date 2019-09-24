@@ -30,7 +30,7 @@ import kotlin.math.min
 
 
 object Armavator : Subsystem("Armavator") {
-    private const val ARM_OFFSET = -135.22 //-119.32 before but the encoder slipped at OMSI and we can't turn it back
+    private const val ARM_OFFSET = -124.22 //-119.32 before but the encoder slipped at OMSI and we can't turn it back
     private const val ELEVATOR_FEED_FORWARD = 0.0
     const val ELEVATOR_HEIGHT = 21.5 //inches
     const val ARM_LENGTH = 28.0 //inches
@@ -125,6 +125,8 @@ object Armavator : Subsystem("Armavator") {
     val isCarryingHatch: Boolean
         get() = !isPinching
 
+    var isCarryingBall = false
+
     var isExtending: Boolean
         get() = extensionSolenoid.get()
         set(value) {
@@ -164,7 +166,6 @@ object Armavator : Subsystem("Armavator") {
                 angleEntry.setDouble(angle.asDegrees)
                 heightSetpointEntry.setDouble(heightSetpoint.asInches)
                 angleSetpointEntry.setDouble(angleSetpoint.asDegrees)
-
                 if (DriverStation.getInstance().isEnabled) {
                     armMotors.setMotionMagicSetpoint((angleSetpoint.asDegrees - ARM_OFFSET))
                     elevatorMotors.setMotionMagicSetpoint(heightSetpoint.asInches, ELEVATOR_FEED_FORWARD)
