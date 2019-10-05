@@ -32,6 +32,6 @@ data class Pose(val elevatorHeight: Length, val armAngle: Angle) {
         val CARGO_LOW = Pose(7.inches, (-40).degrees)
         val CARGO_MED = Pose(1.inches, (25).degrees)
         val CARGO_HIGH = Pose(18.inches, (52).degrees)
-        val CARGO_SHIP_SCORE = Pose((-10.5).inches, (17).degrees)
+        val CARGO_SHIP_SCORE = Pose((-6.5).inches, (17).degrees)
     }
 }

@@ -20,6 +20,7 @@ import javax.jws.soap.SOAPBinding
 private var isClimbing = false
 
 suspend fun climb() {
+    println("It is going into the climb function. Hi.")
     if (isClimbing) return
     isClimbing = true
     use(Armavator, OB) {

@@ -55,9 +55,10 @@ object Robot : RobotProgram {
 
     override suspend fun autonomous() {
         Drive.zeroGyro()
-//        AutoChooser.autonomous()
-        goToPose(Pose.HOME)
-        Armavator.isPinching = false
+        println("The fun auto in main has started. Hi.")
+        AutoChooser.autonomous()
+//        goToPose(Pose.HOME)
+//        Armavator.isPinching = false
 //        intakeHatch()
 //        scoreCargoShip()
     }

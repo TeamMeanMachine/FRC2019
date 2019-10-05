@@ -32,6 +32,7 @@ repositories {
     maven { setUrl("http://first.wpi.edu/FRC/roborio/maven/release") }
     maven { setUrl("http://devsite.ctr-electronics.com/maven/release/") }
     maven { setUrl("http://maven.highcurrent.io/maven") }
+    maven { setUrl("http://www.revrobotics.com/content/sw/max/sdk/maven/") }
 }
 
 dependencies {
